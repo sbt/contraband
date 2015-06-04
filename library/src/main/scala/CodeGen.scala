@@ -16,7 +16,39 @@ $typesCode"""
       val name = td.name
       val fields = td.fields map { field: FieldSchema => generateField(field) }
       val fieldsCode = fields.mkString(",\n  ")
-      s"""final class $name($fieldsCode)"""
+      val fieldNames = td.fields map { field: FieldSchema => field.name }
+      val fieldNamesCode = fieldNames.mkString(", ")
+      val fieldNamesEq = fieldNames map { n: String => s"(this.$n == o.$n)" }
+      val fieldNamesEqCode = fieldNamesEq.mkString(" && \n")
+      val fieldNamesHash = fieldNames map { n: String => 
+        s"hash = hash * 31 + this.$n.##"
+      }
+      val fieldNameHashCode = fieldNamesHash.mkString("\n      ") 
+      val mainApply =
+        s"""def apply($fieldsCode): $name =
+    new $name($fieldNamesCode)"""
+      val equals =
+        s"""override def equals(o: Any): Boolean =
+    o match {
+      case x: $name =>
+        $fieldNamesEqCode
+      case _ => false
+    }"""
+      val hashCode =
+        s"""override def hashCode: Int =
+    {
+      var hash = 1
+      $fieldNameHashCode
+      hash
+    }"""
+      s"""final class $name($fieldsCode) private {
+  $equals
+  $hashCode
+}
+
+object $name {
+  $mainApply
+}"""
     }
 
   def generateField(fs: FieldSchema): String =

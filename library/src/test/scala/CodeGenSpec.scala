@@ -16,7 +16,25 @@ class CodeGenSpec extends Specification {
     val code = CodeGen.generate(s)
     code must_== """package com.example
 
-final class Greeting(message: String)"""
+final class Greeting(message: String) private {
+  override def equals(o: Any): Boolean =
+    o match {
+      case x: Greeting =>
+        (this.message == o.message)
+      case _ => false
+    }
+  override def hashCode: Int =
+    {
+      var hash = 1
+      hash = hash * 31 + this.message.##
+      hash
+    }
+}
+
+object Greeting {
+  def apply(message: String): Greeting =
+    new Greeting(message)
+}"""
   }
 }
 

@@ -46,8 +46,13 @@ case class TypeRef(name: String) extends Type
 object TypeRef {
   def lookupType(name: String): TypeRef =
     name match {
-      case "string" => TypeRef("String")
-      case x        => TypeRef(x)
+      case "string"  => TypeRef("String")
+      case "boolean" => TypeRef("Boolean")
+      case "int"     => TypeRef("Int")
+      case "long"    => TypeRef("Long")
+      case "float"   => TypeRef("Float")
+      case "double"  => TypeRef("Double")
+      case x         => TypeRef(x)
     }
 }
 
