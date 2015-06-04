@@ -28,18 +28,29 @@ object ProtocolSchema {
     }
 }
 
-sealed trait Type
+sealed trait Type {
+  def name: String
+}
 
 object Type {
   def parse(json: JValue): Type =
     json match {
-      case JString(str) => TypeRef(str)
+      case JString(str) => TypeRef.lookupType(str)
       case JObject(obj) => TypeDef.parse(JObject(obj))
       case _ => sys.error(s"Unsupported type: $json")
     }
 }
 
 case class TypeRef(name: String) extends Type
+
+object TypeRef {
+  def lookupType(name: String): TypeRef =
+    name match {
+      case "string" => TypeRef("String")
+      case x        => TypeRef(x)
+    }
+}
+
 
 case class TypeDef(name: String,
   `type`: String,

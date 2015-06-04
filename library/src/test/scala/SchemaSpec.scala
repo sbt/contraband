@@ -1,6 +1,7 @@
 package com.eed3si9n.datatype
 
 import org.specs2._
+import SchemaExample._
 
 class SchemaSpec extends Specification {
   def is = s2"""
@@ -11,20 +12,8 @@ class SchemaSpec extends Specification {
   """
 
   def e1 = {
-    val s = ProtocolSchema.parse(exampleJson)
+    val s = ProtocolSchema.parse(basicSchema)
     s.namespace must_== "com.example"
   }
-
-  val exampleJson = """{
-  "namespace": "com.example",
-  "protocol": "HelloWorld",
-  "doc": "Protocol Greetings",
-
-  "types": [
-    {"name": "Greeting", "type": "record", "fields": [
-      {"name": "message", "type": "string"}]}
-  ]
-}"""
-
 }
 
