@@ -67,7 +67,7 @@ object $name {
   def generateCopy(name: String, fields: Vector[FieldSchema]): String =
     {
       val params = fields map { f => s"${f.name}: ${f.`type`.name} = this.${f.name}" }
-      val paramsCode = params.mkString(", ")
+      val paramsCode = params.mkString(",\n    ")
       val args = fields map { f => f.name }
       val argsCode = args.mkString(", ")
       s"private[this] def copy($paramsCode): $name =\n" +

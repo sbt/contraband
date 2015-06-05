@@ -33,7 +33,8 @@ final class Greeting(val message: String,
       hash = hash * 31 + this.name.##
       hash
     }
-  private[this] def copy(message: String = this.message, name: String = this.name): Greeting =
+  private[this] def copy(message: String = this.message,
+    name: String = this.name): Greeting =
     new Greeting(message, name)
 }
 
