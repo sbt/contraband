@@ -17,6 +17,8 @@ $typesCode"""
       val fields = td.fields map { field: FieldSchema => generateField(field) }
       val fieldsCode = fields.mkString(",\n  ")
       val fieldNames = td.fields map { field: FieldSchema => field.name }
+      val sinces = (td.fields map {_.since}).distinct.sorted
+      // println(sinces)
       val fieldNamesCode = fieldNames.mkString(", ")
       val mainApply =
         s"""def apply($fieldsCode): $name =
