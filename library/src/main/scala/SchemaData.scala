@@ -76,9 +76,12 @@ object TypeDef {
 }
 
 case class FieldSchema(name: String,
-  `type`: Type)
+  `type`: Type,
+  since: VersionNumber,
+  defaultValue: Option[String])
 
 object FieldSchema {
+  val emptyVersion: VersionNumber = VersionNumber("0.0.0")
   def parse(json: JValue): FieldSchema =
     {
       val xs = for {
@@ -86,8 +89,16 @@ object FieldSchema {
         JField("name", JString(name)) <- ts
         JField("type", tpe) <- ts
       } yield FieldSchema(name,
-        Type.parse(tpe))
+        Type.parse(tpe),
+        (json \ "since").toOption map {
+          case JString(str) => VersionNumber(str)
+          case json         => sys.error(s"Invalid since: $json")
+        } getOrElse emptyVersion,
+        (json \ "default").toOption map {
+          case JString(str) => str
+          case json         => sys.error(s"Invalid since: $json")
+        }
+      )
       xs.headOption getOrElse sys.error(s"Invalid schema: $json")
     }
 }
-

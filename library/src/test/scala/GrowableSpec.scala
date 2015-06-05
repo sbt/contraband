@@ -17,7 +17,8 @@ class CodeGenSpec extends Specification {
     code must_== """package com.example
 
 final class Greeting(message: String,
-  name: String) private {
+  name: String) {
+  def this(message: String) = this(message, "foo")
   override def equals(o: Any): Boolean =
     o match {
       case x: Greeting =>

@@ -16,7 +16,8 @@ class GrowableSpec extends Specification {
     val code = CodeGen.generate(s)
     code must_== """package com.example
 
-final class Greeting(message: String) private {
+final class Greeting(message: String) {
+  
   override def equals(o: Any): Boolean =
     o match {
       case x: Greeting =>
