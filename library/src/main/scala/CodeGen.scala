@@ -34,7 +34,6 @@ $typesCode"""
         s"""def apply($fieldsCode): $name =
     new $name($fieldNamesCode)"""
       s"""final class $name($ctorFieldsCode) {
-  ${altCode}
   ${generateEquals(name, fieldNames)}
   ${generateHashCode(fieldNames)}
   

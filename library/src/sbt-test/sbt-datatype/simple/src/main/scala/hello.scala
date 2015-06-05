@@ -1,3 +1,7 @@
+package com.example
+
 object Main extends App {
-  println("hello")
+  val g = new Greeting("hello")
+
+  println(g.message)
 }
