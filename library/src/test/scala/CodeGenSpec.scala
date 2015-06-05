@@ -16,8 +16,8 @@ class GrowableSpec extends Specification {
     val code = CodeGen.generate(s)
     code must_== """package com.example
 
-final class Greeting(message: String) {
-  
+final class Greeting(val message: String) {
+
   override def equals(o: Any): Boolean =
     o match {
       case x: Greeting =>
@@ -30,6 +30,7 @@ final class Greeting(message: String) {
       hash = hash * 31 + this.message.##
       hash
     }
+
 }
 
 object Greeting {

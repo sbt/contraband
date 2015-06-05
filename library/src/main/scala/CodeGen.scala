@@ -4,18 +4,20 @@ object CodeGen {
   def generate(ps: ProtocolSchema): String =
     {
       val ns = ps.namespace
-      val types = ps.types map { tpe: TypeDef => generateType(tpe) }
+      val types = ps.types map { tpe: TypeDef => generateType(ns, tpe) }
       val typesCode = types.mkString("\n")
       s"""package $ns
 
 $typesCode"""
     }
 
-  def generateType(td: TypeDef): String =
+  def generateType(namespace: String, td: TypeDef): String =
     {
       val name = td.name
-      val fields = td.fields map { field: FieldSchema => generateField(field) }
+      val fields = td.fields map { field: FieldSchema => s"""${field.name}: ${field.`type`.name}""" }
       val fieldsCode = fields.mkString(",\n  ")
+      val ctorFields = td.fields map { field: FieldSchema => s"""val ${field.name}: ${field.`type`.name}""" }
+      val ctorFieldsCode = ctorFields.mkString(",\n  ")
       val fieldNames = td.fields map { field: FieldSchema => field.name }
       val sinces = (td.fields map {_.since}).distinct.sorted
       val inclusives = sinces.zipWithIndex map { case (k, idx) =>
@@ -31,15 +33,16 @@ $typesCode"""
       val mainApply =
         s"""def apply($fieldsCode): $name =
     new $name($fieldNamesCode)"""
-      s"""final class $name($fieldsCode) {
+      s"""final class $name($ctorFieldsCode) {
   ${altCode}
   ${generateEquals(name, fieldNames)}
   ${generateHashCode(fieldNames)}
+  
 }
 
 object $name {
   $mainApply
-}"""
+}"""  // ${generateCopy(name, td.fields)}
     }
   
   def generateAltCtor(fields: Vector[FieldSchema], versions: Vector[VersionNumber]): String =
@@ -59,6 +62,16 @@ object $name {
     tpe match {
       case "String" => s""""$value"""" // "
       case _        => value
+    }
+
+  def generateCopy(name: String, fields: Vector[FieldSchema]): String =
+    {
+      val params = fields map { f => s"${f.name}: ${f.`type`.name} = this.${f.name}" }
+      val paramsCode = params.mkString(", ")
+      val args = fields map { f => f.name }
+      val argsCode = args.mkString(", ")
+      s"private[this] def copy($paramsCode): $name =\n" +
+      s"    new $name($argsCode)"
     }
 
   def generateEquals(name: String, fieldNames: Vector[String]): String =
@@ -85,13 +98,6 @@ object $name {
       $fieldNameHashCode
       hash
     }"""
-    }
-
-  def generateField(fs: FieldSchema): String =
-    {
-      val name = fs.name
-      val tpe = fs.`type`.name
-      s"""$name: $tpe"""
     }
 }
 
