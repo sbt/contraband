@@ -1,4 +1,4 @@
-package com.eed3si9n.datatype
+package sbt.datatype
 
 import scala.util.Try
 import org.json4s._

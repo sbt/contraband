@@ -1,4 +1,4 @@
-package com.eed3si9n.datatype
+package sbt.datatype
 
 import org.specs2._
 import SchemaExample._

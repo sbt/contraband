@@ -3,7 +3,7 @@ package sbt.datatype
 import org.specs2._
 import SchemaExample._
 
-class GrowableSpec extends Specification {
+class CodeGenSpec extends Specification {
   def is = s2"""
     This is a specification for data type spec.
 

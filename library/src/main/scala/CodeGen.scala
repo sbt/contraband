@@ -1,4 +1,4 @@
-package com.eed3si9n.datatype
+package sbt.datatype
 
 object CodeGen {
   def generate(ps: ProtocolSchema): String =
