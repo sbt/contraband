@@ -17,11 +17,11 @@ class GrowableSpec extends Specification {
     code must_== """package com.example
 
 final class Greeting(val message: String) {
-
+  
   override def equals(o: Any): Boolean =
     o match {
       case x: Greeting =>
-        (this.message == o.message)
+        (this.message == x.message)
       case _ => false
     }
   override def hashCode: Int =
@@ -30,7 +30,8 @@ final class Greeting(val message: String) {
       hash = hash * 31 + this.message.##
       hash
     }
-
+  private[this] def copy(message: String = this.message): Greeting =
+    new Greeting(message)
 }
 
 object Greeting {

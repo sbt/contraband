@@ -14,16 +14,16 @@ class CodeGenSpec extends Specification {
   def e1 = {
     val s = ProtocolSchema.parse(growableSchema)
     val code = CodeGen.generate(s)
-    code must_== """package com.example
+    code.lines.toList must containTheSameElementsAs("""package com.example
 
-final class Greeting(message: String,
-  name: String) {
+final class Greeting(val message: String,
+  val name: String) {
   def this(message: String) = this(message, "foo")
   override def equals(o: Any): Boolean =
     o match {
       case x: Greeting =>
-        (this.message == o.message) &&
-        (this.name == o.name)
+        (this.message == x.message) &&
+        (this.name == x.name)
       case _ => false
     }
   override def hashCode: Int =
@@ -33,13 +33,15 @@ final class Greeting(message: String,
       hash = hash * 31 + this.name.##
       hash
     }
+  private[this] def copy(message: String = this.message, name: String = this.name): Greeting =
+    new Greeting(message, name)
 }
 
 object Greeting {
   def apply(message: String,
   name: String): Greeting =
     new Greeting(message, name)
-}"""
+}""".lines.toList)
   }
 }
 

@@ -37,12 +37,12 @@ $typesCode"""
   ${altCode}
   ${generateEquals(name, fieldNames)}
   ${generateHashCode(fieldNames)}
-  
+  ${generateCopy(name, td.fields)}
 }
 
 object $name {
   $mainApply
-}"""  // ${generateCopy(name, td.fields)}
+}"""
     }
   
   def generateAltCtor(fields: Vector[FieldSchema], versions: Vector[VersionNumber]): String =
