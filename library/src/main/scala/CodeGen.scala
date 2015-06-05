@@ -34,7 +34,7 @@ object $name {
   def generateEquals(name: String, fieldNames: Vector[String]): String =
     {
       val fieldNamesEq = fieldNames map { n: String => s"(this.$n == o.$n)" }
-      val fieldNamesEqCode = fieldNamesEq.mkString(" && \n        ")
+      val fieldNamesEqCode = fieldNamesEq.mkString(" &&\n        ")
       s"""override def equals(o: Any): Boolean =
     o match {
       case x: $name =>
