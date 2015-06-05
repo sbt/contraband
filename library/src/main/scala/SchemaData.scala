@@ -77,7 +77,8 @@ object TypeDef {
 
 case class FieldSchema(name: String,
   `type`: Type,
-  since: VersionNumber)
+  since: VersionNumber,
+  defaultValue: Option[String])
 
 object FieldSchema {
   val emptyVersion: VersionNumber = VersionNumber("0.0.0")
@@ -92,7 +93,11 @@ object FieldSchema {
         (json \ "since").toOption map {
           case JString(str) => VersionNumber(str)
           case json         => sys.error(s"Invalid since: $json")
-        } getOrElse emptyVersion
+        } getOrElse emptyVersion,
+        (json \ "default").toOption map {
+          case JString(str) => str
+          case json         => sys.error(s"Invalid since: $json")
+        }
       )
       xs.headOption getOrElse sys.error(s"Invalid schema: $json")
     }
