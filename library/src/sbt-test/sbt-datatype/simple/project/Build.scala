@@ -33,6 +33,7 @@ object BcTests {
       scalaVersion := "2.11.6",
       name := "simpletest"
     )
+  // how to set trapExit to false? Meanwhile, just parse the response
   def runTask(name: String, classpath: Classpath, mainClass: Option[String], runner: ScalaRun, s: TaskStreams): String =
     runner.run(mainClass getOrElse "Main", classpath map (_.data), Seq.empty, s.log) match {
       case Some(s) if (!s.startsWith("Nonzero exit code")) => s
