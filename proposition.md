@@ -158,7 +158,7 @@ The `default` member can appear only in the definition of a `field`. It indicate
 
 How does the following schema map to Scala and Java?
 
-```
+```javascript
 {
 	"namespace": "com.example",
 
