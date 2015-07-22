@@ -37,6 +37,14 @@ trait Parser[T] {
 
   /** Parse an instance of `T` from `input`. */
   def parse(json: JValue): T
+
+  val emptyVersion: VersionNumber = VersionNumber("0.0.0")
+
+}
+
+sealed trait SchemaElement {
+  def name: String
+  def doc: Option[String]
 }
 
 /**
@@ -44,9 +52,10 @@ trait Parser[T] {
  * Syntax:
  *   Definition := Protocol | Record | Enumeration
  */
-sealed trait Definition {
-  def name: String
-  def doc: Option[String]
+sealed trait Definition extends SchemaElement
+
+sealed trait ClassLike extends Definition {
+  def fields: List[Field]
 }
 
 object Definition extends Parser[Definition] {
@@ -86,7 +95,7 @@ object Schema extends Parser[Schema] {
 case class Protocol(name: String,
   doc: Option[String],
   fields: List[Field],
-  children: List[Definition]) extends Definition
+  children: List[Definition]) extends ClassLike
 
 object Protocol extends Parser[Protocol] {
   override def parse(json: JValue): Protocol =
@@ -105,7 +114,7 @@ object Protocol extends Parser[Protocol] {
  */
 case class Record(name: String,
   doc: Option[String],
-  fields: List[Field]) extends Definition
+  fields: List[Field]) extends ClassLike
 
 object Record extends Parser[Record] {
   override def parse(json: JValue): Record =
@@ -141,7 +150,7 @@ object Enumeration extends Parser[Enumeration] {
                           (, "doc": string constant)? }
   */
 case class EnumerationValue(name: String,
-  doc: Option[String])
+  doc: Option[String]) extends SchemaElement
 
 object EnumerationValue extends Parser[EnumerationValue] {
   override def parse(json: JValue): EnumerationValue =
@@ -162,18 +171,42 @@ object EnumerationValue extends Parser[EnumerationValue] {
  */
 case class Field(name: String,
   doc: Option[String],
-  tpe: String,
+  tpe: TpeRef,
   since: VersionNumber,
-  default: Option[String])
+  default: Option[String]) extends SchemaElement
 
 object Field extends Parser[Field] {
-  val emptyVersion: VersionNumber = VersionNumber("0.0.0")
   override def parse(json: JValue): Field =
     Field(json -> "name",
       json ->? "doc",
-      json -> "type",
+      TpeRef(json -> "type"),
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "default")
+}
+
+case class TpeRef(name: String, lzy: Boolean, repeated: Boolean)
+object TpeRef {
+  import scala.util.matching.Regex
+  private val LazyRepeated = """^lazy (.+?)\*$""".r
+  private val Lazy = """^lazy (.+?)$""".r
+  private val Repeated = """^(.+?)\*""".r
+
+  private def lookupTpe(tpe: String): String = tpe match {
+    case "string"  => "String"
+    case "boolean" => "Boolean"
+    case "int"     => "Int"
+    case "long"    => "Long"
+    case "float"   => "Float"
+    case "double"  => "Double"
+    case other     => other
+  }
+
+  def apply(str: String): TpeRef = str match {
+    case LazyRepeated(tpe) => TpeRef(lookupTpe(tpe), true, true)
+    case Lazy(tpe)         => TpeRef(lookupTpe(tpe), true, false)
+    case Repeated(tpe)     => TpeRef(lookupTpe(tpe), false, true)
+    case tpe               => TpeRef(lookupTpe(tpe), false, false)
+  }
 }
 
 

@@ -90,7 +90,7 @@ class SchemaSpec extends Specification {
         name must_== "simpleProtocolExample"
         doc must_== Some("example of simple protocol")
         fields must haveSize(1)
-        fields(0) must_== Field("field", None, "type", Field.emptyVersion, None)
+        fields(0) must_== Field("field", None, TpeRef("type", false, false), Field.emptyVersion, None)
         children must haveSize(0)
 
       case _ =>
