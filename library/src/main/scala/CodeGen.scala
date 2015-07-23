@@ -1,13 +1,30 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 
+/**
+ * The base for code generators.
+ */
 abstract class CodeGenerator {
 
-  def augmentIndentTrigger(s: String): Boolean
-  def reduceIndentTrigger(s: String): Boolean
+  /** When this predicate holds, next lines should have one more level of indentation. */
+  protected def augmentIndentTrigger(s: String): Boolean
 
+  /** When this predicate holds, this line and the followings should have one less level of indentation */
+  protected def reduceIndentTrigger(s: String): Boolean
+
+  /**
+   * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`
+   * and `reduceIndentTrigger`) as text is added.
+   */
   protected class IndentationAwareBuffer(val indent: String, private var level: Int = 0) {
     private val buffer: StringBuilder = new StringBuilder
+
+    /** Add all the lines of `it` to the buffer. */
+    def +=(it: Iterator[String]): Unit = it foreach append
+    /** Add `s` to the buffer */
+    def +=(s: String): Unit = s.lines foreach append
+
+    override def toString: String = buffer.mkString
 
     private def append(s: String): Unit = {
       val clean = s.trim
@@ -15,32 +32,38 @@ abstract class CodeGenerator {
       buffer append (indent * level + clean + EOL)
       if (augmentIndentTrigger(clean)) level += 1
     }
-
-    def +=(it: Iterator[String]): Unit = it foreach append
-    def +=(s: String): Unit = s.lines foreach append
-
-    override def toString(): String = buffer.mkString
   }
 
+  /** Run an operation `op` with a new `IndentationAwareBuffer` and return its content. */
   protected def buffered(op: IndentationAwareBuffer => Unit): String
 
-  protected final def perVersionNumber[T](allFields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
-    val versionNumbers = allFields.map(_.since).sorted.distinct
+  /** Run an operation `op` for each different version number that affects the fields `fields`. */
+  protected final def perVersionNumber[T](fields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
+    val versionNumbers = fields.map(_.since).sorted.distinct
     versionNumbers map { v =>
-      val (provided, byDefault) = allFields partition (_.since <= v)
+      val (provided, byDefault) = fields partition (_.since <= v)
       op(provided, byDefault)
     }
   }
 
-  def generate(s: Schema): Map[String, String]
+  /** Generate the code corresponding to `d`. */
   final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[String, String] =
     d match {
       case p: Protocol    => generate(p, parent, superFields)
       case r: Record      => generate(r, parent, superFields)
       case e: Enumeration => generate(e)
     }
+
+  /** Generate the code corresponding to all definitions in `s`. */
+  def generate(s: Schema): Map[String, String]
+
+  /** Generate the code corresponding to the protocol `p`. */
   def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+
+  /** Generate the code corresponding to the record `r`. */
   def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+
+  /** Generate the code corresponding to the enumeration `e`. */
   def generate(e: Enumeration): Map[String, String]
 
 }

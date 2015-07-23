@@ -1,16 +1,18 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 
+/**
+ * Code generator for Java.
+ */
 object JavaCodeGen extends CodeGenerator {
 
+  override def augmentIndentTrigger(s: String) = s endsWith "{"
+  override def reduceIndentTrigger(s: String) = s startsWith "}"
   override def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("\t")
     op(buffer)
     buffer.toString
   }
-
-  override def augmentIndentTrigger(s: String) = s endsWith "{"
-  override def reduceIndentTrigger(s: String) = s startsWith "}"
 
   override def generate(s: Schema): Map[String, String] =
     s.definitions flatMap (generate(_, None, Nil)) map {

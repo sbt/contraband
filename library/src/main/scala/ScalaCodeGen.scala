@@ -1,6 +1,9 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 
+/**
+ * Code generator for Scala.
+ */
 class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
 
   private implicit class MergeableMap[T](m: Map[T, String]) {
@@ -11,16 +14,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       }
   }
 
+  override def augmentIndentTrigger(s: String) = s endsWith "{"
+  override def reduceIndentTrigger(s: String) = s startsWith "}"
   override def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("  ")
     op(buffer)
     buffer.toString
   }
-
-  override def augmentIndentTrigger(s: String) = s endsWith "{"
-  override def reduceIndentTrigger(s: String) = s startsWith "}"
-
-  private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
 
   override def generate(s: Schema): Map[String,String] = {
     s.definitions map (generate (_, None, Nil)) reduce (_ merge _) map {
@@ -52,52 +52,34 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
     val allFields = superFields ++ r.fields
-    val alternativeCtors =
-      perVersionNumber(allFields) {
-        case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
-          val ctorParameters =
-            provided map {
-              case f if f.tpe.lzy => s"${f.name}: => ${genRealTpe(f.tpe)}"
-              case f              => s"${f.name}: ${genRealTpe(f.tpe)}"
-            } mkString ", "
-          val thisCallArguments =
-            allFields map {
-              case f if provided contains f   => f.name
-              case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for fied ${f.name}.")
-            } mkString ", "
 
-          s"def this($ctorParameters) = this($thisCallArguments)"
-        case (_, _) => ""
-      } mkString EOL
+    val alternativeCtors =
+      genAlternativeConstructors(allFields) mkString EOL
 
     val applyOverloads =
       perVersionNumber(allFields) { (provided, byDefault) =>
         val applyParameters =
-          provided map {
-            case f if f.tpe.lzy => s"${f.name}: => ${genRealTpe(f.tpe)}"
-            case f              => s"${f.name}: ${genRealTpe(f.tpe)}"
+          provided map genParam mkString ", "
+
+        val ctorCallArguments =
+          allFields map {
+            case f if provided contains f  => f.name
+            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
           } mkString ", "
-        val ctorCallArguments = allFields map {
-          case f if provided contains f  => f.name
-          case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
-        } mkString ", "
 
         s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
       } mkString EOL
 
     val ctorParameters =
-      allFields map {
-        case f if r.fields.contains(f)    && f.tpe.lzy => s"_${f.name}: => ${genRealTpe(f.tpe)}"
-        case f if r.fields.contains(f)                 => s"val ${f.name}: ${genRealTpe(f.tpe)}"
-        case f if superFields.contains(f) && f.tpe.lzy => s"${f.name}: => ${genRealTpe(f.tpe)}"
-        case f if superFields.contains(f)              => s"${f.name}: ${genRealTpe(f.tpe)}"
-      } mkString ", "
-    val superCtorArguments =
-      superFields map (_.name) mkString ", "
+      genCtorParameters(r, allFields) mkString ", "
+
+    val superCtorArguments = superFields map (_.name) mkString ", "
+
     val extendsCode =
       parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
+
     val lazyMembers =
-      r.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe)} = _${f.name}") mkString EOL
+      r.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}") mkString EOL
 
     val code =
       s"""${genDoc(r.doc)}
@@ -120,31 +102,10 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     val allFields = superFields ++ p.fields
 
     val alternativeCtors =
-      perVersionNumber(allFields) {
-        case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
-          val ctorParameters =
-            provided map {
-              case f if f.tpe.lzy => s"${f.name}: => ${genRealTpe(f.tpe)}"
-              case f              => s"${f.name}: ${genRealTpe(f.tpe)}"
-            } mkString ", "
-          val thisCallArguments =
-            allFields map {
-              case f if provided contains f   => f.name
-              case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for fied ${f.name}.")
-            } mkString ", "
-
-          s"def this($ctorParameters) = this($thisCallArguments)"
-
-        case (_, _) => ""
-      } mkString EOL
+      genAlternativeConstructors(allFields) mkString EOL
 
     val ctorParameters =
-      allFields map {
-        case f if p.fields.contains(f)    && f.tpe.lzy => s"_${f.name}: => ${genRealTpe(f.tpe)}"
-        case f if p.fields.contains(f)                 => s"val ${f.name}: ${genRealTpe(f.tpe)}"
-        case f if superFields.contains(f) && f.tpe.lzy => s"${f.name}: => ${genRealTpe(f.tpe)}"
-        case f if superFields.contains(f)              => s"${f.name}: ${genRealTpe(f.tpe)}"
-      } mkString ", "
+      genCtorParameters(p, allFields) mkString ", "
 
     val superCtorArguments =
       superFields map (_.name) mkString ", "
@@ -153,11 +114,11 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
 
     val lazyMembers =
-      p.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe)} = _${f.name}") mkString EOL
+      p.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}") mkString EOL
 
     val code =
       s"""${genDoc(p.doc)}
-         |sealed abstract class ${p.name}($ctorParameters) {
+         |sealed abstract class ${p.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
          |  ${genEquals(p, superFields)}
@@ -168,11 +129,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     Map(genFileName(p) -> code) :: (p.children map (generate(_, Some(p), superFields ++ p.fields))) reduce (_ merge _)
   }
 
-  private def genRealTpe(tpe: TpeRef) = tpe match {
-    case TpeRef(name, false, false) => name
-    case TpeRef(name, false, true)  => s"Array[$name]"
-    case TpeRef(name, true, false)  => name
-    case TpeRef(name, true, true)   => s"Array[$name]"
+  private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
+
+  private def genParam(f: Field): String = s"${f.name}: ${genRealTpe(f.tpe, isParam = true)}"
+
+  private def genRealTpe(tpe: TpeRef, isParam: Boolean) = {
+    val base = if (tpe.repeated) s"Array[${tpe.name}]" else tpe.name
+    if (tpe.lzy && isParam) s"=> $base" else base
   }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
@@ -215,5 +178,32 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
        |  "${cl.name}("$fieldsToString")"
        |}""".stripMargin
   }
+
+  private def genAlternativeConstructors(allFields: List[Field]) =
+    perVersionNumber(allFields) {
+      case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
+        val ctorParameters =
+          provided map genParam mkString ", "
+        val thisCallArguments =
+          allFields map {
+            case f if provided contains f  => f.name
+            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
+          } mkString ", "
+
+        s"def this($ctorParameters) = this($thisCallArguments)"
+
+      case _ => ""
+    }
+
+  // If a class has a lazy member, it means that the class constructor will have a call-by-name
+  // parameter. Because val parameters may not be call-by-name, we prefix the parameter with `_`
+  // and we will create the actual lazy val as a regular class member.
+  // Non-lazy fields that belong to `cl` are made val parameters.
+  private def genCtorParameters(cl: ClassLike, allFields: List[Field]): List[String] =
+    allFields map {
+      case f if cl.fields.contains(f) && f.tpe.lzy => "_" + genParam(f)
+      case f if cl.fields.contains(f)              => "val " + genParam(f)
+      case f                                       => genParam(f)
+    }
 
 }
