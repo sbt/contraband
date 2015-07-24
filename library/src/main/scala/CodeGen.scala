@@ -6,11 +6,17 @@ import scala.compat.Platform.EOL
  */
 abstract class CodeGenerator {
 
-  /** When this predicate holds, next lines should have one more level of indentation. */
-  protected def augmentIndentTrigger(s: String): Boolean
+  /** When this predicate holds for `s`, this line and the following should have one more level of indentation. */
+  protected def augmentIndentTrigger(s: String): Boolean = false
 
-  /** When this predicate holds, this line and the followings should have one less level of indentation */
-  protected def reduceIndentTrigger(s: String): Boolean
+  /** When this predicate holds for `s`, next lines should have one more level of indentation. */
+  protected def augmentIndentAfterTrigger(s: String): Boolean = false
+
+  /** When this predicate holds for `s`, this line and the following should have one less level of indentation. */
+  protected def reduceIndentTrigger(s: String): Boolean = false
+
+  /** When this predicate holds for `s`, next lines should have one less level of indentation. */
+  protected def reduceIndentAfterTrigger(s: String): Boolean = false
 
   /**
    * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`
@@ -28,9 +34,11 @@ abstract class CodeGenerator {
 
     private def append(s: String): Unit = {
       val clean = s.trim
+      if (augmentIndentTrigger(clean)) level += 1
       if (reduceIndentTrigger(clean)) level = 0 max (level - 1)
       buffer append (indent * level + clean + EOL)
-      if (augmentIndentTrigger(clean)) level += 1
+      if (augmentIndentAfterTrigger(clean)) level += 1
+      if (reduceIndentAfterTrigger(clean)) level = 0 max (level - 1)
     }
   }
 

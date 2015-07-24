@@ -14,8 +14,12 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       }
   }
 
-  override def augmentIndentTrigger(s: String) = s endsWith "{"
-  override def reduceIndentTrigger(s: String) = s startsWith "}"
+  override def augmentIndentAfterTrigger(s: String) =
+    s.endsWith("{") ||
+    (s.contains(" class ") && s.endsWith("(")) // Constructor definition
+  override def reduceIndentTrigger(s: String) = s.startsWith("}")
+  override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
+
   override def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("  ")
     op(buffer)
@@ -71,7 +75,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       } mkString EOL
 
     val ctorParameters =
-      genCtorParameters(r, allFields) mkString ", "
+      genCtorParameters(r, allFields) mkString ","
 
     val superCtorArguments = superFields map (_.name) mkString ", "
 
@@ -79,7 +83,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
 
     val lazyMembers =
-      r.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}") mkString EOL
+      genLazyMembers(r.fields) mkString EOL
 
     val code =
       s"""${genDoc(r.doc)}
@@ -114,7 +118,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
 
     val lazyMembers =
-      p.fields filter (_.tpe.lzy) map (f => s"lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}") mkString EOL
+      genLazyMembers(p.fields) mkString EOL
 
     val code =
       s"""${genDoc(p.doc)}
@@ -201,9 +205,21 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
   // Non-lazy fields that belong to `cl` are made val parameters.
   private def genCtorParameters(cl: ClassLike, allFields: List[Field]): List[String] =
     allFields map {
-      case f if cl.fields.contains(f) && f.tpe.lzy => "_" + genParam(f)
-      case f if cl.fields.contains(f)              => "val " + genParam(f)
-      case f                                       => genParam(f)
+      case f if cl.fields.contains(f) && f.tpe.lzy =>
+        EOL + "_" + genParam(f)
+
+      case f if cl.fields.contains(f) =>
+        s"""$EOL${genDoc(f.doc)}
+           |val ${genParam(f)}""".stripMargin
+
+      case f =>
+        EOL + genParam(f)
+    }
+
+  private def genLazyMembers(fields: List[Field]): List[String] =
+    fields filter (_.tpe.lzy) map { f =>
+        s"""${genDoc(f.doc)}
+           |lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
     }
 
 }
