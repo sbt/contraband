@@ -88,6 +88,44 @@ object NewSchema {
   ]
 }"""
 
+  val simpleRecordExample = """{
+  "name": "simpleRecordExample",
+  "type": "record",
+  "doc": "Example of simple record",
+  "fields": [
+    {
+      "name": "field",
+      "type": "type"
+    }
+  ]
+}"""
+
+  val simpleEnumerationExample = """{
+  "name": "simpleEnumerationExample",
+  "type": "enumeration",
+  "doc": "Example of simple enumeration",
+  "types": [
+    {
+      "name": "first",
+      "doc": "First type"
+    },
+    "second"
+  ]
+}"""
+
+  val fieldExample = """{
+  "name": "fieldExample",
+  "doc": "Example of field",
+  "type": "type",
+  "since": "1.0.0",
+  "default": "2 + 2"
+}"""
+
+  val simpleTpeRefExample = "simpleTpeRefExample"
+  val lazyTpeRefExample = "lazy lazyTpeRefExample"
+  val arrayTpeRefExample = "arrayTpeRefExample*"
+  val lazyArrayTpeRefExample = "lazy lazyArrayTpeRefExample*"
+
   val completeExample = """{
   "namespace": "com.example",
 

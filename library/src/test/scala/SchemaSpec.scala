@@ -25,6 +25,21 @@ class SchemaSpec extends Specification {
       parse simple protocol                      $protocolParseSimple
       parse protocol with one child              $protocolParseOneChild
       parse nested protocols                     $protocolParseNested
+
+    Record.parse should
+      parse simple record                        $recordParseSimple
+
+    Enumeration.parse should
+      parse simple enumeration                   $enumerationParseSimple
+
+    Field.parse should
+      parse                                      $fieldParse
+
+    TpeRef.apply should
+      parse simple types                         $tpeRefParseSimple
+      parse lazy types                           $tpeRefParseLazy
+      parse array types                          $tpeRefParseArray
+      parse lazy array types                     $tpeRefParseLazyArray
   """
 
   def e1 = {
@@ -92,9 +107,6 @@ class SchemaSpec extends Specification {
         fields must haveSize(1)
         fields(0) must_== Field("field", None, TpeRef("type", false, false), Field.emptyVersion, None)
         children must haveSize(0)
-
-      case _ =>
-        true must_== false
     }
   }
 
@@ -117,6 +129,75 @@ class SchemaSpec extends Specification {
         fields must haveSize(0)
         children must haveSize(1)
         children(0) must_== Protocol("nestedProtocol", None, Nil, Nil)
+    }
+  }
+
+  def recordParseSimple = {
+    Record parse simpleRecordExample match {
+      case Record(name, doc, fields) =>
+        name must_== "simpleRecordExample"
+        doc must_== Some("Example of simple record")
+        fields must haveSize(1)
+        fields(0) must_== Field("field", None, TpeRef("type", false, false), Field.emptyVersion, None)
+    }
+  }
+
+  def enumerationParseSimple = {
+    Enumeration parse simpleEnumerationExample match {
+      case Enumeration(name, doc, values) =>
+        name must_== "simpleEnumerationExample"
+        doc must_== Some("Example of simple enumeration")
+        values must haveSize(2)
+        values(0) must_== EnumerationValue("first", Some("First type"))
+        values(1) must_== EnumerationValue("second", None)
+    }
+  }
+
+  def fieldParse = {
+    Field parse fieldExample match {
+      case Field(name, doc, tpe, since, default) =>
+        name must_== "fieldExample"
+        doc must_== "Example of field"
+        tpe must_== TpeRef("type", false, false)
+        since must_== VersionNumber("1.0.0")
+        default must_== Some("2 + 2")
+    }
+
+  }
+
+  def tpeRefParseSimple = {
+    TpeRef apply simpleTpeRefExample match {
+      case TpeRef(name, lzy, repeated) =>
+        name must_== "simpleTpeRefExample"
+        lzy must_== false
+        repeated must_== false
+    }
+  }
+
+  def tpeRefParseLazy = {
+    TpeRef apply lazyTpeRefExample match {
+      case TpeRef(name, lzy, repeated) =>
+        name must_== "lazyTpeRefExample"
+        lzy must_== true
+        repeated must_== false
+    }
+  }
+
+  def tpeRefParseArray = {
+    TpeRef apply arrayTpeRefExample match {
+      case TpeRef(name, lzy, repeated) =>
+        name must_== "arrayTpeRefExample"
+        lzy must_== false
+        repeated must_== true
+    }
+  }
+
+  def tpeRefParseLazyArray = {
+    TpeRef apply lazyArrayTpeRefExample match {
+      case TpeRef(name, lzy, repeated) =>
+        name must_== "lazyArrayTpeRefExample"
+        lzy must_== true
+        repeated must_== true
     }
   }
 
