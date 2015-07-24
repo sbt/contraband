@@ -28,7 +28,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
       """/** example of simple protocol */
         |public abstract class simpleProtocolExample  {
         |    private type field;
-        |    public simpleProtocolExample(type _ field) {
+        |    public simpleProtocolExample(type _field) {
         |        super();
         |        field = _field;
         |    }
@@ -165,7 +165,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |public final class simpleRecordExample  {
             |
             |    private type field;
-            |    public simpleRecordExample(type _ field) {
+            |    public simpleRecordExample(type _field) {
             |        super();
             |        field = _field;
             |    }

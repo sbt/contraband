@@ -6,7 +6,7 @@ import scala.compat.Platform.EOL
  */
 object JavaCodeGen extends CodeGenerator {
 
-  override def augmentIndentTrigger(s: String) = s endsWith "{"
+  override def augmentIndentAfterTrigger(s: String) = s endsWith "{"
   override def reduceIndentTrigger(s: String) = s startsWith "}"
   override def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("    ")
@@ -112,7 +112,7 @@ object JavaCodeGen extends CodeGenerator {
 
   private def genConstructors(cl: ClassLike, parent: Option[Protocol], superFields: List[Field]) =
     perVersionNumber(superFields ++ cl.fields) { (provided, byDefault) =>
-      val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _ ${f.name}") mkString ", "
+      val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _${f.name}") mkString ", "
       val superFieldsValues = superFields map {
         case f if provided contains f  => s"_${f.name}"
         case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")

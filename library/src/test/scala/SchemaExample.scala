@@ -335,16 +335,16 @@ object NewSchema {
           |    /** The priority of this Greeting */
           |    private PriorityLevel priority;
           |    /** The author of the Greeting */
-          |
           |    private String author;
-          |        public GreetingHeader(Lazy<java.util.Date> _ created, String _ author) {
+          |
+          |    public GreetingHeader(Lazy<java.util.Date> _created, String _author) {
           |        super();
           |        created = _created;
           |        priority = PriorityLevel.Medium;
-          |       author = _author;
+          |        author = _author;
           |    }
           |
-          |    public GreetingHeader(Lazy<java.util.Date> _ created, PriorityLevel _ priority, String _ author) {
+          |    public GreetingHeader(Lazy<java.util.Date> _created, PriorityLevel _priority, String _author) {
           |        super();
           |        created = _created;
           |        priority = _priority;
@@ -394,12 +394,12 @@ object NewSchema {
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
           |
-          |    public GreetingWithAttachments(Lazy<String> _ message, java.io.File[] _ attachments) {
+          |    public GreetingWithAttachments(Lazy<String> _message, java.io.File[] _attachments) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
           |
-          |    public GreetingWithAttachments(Lazy<String> _ message, GreetingHeader _ header, java.io.File[] _ attachments) {
+          |    public GreetingWithAttachments(Lazy<String> _message, GreetingHeader _header, java.io.File[] _attachments) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
@@ -431,13 +431,13 @@ object NewSchema {
           |    /** The header of the Greeting */
           |    private GreetingHeader header;
           |
-          |    public Greetings(Lazy<String> _ message) {
+          |    public Greetings(Lazy<String> _message) {
           |        super();
           |        message = _message;
           |        header = new GreetingHeader(new java.util.Date(), "Unknown");
           |    }
           |
-          |    public Greetings(Lazy<String> _ message, GreetingHeader _ header) {
+          |    public Greetings(Lazy<String> _message, GreetingHeader _header) {
           |        super();
           |        message = _message;
           |        header = _header;
@@ -469,11 +469,11 @@ object NewSchema {
           |/** A Greeting in its simplest form */
           |public final class SimpleGreeting extends Greetings {
           |
-          |    public SimpleGreeting(Lazy<String> _ message) {
+          |    public SimpleGreeting(Lazy<String> _message) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
           |    }
           |
-          |    public SimpleGreeting(Lazy<String> _ message, GreetingHeader _ header) {
+          |    public SimpleGreeting(Lazy<String> _message, GreetingHeader _header) {
           |        super(_message, _header);
           |    }
           |
