@@ -100,7 +100,7 @@ class ScalaCodeGenSpec extends Specification {
         |object childRecord {
         |  def apply(): childRecord = new childRecord()
         |}""".stripMargin.unindent)
-  } pendingUntilFixed
+  }
 
   def protocolGenerateNested = {
     val gen = new ScalaCodeGen(genFileName)

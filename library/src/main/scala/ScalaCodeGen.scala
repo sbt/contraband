@@ -60,19 +60,24 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     val alternativeCtors =
       genAlternativeConstructors(allFields) mkString EOL
 
+    // If there are no fields, we still need an `apply` method with an empty parameter list.
     val applyOverloads =
-      perVersionNumber(allFields) { (provided, byDefault) =>
-        val applyParameters =
-          provided map genParam mkString ", "
+      if (allFields.isEmpty) {
+        s"def apply(): ${r.name} = new ${r.name}()"
+      } else {
+        perVersionNumber(allFields) { (provided, byDefault) =>
+          val applyParameters =
+            provided map genParam mkString ", "
 
-        val ctorCallArguments =
-          allFields map {
-            case f if provided contains f  => f.name
-            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
-          } mkString ", "
+          val ctorCallArguments =
+            allFields map {
+              case f if provided contains f  => f.name
+              case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
+            } mkString ", "
 
-        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
-      } mkString EOL
+          s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
+        } mkString EOL
+      }
 
     val ctorParameters =
       genCtorParameters(r, allFields) mkString ","
