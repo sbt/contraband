@@ -13,6 +13,7 @@ class SchemaSpec extends Specification {
 
     Schema.parse should
       parse empty Schemas                        $emptySchema
+      parse schema with only a namespace         $onlyNamespaceSchema
       parse complete example                     $complete
 
     Definition.parse should
@@ -49,7 +50,13 @@ class SchemaSpec extends Specification {
 
   def emptySchema = {
     val s = Schema parse emptySchemaExample
-    s.namespace must_== "com.example"
+    s.namespace must_== None
+    s.definitions must_== Nil
+  }
+
+  def onlyNamespaceSchema = {
+    val s = Schema parse onlyNamespaceSchemaExample
+    s.namespace must_== Some("com.example")
     s.definitions must_== Nil
   }
 

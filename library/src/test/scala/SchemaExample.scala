@@ -28,8 +28,10 @@ object SchemaExample {
 
 object NewSchema {
 
-  val emptySchemaExample = """{
-  "namespace": "com.example"
+  val emptySchemaExample = """{}"""
+
+  val onlyNamespaceSchemaExample = """{
+    "namespace": "com.example"
 }"""
 
   val emptyProtocolExample = """{
