@@ -1,5 +1,6 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
+import java.io.File
 
 /**
  * The base for code generators.
@@ -63,7 +64,7 @@ abstract class CodeGenerator {
     }
 
   /** Generate the code corresponding to all definitions in `s`. */
-  def generate(s: Schema): Map[String, String]
+  def generate(s: Schema): Map[File, String]
 
   /** Generate the code corresponding to the protocol `p`. */
   protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String]

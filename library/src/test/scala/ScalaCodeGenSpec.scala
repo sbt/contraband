@@ -13,7 +13,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
         |sealed abstract class simpleEnumerationExample
         |object simpleEnumerationExample {
@@ -29,7 +29,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Protocol parse simpleProtocolExample
     val code = gen generate protocol
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
         |sealed abstract class simpleProtocolExample(
         |  val field: type)  {
@@ -51,7 +51,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Protocol parse oneChildProtocolExample
     val code = gen generate protocol
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** example of protocol */
         |sealed abstract class oneChildProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
@@ -88,7 +88,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Protocol parse nestedProtocolExample
     val code = gen generate protocol
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** example of nested protocols */
         |sealed abstract class nestedProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
@@ -121,7 +121,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple record */
         |final class simpleRecordExample(
         |val field: type)  {
@@ -146,7 +146,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code(outputFileName).unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
+    code.head._2.unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
@@ -154,7 +154,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code(outputFileName).withoutEmptyLines must containTheSameElementsAs(completeExampleCodeScala.withoutEmptyLines)
+    code.head._2.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeScala.withoutEmptyLines)
   }
 
 }

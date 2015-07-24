@@ -1,5 +1,7 @@
 package sbt.datatype
 
+import java.io.File
+
 object SchemaExample {
   val basicSchema = """{
   "namespace": "com.example",
@@ -327,7 +329,7 @@ object NewSchema {
 
   val completeExampleCodeJava =
     Map(
-      "GreetingHeader.java" ->
+      new File("com/example/GreetingHeader.java") ->
         """package com.example;
           |/** Meta information of a Greeting */
           |public final class GreetingHeader  {
@@ -378,7 +380,7 @@ object NewSchema {
           |    }
           |}""".stripMargin,
 
-      "PriorityLevel.java" ->
+      new File("com/example/PriorityLevel.java") ->
         """package com.example;
           |/** Priority levels */
           |public enum PriorityLevel {
@@ -388,7 +390,7 @@ object NewSchema {
           |    High
           |}""".stripMargin,
 
-      "GreetingWithAttachments.java" ->
+      new File("com/example/GreetingWithAttachments.java") ->
         """package com.example;
           |/** A Greeting with attachments */
           |public final class GreetingWithAttachments extends Greetings {
@@ -423,7 +425,7 @@ object NewSchema {
           |    }
           |}""".stripMargin,
 
-      "Greetings.java" ->
+      new File("com/example/Greetings.java") ->
         """package com.example;
           |/** A greeting protocol */
           |public abstract class Greetings  {
@@ -466,7 +468,7 @@ object NewSchema {
           |    }
           |}""".stripMargin,
 
-      "SimpleGreeting.java" ->
+      new File("com/example/SimpleGreeting.java") ->
         """package com.example;
           |/** A Greeting in its simplest form */
           |public final class SimpleGreeting extends Greetings {

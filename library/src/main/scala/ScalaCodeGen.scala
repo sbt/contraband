@@ -1,5 +1,6 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
+import java.io.File
 
 /**
  * Code generator for Scala.
@@ -26,10 +27,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     buffer.toString
   }
 
-  override def generate(s: Schema): Map[String,String] = {
+  override def generate(s: Schema): Map[File, String] = {
+    def makeFile(name: String) =
+      s.namespace map (ns => new File(ns.replace(".", File.separator), name)) getOrElse new File(name)
+
     s.definitions map (generate (_, None, Nil)) reduce (_ merge _) map {
       case (k, v) =>
-        (k, buffered { b =>
+        (makeFile(k), buffered { b =>
           b += s.namespace map (ns => s"package $ns") getOrElse ""
           b +=  v.lines
         })

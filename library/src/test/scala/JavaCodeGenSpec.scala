@@ -1,5 +1,7 @@
 package sbt.datatype
 
+import java.io.File
+
 import org.specs2._
 import NewSchema._
 
@@ -8,9 +10,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def enumerationGenerateSimple = {
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = JavaCodeGen generate enumeration
-    val outputFileName = "simpleEnumerationExample.java"
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
         |public enum simpleEnumerationExample {
         |    /** First type */
@@ -22,9 +23,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def protocolGenerateSimple = {
     val protocol = Protocol parse simpleProtocolExample
     val code = JavaCodeGen generate protocol
-    val outputFileName = "simpleProtocolExample.java"
 
-    code(outputFileName).unindent must containTheSameElementsAs(
+    code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
         |public abstract class simpleProtocolExample  {
         |    private type field;
@@ -60,7 +60,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
-        "oneChildProtocolExample.java" ->
+        new File("oneChildProtocolExample.java") ->
           """/** example of protocol */
             |public abstract class oneChildProtocolExample  {
             |    public boolean equals(Object obj) {
@@ -81,7 +81,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |}""".stripMargin.unindent,
 
-        "childRecord.java" ->
+        new File("childRecord.java") ->
           """public final class childRecord extends oneChildProtocolExample {
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -110,7 +110,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
-        "nestedProtocolExample.java" ->
+        new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
             |public abstract class nestedProtocolExample  {
             |    public boolean equals(Object obj) {
@@ -131,7 +131,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |}""".stripMargin.unindent,
 
-        "nestedProtocol.java" ->
+        new File("nestedProtocol.java") ->
           """public abstract class nestedProtocol extends nestedProtocolExample {
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -160,7 +160,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
-        "simpleRecordExample.java" ->
+        new File("simpleRecordExample.java") ->
           """/** Example of simple record */
             |public final class simpleRecordExample  {
             |
