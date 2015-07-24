@@ -3,36 +3,12 @@ package sbt.datatype
 import org.specs2._
 import NewSchema._
 
-class ScalaCodeGenSpec extends Specification {
-
-  implicit class CleanedString(s: String) {
-    def unindent: List[String] = s.lines.toList map (_.trim) filterNot (_.isEmpty)
-    def withoutEmptyLines: List[String] = s.lines.toList filterNot (_.trim.isEmpty)
-  }
+class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   val outputFileName = "output.scala"
   val genFileName = (_: Definition) => outputFileName
 
-  def is = s2"""
-    This is a specification for the generation of Scala code.
-
-    generate(Enumeration) should
-      generate a simple enumeration              $enumerationGenerateSimple
-
-    generate(Protocol) should
-      generate a simple protocol                 $protocolGenerateSimple
-      generate a simple protocol with one child  $protocolGenerateOneChild
-      generate nested protocols                  $protocolGenerateNested
-
-    generate(Record) should
-      generate a simple record                   $recordGenerateSimple
-
-    generate(Schema) should
-      generate a complete schema                 $schemaGenerateComplete
-      generate and indent a complete schema      $schemaGenerateCompletePlusIndent
-  """
-
-  def enumerationGenerateSimple = {
+  override def enumerationGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
@@ -48,7 +24,7 @@ class ScalaCodeGenSpec extends Specification {
         |}""".stripMargin.unindent)
   }
 
-  def protocolGenerateSimple = {
+  override def protocolGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse simpleProtocolExample
     val code = gen.generate(protocol, None, Nil)
@@ -70,7 +46,7 @@ class ScalaCodeGenSpec extends Specification {
         |}""".stripMargin.unindent)
   }
 
-  def protocolGenerateOneChild = {
+  override def protocolGenerateOneChild = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse oneChildProtocolExample
     val code = gen.generate(protocol, None, Nil)
@@ -107,7 +83,7 @@ class ScalaCodeGenSpec extends Specification {
         |}""".stripMargin.unindent)
   }
 
-  def protocolGenerateNested = {
+  override def protocolGenerateNested = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse nestedProtocolExample
     val code = gen.generate(protocol, None, Nil)
@@ -140,7 +116,7 @@ class ScalaCodeGenSpec extends Specification {
         |}""".stripMargin.unindent)
   }
 
-  def recordGenerateSimple = {
+  override def recordGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
     val record = Record parse simpleRecordExample
     val code = gen.generate(record, None, Nil)
@@ -165,20 +141,20 @@ class ScalaCodeGenSpec extends Specification {
         |}""".stripMargin.unindent)
   }
 
-  def schemaGenerateComplete = {
+  override def schemaGenerateComplete = {
     val gen = new ScalaCodeGen(genFileName)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code(outputFileName).unindent must containTheSameElementsAs(completeExampleCode.unindent)
+    code(outputFileName).unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
   }
 
-  def schemaGenerateCompletePlusIndent = {
+  override def schemaGenerateCompletePlusIndent = {
     val gen = new ScalaCodeGen(genFileName)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code(outputFileName).withoutEmptyLines must containTheSameElementsAs(completeExampleCode.withoutEmptyLines)
+    code(outputFileName).withoutEmptyLines must containTheSameElementsAs(completeExampleCodeScala.withoutEmptyLines)
   }
 
 }

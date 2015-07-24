@@ -9,7 +9,7 @@ object JavaCodeGen extends CodeGenerator {
   override def augmentIndentTrigger(s: String) = s endsWith "{"
   override def reduceIndentTrigger(s: String) = s startsWith "}"
   override def buffered(op: IndentationAwareBuffer => Unit): String = {
-    val buffer = new IndentationAwareBuffer("\t")
+    val buffer = new IndentationAwareBuffer("    ")
     op(buffer)
     buffer.toString
   }

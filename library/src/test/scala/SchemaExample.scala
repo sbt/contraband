@@ -213,7 +213,7 @@ object NewSchema {
   ]
 }"""
 
-  val completeExampleCode =
+  val completeExampleCodeScala =
     """package com.example
       |/** A greeting protocol */
       |sealed abstract class Greetings(
@@ -322,5 +322,172 @@ object NewSchema {
       |
       |  case object High extends PriorityLevel
       |}""".stripMargin
+
+  val completeExampleCodeJava =
+    Map(
+      "GreetingHeader.java" ->
+        """package com.example;
+          |/** Meta information of a Greeting */
+          |public final class GreetingHeader  {
+          |
+          |    /** Creation date */
+          |    private Lazy<java.util.Date> created;
+          |    /** The priority of this Greeting */
+          |    private PriorityLevel priority;
+          |    /** The author of the Greeting */
+          |
+          |    private String author;
+          |        public GreetingHeader(Lazy<java.util.Date> _ created, String _ author) {
+          |        super();
+          |        created = _created;
+          |        priority = PriorityLevel.Medium;
+          |       author = _author;
+          |    }
+          |
+          |    public GreetingHeader(Lazy<java.util.Date> _ created, PriorityLevel _ priority, String _ author) {
+          |        super();
+          |        created = _created;
+          |        priority = _priority;
+          |        author = _author;
+          |    }
+          |
+          |    public java.util.Date created() {
+          |        return this.created.get();
+          |    }
+          |
+          |    public PriorityLevel priority() {
+          |        return this.priority;
+          |    }
+          |
+          |    public String author() {
+          |        return this.author;
+          |    }
+          |
+          |    public boolean equals(Object obj) {
+          |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+          |    }
+          |
+          |    public int hashCode() {
+          |        return super.hashCode();
+          |    }
+          |
+          |    public String toString() {
+          |        return  "GreetingHeader("  + "created: " + created() + ", " + "priority: " + priority() + ", " + "author: " + author() + ")";
+          |    }
+          |}""".stripMargin,
+
+      "PriorityLevel.java" ->
+        """package com.example;
+          |/** Priority levels */
+          |public enum PriorityLevel {
+          |    Low,
+          |    /** Default priority level */
+          |    Medium,
+          |    High
+          |}""".stripMargin,
+
+      "GreetingWithAttachments.java" ->
+        """package com.example;
+          |/** A Greeting with attachments */
+          |public final class GreetingWithAttachments extends Greetings {
+          |
+          |    /** The files attached to the greeting */
+          |    private java.io.File[] attachments;
+          |
+          |    public GreetingWithAttachments(Lazy<String> _ message, java.io.File[] _ attachments) {
+          |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
+          |        attachments = _attachments;
+          |    }
+          |
+          |    public GreetingWithAttachments(Lazy<String> _ message, GreetingHeader _ header, java.io.File[] _ attachments) {
+          |        super(_message, _header);
+          |        attachments = _attachments;
+          |    }
+          |
+          |    public java.io.File[] attachments() {
+          |        return this.attachments;
+          |    }
+          |
+          |    public boolean equals(Object obj) {
+          |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+          |    }
+          |
+          |    public int hashCode() {
+          |        return super.hashCode();
+          |    }
+          |
+          |    public String toString() {
+          |        return  "GreetingWithAttachments("  + "message: " + message() + ", " + "header: " + header() + ", " + "attachments: " + attachments() + ")";
+          |    }
+          |}""".stripMargin,
+
+      "Greetings.java" ->
+        """package com.example;
+          |/** A greeting protocol */
+          |public abstract class Greetings  {
+          |
+          |    /** The message of the Greeting */
+          |    private Lazy<String> message;
+          |    /** The header of the Greeting */
+          |    private GreetingHeader header;
+          |
+          |    public Greetings(Lazy<String> _ message) {
+          |        super();
+          |        message = _message;
+          |        header = new GreetingHeader(new java.util.Date(), "Unknown");
+          |    }
+          |
+          |    public Greetings(Lazy<String> _ message, GreetingHeader _ header) {
+          |        super();
+          |        message = _message;
+          |        header = _header;
+          |    }
+          |
+          |    public String message() {
+          |        return this.message.get();
+          |    }
+          |
+          |    public GreetingHeader header() {
+          |        return this.header;
+          |    }
+          |
+          |    public boolean equals(Object obj) {
+          |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+          |    }
+          |
+          |    public int hashCode() {
+          |        return super.hashCode();
+          |    }
+          |
+          |    public String toString() {
+          |        return  "Greetings("  + "message: " + message() + ", " + "header: " + header() + ")";
+          |    }
+          |}""".stripMargin,
+
+      "SimpleGreeting.java" ->
+        """package com.example;
+          |/** A Greeting in its simplest form */
+          |public final class SimpleGreeting extends Greetings {
+          |
+          |    public SimpleGreeting(Lazy<String> _ message) {
+          |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
+          |    }
+          |
+          |    public SimpleGreeting(Lazy<String> _ message, GreetingHeader _ header) {
+          |        super(_message, _header);
+          |    }
+          |
+          |    public boolean equals(Object obj) {
+          |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+          |    }
+          |
+          |    public int hashCode() {
+          |        return super.hashCode();
+          |    }
+          |
+          |    public String toString() {
+          |        return  "SimpleGreeting("  + "message: " + message() + ", " + "header: " + header() + ")";
+          |    }
+          |}""".stripMargin)
 
 }
