@@ -139,13 +139,13 @@ object NewSchema {
         {
           "name": "message",
           "doc": "The message of the Greeting",
-          "type": "string"
+          "type": "lazy string"
         },
         {
           "name": "header",
           "doc": "The header of the Greeting",
           "type": "GreetingHeader",
-
+          "default": "new GreetingHeader(new java.util.Date(), \"Unknown\")",
           "since": "0.2.0"
         }
       ],
@@ -180,8 +180,7 @@ object NewSchema {
         {
           "name": "created",
           "doc": "Creation date",
-          "type": "java.util.Date",
-          "default": "new java.util.Date()"
+          "type": "lazy java.util.Date"
         },
         {
           "name": "priority",
@@ -193,8 +192,7 @@ object NewSchema {
         {
           "name": "author",
           "doc": "The author of the Greeting",
-          "type": "string",
-          "default": "Unknown"
+          "type": "string"
         }
       ]
     },
@@ -214,5 +212,115 @@ object NewSchema {
     }
   ]
 }"""
+
+  val completeExampleCode =
+    """package com.example
+      |/** A greeting protocol */
+      |sealed abstract class Greetings(
+      |  _message: => String,
+      |  /** The header of the Greeting */
+      |  val header: GreetingHeader)  {
+      |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |
+      |  /** The message of the Greeting */
+      |  lazy val message: String = _message
+      |  override def equals(o: Any): Boolean = o match {
+      |    case x: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+      |    case _ => false
+      |  }
+      |  override def hashCode: Int = {
+      |    super.hashCode
+      |  }
+      |  override def toString: String = {
+      |    "Greetings(" + message + ", " + header + ")"
+      |  }
+      |}
+      |
+      |/** A Greeting in its simplest form */
+      |final class SimpleGreeting(
+      |  message: => String,
+      |  header: GreetingHeader) extends Greetings(message, header) {
+      |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |
+      |  override def equals(o: Any): Boolean = o match {
+      |    case x: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+      |    case _ => false
+      |  }
+      |  override def hashCode: Int = {
+      |    super.hashCode
+      |  }
+      |  override def toString: String = {
+      |    "SimpleGreeting(" + message + ", " + header + ")"
+      |  }
+      |}
+      |
+      |object SimpleGreeting {
+      |  def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def apply(message: => String, header: GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
+      |}
+      |
+      |/** A Greeting with attachments */
+      |final class GreetingWithAttachments(
+      |  message: => String,
+      |  header: GreetingHeader,
+      |  /** The files attached to the greeting */
+      |  val attachments: Array[java.io.File]) extends Greetings(message, header) {
+      |  def this(message: => String, attachments: Array[java.io.File]) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+      |
+      |  override def equals(o: Any): Boolean = o match {
+      |    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+      |    case _ => false
+      |  }
+      |  override def hashCode: Int = {
+      |    super.hashCode
+      |  }
+      |  override def toString: String = {
+      |    "GreetingWithAttachments(" + message + ", " + header + ", " + attachments + ")"
+      |  }
+      |}
+      |
+      |object GreetingWithAttachments {
+      |  def apply(message: => String, attachments: Array[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+      |  def apply(message: => String, header: GreetingHeader, attachments: Array[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
+      |}
+      |
+      |/** Meta information of a Greeting */
+      |final class GreetingHeader(
+      |  _created: => java.util.Date,
+      |  /** The priority of this Greeting */
+      |  val priority: PriorityLevel,
+      |  /** The author of the Greeting */
+      |  val author: String)  {
+      |  def this(created: => java.util.Date, author: String) = this(created, PriorityLevel.Medium, author)
+      |
+      |  /** Creation date */
+      |  lazy val created: java.util.Date = _created
+      |  override def equals(o: Any): Boolean = o match {
+      |    case x: GreetingHeader => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+      |    case _ => false
+      |  }
+      |  override def hashCode: Int = {
+      |    super.hashCode
+      |  }
+      |  override def toString: String = {
+      |    "GreetingHeader(" + created + ", " + priority + ", " + author + ")"
+      |  }
+      |}
+      |
+      |object GreetingHeader {
+      |  def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, PriorityLevel.Medium, author)
+      |  def apply(created: => java.util.Date, priority: PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
+      |}
+      |
+      |/** Priority levels */
+      |sealed abstract class PriorityLevel
+      |object PriorityLevel {
+      |
+      |  case object Low extends PriorityLevel
+      |  /** Default priority level */
+      |  case object Medium extends PriorityLevel
+      |
+      |  case object High extends PriorityLevel
+      |}""".stripMargin
 
 }

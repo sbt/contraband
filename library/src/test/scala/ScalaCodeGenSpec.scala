@@ -5,8 +5,9 @@ import NewSchema._
 
 class ScalaCodeGenSpec extends Specification {
 
-  implicit class UnindentedString(s: String) {
+  implicit class CleanedString(s: String) {
     def unindent: List[String] = s.lines.toList map (_.trim) filterNot (_.isEmpty)
+    def withoutEmptyLines: List[String] = s.lines.toList filterNot (_.trim.isEmpty)
   }
 
   val outputFileName = "output.scala"
@@ -25,6 +26,10 @@ class ScalaCodeGenSpec extends Specification {
 
     generate(Record) should
       generate a simple record                   $recordGenerateSimple
+
+    generate(Schema) should
+      generate a complete schema                 $schemaGenerateComplete
+      generate and indent a complete schema      $schemaGenerateCompletePlusIndent
   """
 
   def enumerationGenerateSimple = {
@@ -159,4 +164,21 @@ class ScalaCodeGenSpec extends Specification {
         |  def apply(field: type): simpleRecordExample = new simpleRecordExample(field)
         |}""".stripMargin.unindent)
   }
+
+  def schemaGenerateComplete = {
+    val gen = new ScalaCodeGen(genFileName)
+    val schema = Schema parse completeExample
+    val code = gen generate schema
+
+    code(outputFileName).unindent must containTheSameElementsAs(completeExampleCode.unindent)
+  }
+
+  def schemaGenerateCompletePlusIndent = {
+    val gen = new ScalaCodeGen(genFileName)
+    val schema = Schema parse completeExample
+    val code = gen generate schema
+
+    code(outputFileName).withoutEmptyLines must containTheSameElementsAs(completeExampleCode.withoutEmptyLines)
+  }
+
 }
