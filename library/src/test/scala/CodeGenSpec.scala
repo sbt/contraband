@@ -10,6 +10,9 @@ abstract class GCodeGenSpec(language: String) extends Specification {
     def withoutEmptyLines: List[String] = s.lines.toList filterNot (_.trim.isEmpty)
   }
 
+  implicit def definition2Schema(d: Definition): Schema =
+    Schema(None, List(d))
+
   def is = s2"""
     This is a specification for the generation of $language code.
 

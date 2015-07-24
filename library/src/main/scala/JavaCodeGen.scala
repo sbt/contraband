@@ -6,9 +6,9 @@ import scala.compat.Platform.EOL
  */
 object JavaCodeGen extends CodeGenerator {
 
-  override def augmentIndentAfterTrigger(s: String) = s endsWith "{"
-  override def reduceIndentTrigger(s: String) = s startsWith "}"
-  override def buffered(op: IndentationAwareBuffer => Unit): String = {
+  override protected def augmentIndentAfterTrigger(s: String) = s endsWith "{"
+  override protected def reduceIndentTrigger(s: String) = s startsWith "}"
+  override protected def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("    ")
     op(buffer)
     buffer.toString
@@ -18,13 +18,13 @@ object JavaCodeGen extends CodeGenerator {
     s.definitions flatMap (generate(_, None, Nil)) map {
       case (k, v) =>
         (k, buffered { b =>
-          b += s"package ${s.namespace};"
+          b += s.namespace map (ns => s"package $ns;") getOrElse ""
           b += v.lines
         })
 
     } toMap
 
-  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
+  override protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
     val Protocol(name, doc, fields, children) = p
     val extendsCode = parent map (p => s"extends ${p.name}") getOrElse ""
 
@@ -42,7 +42,7 @@ object JavaCodeGen extends CodeGenerator {
     Map(genFileName(p) -> code) ++ (children flatMap (generate(_, Some(p), superFields ++ fields)))
   }
 
-  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
+  override protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
     val Record(name, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${p.name}") getOrElse ""
 
@@ -60,7 +60,7 @@ object JavaCodeGen extends CodeGenerator {
     Map(genFileName(r) -> code)
   }
 
-  override def generate(e: Enumeration): Map[String, String] = {
+  override protected def generate(e: Enumeration): Map[String, String] = {
     val Enumeration(name, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>

@@ -27,7 +27,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   override def protocolGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse simpleProtocolExample
-    val code = gen.generate(protocol, None, Nil)
+    val code = gen generate protocol
 
     code(outputFileName).unindent must containTheSameElementsAs(
       """/** example of simple protocol */
@@ -49,7 +49,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   override def protocolGenerateOneChild = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse oneChildProtocolExample
-    val code = gen.generate(protocol, None, Nil)
+    val code = gen generate protocol
 
     code(outputFileName).unindent must containTheSameElementsAs(
       """/** example of protocol */
@@ -86,7 +86,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   override def protocolGenerateNested = {
     val gen = new ScalaCodeGen(genFileName)
     val protocol = Protocol parse nestedProtocolExample
-    val code = gen.generate(protocol, None, Nil)
+    val code = gen generate protocol
 
     code(outputFileName).unindent must containTheSameElementsAs(
       """/** example of nested protocols */
@@ -119,7 +119,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   override def recordGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
     val record = Record parse simpleRecordExample
-    val code = gen.generate(record, None, Nil)
+    val code = gen generate record
 
     code(outputFileName).unindent must containTheSameElementsAs(
       """/** Example of simple record */

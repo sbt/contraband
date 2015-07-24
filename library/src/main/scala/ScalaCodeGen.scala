@@ -14,13 +14,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       }
   }
 
-  override def augmentIndentAfterTrigger(s: String) =
+  override protected def augmentIndentAfterTrigger(s: String) =
     s.endsWith("{") ||
     (s.contains(" class ") && s.endsWith("(")) // Constructor definition
-  override def reduceIndentTrigger(s: String) = s.startsWith("}")
-  override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
+  override protected def reduceIndentTrigger(s: String) = s.startsWith("}")
+  override protected def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
 
-  override def buffered(op: IndentationAwareBuffer => Unit): String = {
+  override protected def buffered(op: IndentationAwareBuffer => Unit): String = {
     val buffer = new IndentationAwareBuffer("  ")
     op(buffer)
     buffer.toString
@@ -30,14 +30,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     s.definitions map (generate (_, None, Nil)) reduce (_ merge _) map {
       case (k, v) =>
         (k, buffered { b =>
-          b += s"package ${s.namespace}"
-          b +=  ""
+          b += s.namespace map (ns => s"package $ns") getOrElse ""
           b +=  v.lines
         })
     }
   }
 
-  override def generate(e: Enumeration): Map[String,String] = {
+  override protected def generate(e: Enumeration): Map[String,String] = {
     val values =
       e.values map { case (EnumerationValue(name, doc)) =>
         s"""${genDoc(doc)}
@@ -54,7 +53,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     Map(genFileName(e) -> code)
   }
 
-  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
+  override protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
     val allFields = superFields ++ r.fields
 
     val alternativeCtors =
@@ -107,7 +106,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     Map(genFileName(r) -> code)
   }
 
-  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String,String] = {
+  override protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String,String] = {
     val allFields = superFields ++ p.fields
 
     val alternativeCtors =

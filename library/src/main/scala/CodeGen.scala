@@ -19,8 +19,8 @@ abstract class CodeGenerator {
   protected def reduceIndentAfterTrigger(s: String): Boolean = false
 
   /**
-   * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`
-   * and `reduceIndentTrigger`) as text is added.
+   * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`,
+   * `augmentIndentAfterTrigger`, `reduceIndentTrigger` and `reduceIndentAfterTrigger`) as text is added.
    */
   protected class IndentationAwareBuffer(val indent: String, private var level: Int = 0) {
     private val buffer: StringBuilder = new StringBuilder
@@ -55,7 +55,7 @@ abstract class CodeGenerator {
   }
 
   /** Generate the code corresponding to `d`. */
-  final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[String, String] =
+  protected final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[String, String] =
     d match {
       case p: Protocol    => generate(p, parent, superFields)
       case r: Record      => generate(r, parent, superFields)
@@ -66,13 +66,13 @@ abstract class CodeGenerator {
   def generate(s: Schema): Map[String, String]
 
   /** Generate the code corresponding to the protocol `p`. */
-  def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+  protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
 
   /** Generate the code corresponding to the record `r`. */
-  def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+  protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
 
   /** Generate the code corresponding to the enumeration `e`. */
-  def generate(e: Enumeration): Map[String, String]
+  protected def generate(e: Enumeration): Map[String, String]
 
 }
 

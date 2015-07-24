@@ -21,7 +21,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateSimple = {
     val protocol = Protocol parse simpleProtocolExample
-    val code = JavaCodeGen.generate(protocol, None, Nil)
+    val code = JavaCodeGen generate protocol
     val outputFileName = "simpleProtocolExample.java"
 
     code(outputFileName).unindent must containTheSameElementsAs(
@@ -56,7 +56,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateOneChild = {
     val protocol = Protocol parse oneChildProtocolExample
-    val code = JavaCodeGen.generate(protocol, None, Nil)
+    val code = JavaCodeGen generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -106,7 +106,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateNested = {
     val protocol = Protocol parse nestedProtocolExample
-    val code = JavaCodeGen.generate(protocol, None, Nil)
+    val code = JavaCodeGen generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -156,7 +156,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGenerateSimple = {
     val record = Record parse simpleRecordExample
-    val code = JavaCodeGen.generate(record, None, Nil)
+    val code = JavaCodeGen generate record
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(

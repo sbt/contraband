@@ -75,12 +75,12 @@ object Definition extends Parser[Definition] {
  *   Schema := { "namespace": QualifiedID,
  *               "types": [ Definition* ] }
  */
-case class Schema(namespace: String,
+case class Schema(namespace: Option[String],
   definitions: List[Definition])
 
 object Schema extends Parser[Schema] {
   override def parse(json: JValue): Schema =
-    Schema(json -> "namespace",
+    Schema(json ->? "namespace",
       json ->* "types" map Definition.parse)
 }
 
