@@ -185,27 +185,18 @@ object Field extends Parser[Field] {
 }
 
 case class TpeRef(name: String, lzy: Boolean, repeated: Boolean)
+
 object TpeRef {
   import scala.util.matching.Regex
   private val LazyRepeated = """^lazy (.+?)\*$""".r
   private val Lazy = """^lazy (.+?)$""".r
   private val Repeated = """^(.+?)\*""".r
 
-  private def lookupTpe(tpe: String): String = tpe match {
-    case "string"  => "String"
-    case "boolean" => "Boolean"
-    case "int"     => "Int"
-    case "long"    => "Long"
-    case "float"   => "Float"
-    case "double"  => "Double"
-    case other     => other
-  }
-
   def apply(str: String): TpeRef = str match {
-    case LazyRepeated(tpe) => TpeRef(lookupTpe(tpe), true, true)
-    case Lazy(tpe)         => TpeRef(lookupTpe(tpe), true, false)
-    case Repeated(tpe)     => TpeRef(lookupTpe(tpe), false, true)
-    case tpe               => TpeRef(lookupTpe(tpe), false, false)
+    case LazyRepeated(tpe) => TpeRef(tpe, true, true)
+    case Lazy(tpe)         => TpeRef(tpe, true, false)
+    case Repeated(tpe)     => TpeRef(tpe, false, true)
+    case tpe               => TpeRef(tpe, false, false)
   }
 }
 

@@ -145,8 +145,21 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
 
   private def genParam(f: Field): String = s"${f.name}: ${genRealTpe(f.tpe, isParam = true)}"
 
+  private def lookupTpe(tpe: String): String = tpe match {
+    case "boolean" => "Boolean"
+    case "byte"    => "Byte"
+    case "char"    => "Char"
+    case "float"   => "Float"
+    case "int"     => "Int"
+    case "long"    => "Long"
+    case "short"   => "Short"
+    case "double"  => "Double"
+    case other     => other
+  }
+
   private def genRealTpe(tpe: TpeRef, isParam: Boolean) = {
-    val base = if (tpe.repeated) s"Array[${tpe.name}]" else tpe.name
+    val scalaTpe = lookupTpe(tpe.name)
+    val base = if (tpe.repeated) s"Array[$scalaTpe]" else scalaTpe
     if (tpe.lzy && isParam) s"=> $base" else base
   }
 

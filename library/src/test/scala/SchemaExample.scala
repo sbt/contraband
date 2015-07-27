@@ -130,6 +130,54 @@ object NewSchema {
   val arrayTpeRefExample = "arrayTpeRefExample*"
   val lazyArrayTpeRefExample = "lazy lazyArrayTpeRefExample*"
 
+  val primitiveTypesExample = """{
+  "types": [
+    {
+      "name": "primitiveTypesExample",
+      "type": "record",
+      "fields": [
+        {
+          "name": "simpleInteger",
+          "type": "int"
+        },
+        {
+          "name": "lazyInteger",
+          "type": "lazy int"
+        },
+        {
+          "name": "arrayInteger",
+          "type": "int*"
+        },
+        {
+          "name": "lazyArrayInteger",
+          "type": "lazy int*"
+        }
+      ]
+    }
+  ]
+}"""
+
+  val primitiveTypesNoLazyExample = """{
+  "types": [
+    {
+      "name": "primitiveTypesNoLazyExample",
+      "type": "record",
+      "fields": [
+        {
+          "name": "simpleInteger",
+          "type": "int"
+        },
+        {
+          "name": "arrayInteger",
+          "type": "int*"
+        }
+      ]
+    }
+  ]
+}"""
+
+
+
   val completeExample = """{
   "namespace": "com.example",
 
@@ -143,7 +191,7 @@ object NewSchema {
         {
           "name": "message",
           "doc": "The message of the Greeting",
-          "type": "lazy string"
+          "type": "lazy String"
         },
         {
           "name": "header",
@@ -196,7 +244,7 @@ object NewSchema {
         {
           "name": "author",
           "doc": "The author of the Greeting",
-          "type": "string"
+          "type": "String"
         }
       ]
     },

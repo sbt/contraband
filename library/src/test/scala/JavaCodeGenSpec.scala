@@ -193,6 +193,98 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     )
   }
 
+  override def schemaGenerateTypeReferences = {
+    val schema = Schema parse primitiveTypesExample
+    val code = JavaCodeGen generate schema
+
+    code mapValues (_.unindent) must containTheSameElementsAs(
+      Map(
+        new File("primitiveTypesExample.java") ->
+          """public final class primitiveTypesExample  {
+            |    private int simpleInteger;
+            |
+            |    private Lazy<Integer> lazyInteger;
+            |
+            |    private int[] arrayInteger;
+            |
+            |    private Lazy<int[]> lazyArrayInteger;
+            |    public primitiveTypesExample(int _simpleInteger, Lazy<Integer> _lazyInteger, int[] _arrayInteger, Lazy<int[]> _lazyArrayInteger) {
+            |        super();
+            |        simpleInteger = _simpleInteger;
+            |        lazyInteger = _lazyInteger;
+            |        arrayInteger = _arrayInteger;
+            |        lazyArrayInteger = _lazyArrayInteger;
+            |    }
+            |    public int simpleInteger() {
+            |        return this.simpleInteger;
+            |    }
+            |    public int lazyInteger() {
+            |        return this.lazyInteger.get();
+            |    }
+            |    public int[] arrayInteger() {
+            |        return this.arrayInteger;
+            |    }
+            |    public int[] lazyArrayInteger() {
+            |        return this.lazyArrayInteger.get();
+            |    }
+            |    public boolean equals(Object obj) {
+            |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+            |    }
+            |    public int hashCode() {
+            |        return super.hashCode();
+            |    }
+            |    public String toString() {
+            |        return  "primitiveTypesExample("  + "simpleInteger: " + simpleInteger() + ", " + "lazyInteger: " + lazyInteger() + ", " + "arrayInteger: " + arrayInteger() + ", " + "lazyArrayInteger: " + lazyArrayInteger() + ")";
+            |    }
+            |}""".stripMargin.unindent
+      ).toList
+    )
+  }
+
+  override def schemaGenerateTypeReferencesNoLazy = {
+    val schema = Schema parse primitiveTypesNoLazyExample
+    val code = JavaCodeGen generate schema
+
+    code mapValues (_.unindent) must containTheSameElementsAs(
+      Map(
+        new File("primitiveTypesNoLazyExample.java") ->
+          """public final class primitiveTypesNoLazyExample  {
+            |
+            |    private int simpleInteger;
+            |
+            |    private int[] arrayInteger;
+            |    public primitiveTypesNoLazyExample(int _simpleInteger, int[] _arrayInteger) {
+            |        super();
+            |        simpleInteger = _simpleInteger;
+            |        arrayInteger = _arrayInteger;
+            |    }
+            |    public int simpleInteger() {
+            |        return this.simpleInteger;
+            |    }
+            |    public int[] arrayInteger() {
+            |        return this.arrayInteger;
+            |    }
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof primitiveTypesNoLazyExample)) {
+            |            return false;
+            |        } else {
+            |            primitiveTypesNoLazyExample o = (primitiveTypesNoLazyExample)obj;
+            |            return (simpleInteger() == o.simpleInteger()) && java.util.Arrays.deepEquals(arrayInteger(), o.arrayInteger());
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 37 * (37 * (17 + (new Integer(simpleInteger)).hashCode()) + arrayInteger().hashCode());
+            |    }
+            |    public String toString() {
+            |        return  "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
+            |    }
+            |}""".stripMargin.unindent
+      ).toList
+    )
+  }
+
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
     val code = JavaCodeGen generate schema

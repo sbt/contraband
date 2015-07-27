@@ -141,6 +141,71 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
+  override def schemaGenerateTypeReferences = {
+    val gen = new ScalaCodeGen(genFileName)
+    val schema = Schema parse primitiveTypesExample
+    val code = gen generate schema
+
+    code.head._2.unindent must containTheSameElementsAs(
+      """final class primitiveTypesExample(
+        |
+        |  val simpleInteger: Int,
+        |  _lazyInteger: => Int,
+        |
+        |  val arrayInteger: Array[Int],
+        |  _lazyArrayInteger: => Array[Int])  {
+        |
+        |
+        |  lazy val lazyInteger: Int = _lazyInteger
+        |
+        |  lazy val lazyArrayInteger: Array[Int] = _lazyArrayInteger
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: primitiveTypesExample => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    super.hashCode
+        |  }
+        |  override def toString: String = {
+        |    "primitiveTypesExample(" + simpleInteger + ", " + lazyInteger + ", " + arrayInteger + ", " + lazyArrayInteger + ")"
+        |  }
+        |}
+        |
+        |object primitiveTypesExample {
+        |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Array[Int], lazyArrayInteger: => Array[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
+        |}""".stripMargin.unindent)
+  }
+
+  override def schemaGenerateTypeReferencesNoLazy = {
+    val gen = new ScalaCodeGen(genFileName)
+    val schema = Schema parse primitiveTypesNoLazyExample
+    val code = gen generate schema
+
+    code.head._2.unindent must containTheSameElementsAs(
+      """final class primitiveTypesNoLazyExample(
+        |
+        |  val simpleInteger: Int,
+        |
+        |  val arrayInteger: Array[Int])  {
+        |
+        |
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: primitiveTypesNoLazyExample => (this.simpleInteger == x.simpleInteger) && (this.arrayInteger == x.arrayInteger)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + simpleInteger.##) + arrayInteger.##)
+        |  }
+        |  override def toString: String = {
+        |    "primitiveTypesNoLazyExample(" + simpleInteger + ", " + arrayInteger + ")"
+        |  }
+        |}
+        |
+        |object primitiveTypesNoLazyExample {
+        |  def apply(simpleInteger: Int, arrayInteger: Array[Int]): primitiveTypesNoLazyExample = new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
+        |}""".stripMargin.unindent)
+  }
+
   override def schemaGenerateComplete = {
     val gen = new ScalaCodeGen(genFileName)
     val schema = Schema parse completeExample

@@ -91,9 +91,23 @@ object JavaCodeGen extends CodeGenerator {
     s"""${genDoc(f.doc)}
        |private ${genRealTpe(f.tpe)} ${f.name};""".stripMargin
 
+  def isPrimitive(tpe: TpeRef) = !tpe.repeated && ! tpe.lzy && tpe.name != boxedType(tpe.name)
+
+  private def boxedType(tpe: String): String = tpe match {
+    case "boolean" => "Boolean"
+    case "byte"    => "Byte"
+    case "char"    => "Character"
+    case "float"   => "Float"
+    case "int"     => "Integer"
+    case "long"    => "Long"
+    case "short"   => "Short"
+    case "double"  => "Double"
+    case other     => other
+  }
+
   private def genRealTpe(tpe: TpeRef): String = tpe match {
     case TpeRef(name, true, true)   => s"Lazy<$name[]>"
-    case TpeRef(name, true, false)  => s"Lazy<$name>"
+    case TpeRef(name, true, false)  => s"Lazy<${boxedType(name)}>"
     case TpeRef(name, false, true)  => s"$name[]"
     case TpeRef(name, false, false) => name
   }
@@ -144,7 +158,8 @@ object JavaCodeGen extends CodeGenerator {
           if (allFields.isEmpty) "return true;"
           else
             allFields.map {
-              case f if f.tpe.repeated => s"java.util.Arrays.deepEquals(${f.name}(), o.${f.name}())"
+              case f if f.tpe.repeated =>     s"java.util.Arrays.deepEquals(${f.name}(), o.${f.name}())"
+              case f if isPrimitive(f.tpe) => s"(${f.name}() == o.${f.name}())"
               case f                   => s"${f.name}().equals(o.${f.name}())"
             }.mkString("return ", " && ", ";")
 
@@ -163,13 +178,17 @@ object JavaCodeGen extends CodeGenerator {
        |}""".stripMargin
   }
 
+  private def hashCode(f: Field): String =
+    if (isPrimitive(f.tpe)) s"(new ${boxedType(f.tpe.name)}(${f.name})).hashCode()"
+    else s"${f.name}().hashCode()"
+
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
     val allFields = superFields ++ cl.fields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return super.hashCode();"
       } else {
-        val computation = (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${f.name}().hashCode())" }
+        val computation = (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${hashCode(f)})" }
         s"return $computation;"
       }
 
