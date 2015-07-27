@@ -7,7 +7,7 @@
 			"fields": [
 				{
 					"name": "name",
-					"type": "string"
+					"type": "String"
 				},
 				{
 					"name": "age",
