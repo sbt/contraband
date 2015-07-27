@@ -1,0 +1,21 @@
+{
+	"namespace": "com.example",
+	"types": [
+		{
+			"name": "Person",
+			"type": "record",
+			"fields": [
+				{
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"name": "age",
+					"type": "int",
+					"since": "0.1.0",
+					"default": "0"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,36 @@
+{
+	"namespace": "com.example",
+	"types": [
+		{
+			"name": "Person",
+			"type": "record",
+			"fields": [
+				{
+					"name": "name",
+					"type": "string"
+				},
+				{
+					"name": "age",
+					"type": "int",
+					"since": "0.1.0",
+					"default": "0"
+				},
+				{
+					"name": "gender",
+					"type": "Gender",
+					"since": "0.2.0",
+					"default": "Gender.Unknown"
+				}
+			]
+		},
+		{
+			"name": "Gender",
+			"type": "enumeration",
+			"types": [
+				"Unknown",
+				"Male",
+				"Female"
+			]
+		}
+	]
+}
