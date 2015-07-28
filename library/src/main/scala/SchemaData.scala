@@ -52,7 +52,10 @@ sealed trait SchemaElement {
  * Syntax:
  *   Definition := Protocol | Record | Enumeration
  */
-sealed trait Definition extends SchemaElement
+sealed trait Definition extends SchemaElement {
+  def namespace: Option[String]
+  def targetLang: String
+}
 
 sealed trait ClassLike extends Definition {
   def fields: List[Field]
@@ -72,27 +75,28 @@ object Definition extends Parser[Definition] {
 /**
  * Represents a complete schema definition.
  * Syntax:
- *   Schema := { "namespace": QualifiedID,
- *               "types": [ Definition* ] }
+ *   Schema := { "types": [ Definition* ] }
  */
-case class Schema(namespace: Option[String],
-  definitions: List[Definition])
+case class Schema(definitions: List[Definition])
 
 object Schema extends Parser[Schema] {
   override def parse(json: JValue): Schema =
-    Schema(json ->? "namespace",
-      json ->* "types" map Definition.parse)
+    Schema(json ->* "types" map Definition.parse)
 }
 
 /**
  * Protocols map to abstract classes.
  * Syntax:
- *   Protocol := {   "name": ID
+ *   Protocol := {   "name": ID,
+ *                   "target": ("Scala" | "Java" | "Mixed")
+ *                (, "namespace": string constant)?
  *                (, "doc": string constant)?
  *                (, "fields": [ Field* ])?
  *                (, "types": [ Definition* ])? }
  */
 case class Protocol(name: String,
+  targetLang: String,
+  namespace: Option[String],
   doc: Option[String],
   fields: List[Field],
   children: List[Definition]) extends ClassLike
@@ -100,6 +104,8 @@ case class Protocol(name: String,
 object Protocol extends Parser[Protocol] {
   override def parse(json: JValue): Protocol =
     Protocol(json -> "name",
+      json -> "target",
+      json ->? "namespace",
       json ->? "doc",
       json ->* "fields" map Field.parse,
       json ->* "types" map Definition.parse)
@@ -109,16 +115,22 @@ object Protocol extends Parser[Protocol] {
  * Records map to concrete classes.
  * Syntax:
  *   Record := {   "name": ID
+ *                 "target": ("Scala" | "Java" | "Mixed")
+ *              (, "namespace": string constant)?
  *              (, "doc": string constant)?
  *              (, "fields": [ Field* ])? }
  */
 case class Record(name: String,
+  targetLang: String,
+  namespace: Option[String],
   doc: Option[String],
   fields: List[Field]) extends ClassLike
 
 object Record extends Parser[Record] {
   override def parse(json: JValue): Record =
     Record(json -> "name",
+      json -> "target",
+      json ->? "namespace",
       json ->? "doc",
       json ->* "fields" map Field.parse)
 }
@@ -127,17 +139,22 @@ object Record extends Parser[Record] {
  * Definition of an Enumeration.
  * Syntax:
  *   Enumeration := {   "name": ID
+ *                      "target": ("Scala" | "Java" | "Mixed")
+ *                   (, "namespace": string constant)?
  *                   (, "doc": string constant)?
  *                   (, "types": [ EnumerationValue* ])? }
  */
 case class Enumeration(name: String,
+  targetLang: String,
+  namespace: Option[String],
   doc: Option[String],
   values: List[EnumerationValue]) extends Definition
 
 object Enumeration extends Parser[Enumeration] {
   override def parse(json: JValue): Enumeration =
-    Enumeration(
-      json -> "name",
+    Enumeration(json -> "name",
+      json -> "target",
+      json ->? "namespace",
       json ->? "doc",
       json ->* "types" map EnumerationValue.parse)
 }

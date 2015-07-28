@@ -5,42 +5,22 @@ import java.io.File
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
+class ScalaCodeGen(genFile: Definition => File) extends CodeGenerator {
 
-  private implicit class MergeableMap[T](m: Map[T, String]) {
-    def merge(o: Map[T, String]): Map[T, String] =
-      (o foldLeft m) { case (acc, (k, v)) =>
-        val existing = acc get k getOrElse ""
-        acc + (k -> (existing + EOL + EOL + v))
-      }
+  implicit object indentationConfiguration extends IndentationConfiguration {
+    override val indentElement = "  "
+    override def augmentIndentAfterTrigger(s: String) =
+      s.endsWith("{") ||
+      (s.contains(" class ") && s.endsWith("(")) // Constructor definition
+    override def reduceIndentTrigger(s: String) = s.startsWith("}")
+    override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
   }
 
-  override protected def augmentIndentAfterTrigger(s: String) =
-    s.endsWith("{") ||
-    (s.contains(" class ") && s.endsWith("(")) // Constructor definition
-  override protected def reduceIndentTrigger(s: String) = s.startsWith("}")
-  override protected def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
 
-  override protected def buffered(op: IndentationAwareBuffer => Unit): String = {
-    val buffer = new IndentationAwareBuffer("  ")
-    op(buffer)
-    buffer.toString
-  }
+  override def generate(s: Schema): Map[File, String] =
+    s.definitions map (generate (_, None, Nil)) reduce (_ merge _) mapValues (_.indented)
 
-  override def generate(s: Schema): Map[File, String] = {
-    def makeFile(name: String) =
-      s.namespace map (ns => new File(ns.replace(".", File.separator), name)) getOrElse new File(name)
-
-    s.definitions map (generate (_, None, Nil)) reduce (_ merge _) map {
-      case (k, v) =>
-        (makeFile(k), buffered { b =>
-          b += s.namespace map (ns => s"package $ns") getOrElse ""
-          b +=  v.lines
-        })
-    }
-  }
-
-  override protected def generate(e: Enumeration): Map[String,String] = {
+  override def generate(e: Enumeration): Map[File, String] = {
     val values =
       e.values map { case (EnumerationValue(name, doc)) =>
         s"""${genDoc(doc)}
@@ -48,16 +28,17 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       } mkString EOL
 
     val code =
-      s"""${genDoc(e.doc)}
+      s"""${genPackage(e)}
+         |${genDoc(e.doc)}
          |sealed abstract class ${e.name}
          |object ${e.name} {
          |  $values
          |}""".stripMargin
 
-    Map(genFileName(e) -> code)
+    Map(genFile(e) -> code)
   }
 
-  override protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
+  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val allFields = superFields ++ r.fields
 
     val alternativeCtors =
@@ -88,13 +69,14 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
     val superCtorArguments = superFields map (_.name) mkString ", "
 
     val extendsCode =
-      parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
+      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse ""
 
     val lazyMembers =
       genLazyMembers(r.fields) mkString EOL
 
     val code =
-      s"""${genDoc(r.doc)}
+      s"""${genPackage(r)}
+         |${genDoc(r.doc)}
          |final class ${r.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
@@ -107,10 +89,10 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
          |  $applyOverloads
          |}""".stripMargin
 
-    Map(genFileName(r) -> code)
+    Map(genFile(r) -> code)
   }
 
-  override protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String,String] = {
+  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val allFields = superFields ++ p.fields
 
     val alternativeCtors =
@@ -123,14 +105,15 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
       superFields map (_.name) mkString ", "
 
     val extendsCode =
-      parent map (p => s"extends ${p.name}($superCtorArguments)") getOrElse ""
+      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse ""
 
     val lazyMembers =
       genLazyMembers(p.fields) mkString EOL
 
     val code =
-      s"""${genDoc(p.doc)}
-         |sealed abstract class ${p.name}($ctorParameters) $extendsCode {
+      s"""${genPackage(p)}
+         |${genDoc(p.doc)}
+         |abstract class ${p.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
          |  ${genEquals(p, superFields)}
@@ -138,7 +121,7 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
          |  ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFileName(p) -> code) :: (p.children map (generate(_, Some(p), superFields ++ p.fields))) reduce (_ merge _)
+    Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), superFields ++ p.fields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
@@ -242,5 +225,13 @@ class ScalaCodeGen(genFileName: Definition => String) extends CodeGenerator {
         s"""${genDoc(f.doc)}
            |lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
     }
+
+  private def fullyQualifiedName(d: Definition): String = {
+    val path = d.namespace map (ns => ns + ".") getOrElse ""
+    path + d.name
+  }
+
+  private def genPackage(d: Definition): String =
+    d.namespace map (ns => s"package $ns") getOrElse ""
 
 }

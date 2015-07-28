@@ -7,34 +7,23 @@ import java.io.File
  */
 object JavaCodeGen extends CodeGenerator {
 
-  override protected def augmentIndentAfterTrigger(s: String) = s endsWith "{"
-  override protected def reduceIndentTrigger(s: String) = s startsWith "}"
-  override protected def buffered(op: IndentationAwareBuffer => Unit): String = {
-    val buffer = new IndentationAwareBuffer("    ")
-    op(buffer)
-    buffer.toString
+  /** Indentation configuration for Java sources. */
+  implicit object indentationConfiguration extends IndentationConfiguration {
+    override val indentElement = "    "
+    override def augmentIndentAfterTrigger(s: String) = s endsWith "{"
+    override def reduceIndentTrigger(s: String) = s startsWith "}"
   }
 
-  override def generate(s: Schema): Map[File, String] = {
-    def makeFile(name: String) =
-      s.namespace map (ns => new File(ns.replace(".", File.separator), name)) getOrElse new File(name)
+  override def generate(s: Schema): Map[File, String] =
+    s.definitions flatMap (generate(_, None, Nil) mapValues (_.indented)) toMap
 
-    s.definitions flatMap (generate(_, None, Nil)) map {
-      case (k, v) =>
-        (makeFile(k), buffered { b =>
-          b += s.namespace map (ns => s"package $ns;") getOrElse ""
-          b += v.lines
-        })
-
-    } toMap
-  }
-
-  override protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
-    val Protocol(name, doc, fields, children) = p
-    val extendsCode = parent map (p => s"extends ${p.name}") getOrElse ""
+  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+    val Protocol(name, _, namespace, doc, fields, children) = p
+    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
 
     val code =
-      s"""${genDoc(doc)}
+      s"""${genPackage(p)}
+         |${genDoc(doc)}
          |public abstract class $name $extendsCode {
          |    ${genFields(fields)}
          |    ${genConstructors(p, parent, superFields)}
@@ -44,15 +33,16 @@ object JavaCodeGen extends CodeGenerator {
          |    ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFileName(p) -> code) ++ (children flatMap (generate(_, Some(p), superFields ++ fields)))
+    Map(genFile(p) -> code) ++ (children flatMap (generate(_, Some(p), superFields ++ fields)))
   }
 
-  override protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String] = {
-    val Record(name, doc, fields) = r
-    val extendsCode = parent map (p => s"extends ${p.name}") getOrElse ""
+  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+    val Record(name, _, namespace, doc, fields) = r
+    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
 
     val code =
-      s"""${genDoc(doc)}
+      s"""${genPackage(r)}
+         |${genDoc(doc)}
          |public final class $name $extendsCode {
          |    ${genFields(fields)}
          |    ${genConstructors(r, parent, superFields)}
@@ -62,11 +52,11 @@ object JavaCodeGen extends CodeGenerator {
          |    ${genToString(r, superFields)}
          |}""".stripMargin
 
-    Map(genFileName(r) -> code)
+    Map(genFile(r) -> code)
   }
 
-  override protected def generate(e: Enumeration): Map[String, String] = {
-    val Enumeration(name, doc, values) = e
+  override def generate(e: Enumeration): Map[File, String] = {
+    val Enumeration(name, _, namespace, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>
       s"""${genDoc(doc)}
@@ -74,17 +64,21 @@ object JavaCodeGen extends CodeGenerator {
     } mkString ("," + EOL)
 
     val code =
-      s"""${genDoc(doc)}
+      s"""${genPackage(e)}
+         |${genDoc(doc)}
          |public enum $name {
          |    $valuesCode
          |}""".stripMargin
 
-    Map(genFileName(e) -> code)
+    Map(genFile(e) -> code)
   }
 
   private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
 
-  private def genFileName(d: Definition) = d.name + ".java"
+  private def genFile(d: Definition) = {
+    val fileName = d.name + ".java"
+    d.namespace map (ns => new File(ns.replace(".", File.separator), fileName)) getOrElse new File(fileName)
+  }
 
   private def genFields(fields: List[Field]) = fields map genField mkString EOL
   private def genField(f: Field) =
@@ -179,7 +173,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def hashCode(f: Field): String =
-    if (isPrimitive(f.tpe)) s"(new ${boxedType(f.tpe.name)}(${f.name})).hashCode()"
+    if (isPrimitive(f.tpe)) s"(new ${boxedType(f.tpe.name)}(${f.name}())).hashCode()"
     else s"${f.name}().hashCode()"
 
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
@@ -207,6 +201,14 @@ object JavaCodeGen extends CodeGenerator {
     s"""public String toString() {
        |    return $code;
        |}""".stripMargin
+  }
+
+  private def genPackage(d: Definition) =
+    d.namespace map (ns => s"package $ns;") getOrElse ""
+
+  private def fullyQualifiedName(d: Definition) = {
+    val path = d.namespace map (ns => ns + ".") getOrElse ""
+    path + d.name
   }
 
 }

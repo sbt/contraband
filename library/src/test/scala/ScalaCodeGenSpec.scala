@@ -1,12 +1,14 @@
 package sbt.datatype
 
+import java.io.File
+
 import org.specs2._
 import NewSchema._
 
 class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
-  val outputFileName = "output.scala"
-  val genFileName = (_: Definition) => outputFileName
+  val outputFile = new File("output.scala")
+  val genFileName = (_: Definition) => outputFile
 
   override def enumerationGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName)
@@ -31,7 +33,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
-        |sealed abstract class simpleProtocolExample(
+        |abstract class simpleProtocolExample(
         |  val field: type)  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleProtocolExample => (this.field == x.field)
@@ -53,7 +55,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of protocol */
-        |sealed abstract class oneChildProtocolExample()  {
+        |abstract class oneChildProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: oneChildProtocolExample => true
         |    case _ => false
@@ -90,7 +92,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of nested protocols */
-        |sealed abstract class nestedProtocolExample()  {
+        |abstract class nestedProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocolExample => true
         |    case _ => false
@@ -102,7 +104,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "nestedProtocolExample(" +  + ")"
         |  }
         |}
-        |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
+        |abstract class nestedProtocol() extends nestedProtocolExample() {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocol => true
         |    case _ => false

@@ -7,44 +7,33 @@ import java.io.File
  */
 abstract class CodeGenerator {
 
-  /** When this predicate holds for `s`, this line and the following should have one more level of indentation. */
-  protected def augmentIndentTrigger(s: String): Boolean = false
+  implicit class MergeableMap[T](m: Map[T, String]) {
+    def merge(o: Map[T, String]): Map[T, String] =
+      (o foldLeft m) { case (acc, (k, v)) =>
+        val existing = acc get k getOrElse ""
 
-  /** When this predicate holds for `s`, next lines should have one more level of indentation. */
-  protected def augmentIndentAfterTrigger(s: String): Boolean = false
+        acc get k match {
+          case None =>
+            acc + (k -> v)
 
-  /** When this predicate holds for `s`, this line and the following should have one less level of indentation. */
-  protected def reduceIndentTrigger(s: String): Boolean = false
+          case Some(existing) =>
+            // Remove `package blah` from what we want to add
+            val content = v.lines.toList.tail mkString EOL
+            acc + (k -> (existing + EOL + EOL + content))
+        }
+      }
+  }
 
-  /** When this predicate holds for `s`, next lines should have one less level of indentation. */
-  protected def reduceIndentAfterTrigger(s: String): Boolean = false
+  implicit protected class IndentationAwareString(code: String) {
+    final def indented(implicit config: IndentationConfiguration): String = indentWith(config)
 
-  /**
-   * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`,
-   * `augmentIndentAfterTrigger`, `reduceIndentTrigger` and `reduceIndentAfterTrigger`) as text is added.
-   */
-  protected class IndentationAwareBuffer(val indent: String, private var level: Int = 0) {
-    private val buffer: StringBuilder = new StringBuilder
-
-    /** Add all the lines of `it` to the buffer. */
-    def +=(it: Iterator[String]): Unit = it foreach append
-    /** Add `s` to the buffer */
-    def +=(s: String): Unit = s.lines foreach append
-
-    override def toString: String = buffer.mkString
-
-    private def append(s: String): Unit = {
-      val clean = s.trim
-      if (augmentIndentTrigger(clean)) level += 1
-      if (reduceIndentTrigger(clean)) level = 0 max (level - 1)
-      buffer append (indent * level + clean + EOL)
-      if (augmentIndentAfterTrigger(clean)) level += 1
-      if (reduceIndentAfterTrigger(clean)) level = 0 max (level - 1)
+    final def indentWith(config: IndentationConfiguration): String = {
+      val buffer = new IndentationAwareBuffer(config)
+      code.lines foreach buffer .+=
+      buffer.toString
     }
   }
 
-  /** Run an operation `op` with a new `IndentationAwareBuffer` and return its content. */
-  protected def buffered(op: IndentationAwareBuffer => Unit): String
 
   /** Run an operation `op` for each different version number that affects the fields `fields`. */
   protected final def perVersionNumber[T](fields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
@@ -55,25 +44,25 @@ abstract class CodeGenerator {
     }
   }
 
+  /** Generate the code corresponding to all definitions in `s`. */
+  def generate(s: Schema): Map[File, String]
+
   /** Generate the code corresponding to `d`. */
-  protected final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[String, String] =
+  protected final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[File, String] =
     d match {
       case p: Protocol    => generate(p, parent, superFields)
       case r: Record      => generate(r, parent, superFields)
       case e: Enumeration => generate(e)
     }
 
-  /** Generate the code corresponding to all definitions in `s`. */
-  def generate(s: Schema): Map[File, String]
-
   /** Generate the code corresponding to the protocol `p`. */
-  protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+  protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
 
   /** Generate the code corresponding to the record `r`. */
-  protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[String, String]
+  protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
 
   /** Generate the code corresponding to the enumeration `e`. */
-  protected def generate(e: Enumeration): Map[String, String]
+  protected def generate(e: Enumeration): Map[File, String]
 
 }
 

@@ -5,11 +5,13 @@ import Keys._
 
 object DatatypePlugin extends AutoPlugin {
 
+  private def scalaDef2File(d: Definition) =
+    d.namespace map (ns => new File(ns.replace(".", "/"))) map (new File(_, d.name + ".scala")) getOrElse new File(d.name + ".scala")
+
   object autoImport {
     val generateDatatypes = taskKey[Seq[File]]("Generate datatypes.")
     val datatypeSource = settingKey[File]("Datatype source directory.")
-    val datatypeTargetLang = settingKey[DatatypeTargetLang]("Target language for datatypes.")
-    val datatypeScalaFileNames = settingKey[Definition => String]("Mapping from `Definition` to file name for Scala generator.")
+    val datatypeScalaFileNames = settingKey[Definition => File]("Mapping from `Definition` to file for Scala generator.")
 
     sealed trait DatatypeTargetLang
     object DatatypeTargetLang {
@@ -19,14 +21,12 @@ object DatatypePlugin extends AutoPlugin {
 
     lazy val baseDatatypeSettings: Seq[Def.Setting[_]] = Seq(
       datatypeSource in generateDatatypes := sourceDirectory.value / "datatype",
-      datatypeTargetLang in generateDatatypes := DatatypeTargetLang.Scala,
       sourceManaged in generateDatatypes := sourceManaged.value,
-      datatypeScalaFileNames in generateDatatypes := ((d: Definition) => s"${d.name}.scala"),
+      datatypeScalaFileNames in generateDatatypes := scalaDef2File,
       sourceGenerators in Compile <+= generateDatatypes,
       generateDatatypes := {
         Generate((datatypeSource in generateDatatypes).value,
           (sourceManaged in generateDatatypes).value,
-          (datatypeTargetLang in generateDatatypes).value,
           (datatypeScalaFileNames in generateDatatypes).value)
       }
     )
@@ -44,13 +44,10 @@ object DatatypePlugin extends AutoPlugin {
 
 object Generate {
 
-  def apply(base: File, target: File, mode: DatatypePlugin.autoImport.DatatypeTargetLang, scalaFileNames: Definition => String): Seq[File] = {
+  def apply(base: File, target: File, scalaFileNames: Definition => File): Seq[File] = {
     val input: Array[Schema] = IO listFiles base map (f => Schema parse (IO read f))
 
-    val generator: CodeGenerator = mode match {
-      case DatatypePlugin.autoImport.DatatypeTargetLang.Java  => JavaCodeGen
-      case DatatypePlugin.autoImport.DatatypeTargetLang.Scala => new ScalaCodeGen(scalaFileNames)
-    }
+    val generator: CodeGenerator = new MixedCodeGen(scalaFileNames)
 
     input flatMap generator.generate map {
       case (file, code) =>

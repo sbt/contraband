@@ -1,8 +1,9 @@
 {
-	"namespace": "com.example",
 	"types": [
 		{
+			"namespace": "com.example",
 			"name": "Person",
+			"target": "Java",
 			"type": "record",
 			"fields": [
 				{

@@ -1,8 +1,9 @@
 {
-	"namespace": "com.example",
 	"types": [
 		{
 			"name": "Person",
+			"namespace": "com.example",
+			"target": "Scala",
 			"type": "record",
 			"fields": [
 				{

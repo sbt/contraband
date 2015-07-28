@@ -1,8 +1,9 @@
 {
-	"namespace": "com.example",
 	"types": [
 		{
 			"name": "Person",
+			"namespace": "com.example",
+			"target": "Java",
 			"type": "record",
 			"fields": [
 				{
@@ -25,6 +26,8 @@
 		},
 		{
 			"name": "Gender",
+			"namespace": "com.example",
+			"target": "Java",
 			"type": "enumeration",
 			"types": [
 				"Unknown",

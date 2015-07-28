@@ -1,0 +1,20 @@
+# No datatype is defined, but we try to use it. It fails.
+-> compile
+
+# Add the first version of the datatype. Compilation succeeds.
+$ copy-file changes/greetings-0.json src/datatype/greetings.json
+> compile
+
+# We use a new version of the datatype which has not been defined yet. Compilation fails.
+$ copy-file changes/Example-1.java src/main/java/com/example/Example.java
+-> compile
+
+# And so on.
+$ copy-file changes/greetings-1.json src/datatype/greetings.json
+> compile
+
+$ copy-file changes/Example-2.java src/main/java/com/example/Example.java
+-> compile
+
+$ copy-file changes/greetings-2.json src/datatype/greetings.json
+> compile

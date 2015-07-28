@@ -275,7 +275,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + (new Integer(simpleInteger)).hashCode()) + arrayInteger().hashCode());
+            |        return 37 * (37 * (17 + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
             |    }
             |    public String toString() {
             |        return  "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";

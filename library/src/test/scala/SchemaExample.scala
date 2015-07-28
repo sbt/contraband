@@ -32,22 +32,21 @@ object NewSchema {
 
   val emptySchemaExample = """{}"""
 
-  val onlyNamespaceSchemaExample = """{
-    "namespace": "com.example"
-}"""
-
   val emptyProtocolExample = """{
   "type": "protocol",
+  "target": "Scala",
   "name": "emptyProtocolExample"
 }"""
 
   val emptyRecordExample = """{
   "type": "record",
+  "target": "Scala",
   "name": "emptyRecordExample"
 }"""
 
   val emptyEnumerationExample = """{
   "type": "enumeration",
+  "target": "Scala",
   "name": "emptyEnumerationExample"
 }"""
 
@@ -60,6 +59,7 @@ object NewSchema {
   "type": "protocol",
   "doc": "example of simple protocol",
   "name": "simpleProtocolExample",
+  "target": "Scala",
   "fields": [
     {
       "name": "field",
@@ -71,22 +71,26 @@ object NewSchema {
   val oneChildProtocolExample = """{
   "name": "oneChildProtocolExample",
   "type": "protocol",
+  "target": "Scala",
   "doc": "example of protocol",
   "types": [
     {
       "name": "childRecord",
-      "type": "record"
+      "type": "record",
+      "target": "Scala"
     }
   ]
 }"""
 
   val nestedProtocolExample = """{
   "name": "nestedProtocolExample",
+  "target": "Scala",
   "type": "protocol",
   "doc": "example of nested protocols",
   "types": [
     {
       "name": "nestedProtocol",
+      "target": "Scala",
       "type": "protocol"
     }
   ]
@@ -95,6 +99,7 @@ object NewSchema {
   val simpleRecordExample = """{
   "name": "simpleRecordExample",
   "type": "record",
+  "target": "Scala",
   "doc": "Example of simple record",
   "fields": [
     {
@@ -106,6 +111,7 @@ object NewSchema {
 
   val simpleEnumerationExample = """{
   "name": "simpleEnumerationExample",
+  "target": "Scala",
   "type": "enumeration",
   "doc": "Example of simple enumeration",
   "types": [
@@ -134,6 +140,7 @@ object NewSchema {
   "types": [
     {
       "name": "primitiveTypesExample",
+      "target": "Scala",
       "type": "record",
       "fields": [
         {
@@ -161,6 +168,7 @@ object NewSchema {
   "types": [
     {
       "name": "primitiveTypesNoLazyExample",
+      "target": "Scala",
       "type": "record",
       "fields": [
         {
@@ -179,11 +187,11 @@ object NewSchema {
 
 
   val completeExample = """{
-  "namespace": "com.example",
-
   "types": [
     {
       "name": "Greetings",
+      "namespace": "com.example",
+      "target": "Scala",
       "doc": "A greeting protocol",
       "type": "protocol",
 
@@ -205,11 +213,15 @@ object NewSchema {
       "types": [
         {
           "name": "SimpleGreeting",
+          "namespace": "com.example",
+          "target": "Scala",
           "type": "record",
           "doc": "A Greeting in its simplest form"
         },
         {
           "name": "GreetingWithAttachments",
+          "namespace": "com.example",
+          "target": "Scala",
           "type": "record",
           "doc": "A Greeting with attachments",
 
@@ -225,6 +237,8 @@ object NewSchema {
     },
     {
       "name": "GreetingHeader",
+      "namespace": "com.example",
+      "target": "Scala",
       "type": "record",
       "doc": "Meta information of a Greeting",
 
@@ -250,6 +264,8 @@ object NewSchema {
     },
     {
       "name": "PriorityLevel",
+      "namespace": "com.example",
+      "target": "Scala",
       "type": "enumeration",
       "doc": "Priority levels",
 
@@ -268,7 +284,7 @@ object NewSchema {
   val completeExampleCodeScala =
     """package com.example
       |/** A greeting protocol */
-      |sealed abstract class Greetings(
+      |abstract class Greetings(
       |  _message: => String,
       |  /** The header of the Greeting */
       |  val header: GreetingHeader)  {
@@ -291,7 +307,7 @@ object NewSchema {
       |/** A Greeting in its simplest form */
       |final class SimpleGreeting(
       |  message: => String,
-      |  header: GreetingHeader) extends Greetings(message, header) {
+      |  header: GreetingHeader) extends com.example.Greetings(message, header) {
       |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  override def equals(o: Any): Boolean = o match {
@@ -316,7 +332,7 @@ object NewSchema {
       |  message: => String,
       |  header: GreetingHeader,
       |  /** The files attached to the greeting */
-      |  val attachments: Array[java.io.File]) extends Greetings(message, header) {
+      |  val attachments: Array[java.io.File]) extends com.example.Greetings(message, header) {
       |  def this(message: => String, attachments: Array[java.io.File]) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"), attachments)
       |
       |  override def equals(o: Any): Boolean = o match {
@@ -441,7 +457,7 @@ object NewSchema {
       new File("com/example/GreetingWithAttachments.java") ->
         """package com.example;
           |/** A Greeting with attachments */
-          |public final class GreetingWithAttachments extends Greetings {
+          |public final class GreetingWithAttachments extends com.example.Greetings {
           |
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
@@ -519,7 +535,7 @@ object NewSchema {
       new File("com/example/SimpleGreeting.java") ->
         """package com.example;
           |/** A Greeting in its simplest form */
-          |public final class SimpleGreeting extends Greetings {
+          |public final class SimpleGreeting extends com.example.Greetings {
           |
           |    public SimpleGreeting(Lazy<String> _message) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));

@@ -11,7 +11,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   }
 
   implicit def definition2Schema(d: Definition): Schema =
-    Schema(None, List(d))
+    Schema(List(d))
 
   def is = s2"""
     This is a specification for the generation of $language code.
