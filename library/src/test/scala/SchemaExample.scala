@@ -284,7 +284,7 @@ object NewSchema {
   val completeExampleCodeScala =
     """package com.example
       |/** A greeting protocol */
-      |abstract class Greetings(
+      |sealed abstract class Greetings(
       |  _message: => String,
       |  /** The header of the Greeting */
       |  val header: GreetingHeader)  {

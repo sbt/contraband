@@ -11,7 +11,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   val genFileName = (_: Definition) => outputFile
 
   override def enumerationGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -27,13 +27,13 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val protocol = Protocol parse simpleProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
-        |abstract class simpleProtocolExample(
+        |sealed abstract class simpleProtocolExample(
         |  val field: type)  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleProtocolExample => (this.field == x.field)
@@ -49,13 +49,13 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val protocol = Protocol parse oneChildProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of protocol */
-        |abstract class oneChildProtocolExample()  {
+        |sealed abstract class oneChildProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: oneChildProtocolExample => true
         |    case _ => false
@@ -86,13 +86,13 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateNested = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val protocol = Protocol parse nestedProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of nested protocols */
-        |abstract class nestedProtocolExample()  {
+        |sealed abstract class nestedProtocolExample()  {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocolExample => true
         |    case _ => false
@@ -104,7 +104,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "nestedProtocolExample(" +  + ")"
         |  }
         |}
-        |abstract class nestedProtocol() extends nestedProtocolExample() {
+        |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocol => true
         |    case _ => false
@@ -119,7 +119,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
@@ -144,7 +144,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesExample
     val code = gen generate schema
 
@@ -179,7 +179,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = gen generate schema
 
@@ -209,7 +209,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateComplete = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
@@ -217,7 +217,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val gen = new ScalaCodeGen(genFileName)
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
 

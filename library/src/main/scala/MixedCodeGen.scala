@@ -5,9 +5,9 @@ import java.io.File
 /**
  * Generator that produces both Scala and Java code.
  */
-class MixedCodeGen(genScalaFileName: Definition => File) extends CodeGenerator {
+class MixedCodeGen(genScalaFileName: Definition => File, scalaSealprotocols: Boolean) extends CodeGenerator {
   val javaGen  = JavaCodeGen
-  val scalaGen = new ScalaCodeGen(genScalaFileName)
+  val scalaGen = new ScalaCodeGen(genScalaFileName, scalaSealprotocols)
 
   def generate(s: Schema): Map[File, String] =
     s.definitions map (generate (_, None, Nil)) reduce (_ merge _)

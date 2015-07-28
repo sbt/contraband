@@ -12,6 +12,7 @@ object DatatypePlugin extends AutoPlugin {
     val generateDatatypes = taskKey[Seq[File]]("Generate datatypes.")
     val datatypeSource = settingKey[File]("Datatype source directory.")
     val datatypeScalaFileNames = settingKey[Definition => File]("Mapping from `Definition` to file for Scala generator.")
+    val datatypeScalaSealProtocols = settingKey[Boolean]("Seal abstract classes representing `Protocol`s in Scala.")
 
     sealed trait DatatypeTargetLang
     object DatatypeTargetLang {
@@ -23,11 +24,16 @@ object DatatypePlugin extends AutoPlugin {
       datatypeSource in generateDatatypes := sourceDirectory.value / "datatype",
       sourceManaged in generateDatatypes := sourceManaged.value,
       datatypeScalaFileNames in generateDatatypes := scalaDef2File,
+      // We cannot enable this by default, because the default function for naming Scala files that we provide
+      // will create a separate file for every `Definition`.
+      datatypeScalaSealProtocols in generateDatatypes := false,
       sourceGenerators in Compile <+= generateDatatypes,
       generateDatatypes := {
         Generate((datatypeSource in generateDatatypes).value,
           (sourceManaged in generateDatatypes).value,
-          (datatypeScalaFileNames in generateDatatypes).value)
+          (datatypeScalaFileNames in generateDatatypes).value,
+          (datatypeScalaSealProtocols in generateDatatypes).value,
+          streams.value.log)
       }
     )
   }
@@ -44,18 +50,16 @@ object DatatypePlugin extends AutoPlugin {
 
 object Generate {
 
-  def apply(base: File, target: File, scalaFileNames: Definition => File): Seq[File] = {
+  def apply(base: File, target: File, scalaFileNames: Definition => File, scalaSealProtocols: Boolean, log: Logger): Seq[File] = {
     val input: Array[Schema] = IO listFiles base map (f => Schema parse (IO read f))
 
-    val generator: CodeGenerator = new MixedCodeGen(scalaFileNames)
+    val generator: CodeGenerator = new MixedCodeGen(scalaFileNames, scalaSealProtocols)
 
     input flatMap generator.generate map {
       case (file, code) =>
         val outputFile = new File(target, "/" + file.toString)
         IO.write(outputFile, code)
-        println("Created " + outputFile)
-
-        IO.write(new File("/Users/martin/Desktop/java/" + file.toString), code)
+        log.info(s"sbt-datatype created $outputFile")
 
         outputFile
     }

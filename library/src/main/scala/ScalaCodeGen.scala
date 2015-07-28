@@ -5,7 +5,7 @@ import java.io.File
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(genFile: Definition => File) extends CodeGenerator {
+class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -110,10 +110,13 @@ class ScalaCodeGen(genFile: Definition => File) extends CodeGenerator {
     val lazyMembers =
       genLazyMembers(p.fields) mkString EOL
 
+    val classDef =
+      if (sealProtocols) "sealed abstract class" else "abstract class"
+
     val code =
       s"""${genPackage(p)}
          |${genDoc(p.doc)}
-         |abstract class ${p.name}($ctorParameters) $extendsCode {
+         |$classDef ${p.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
          |  ${genEquals(p, superFields)}
