@@ -1,0 +1,22 @@
+{
+	"types": [
+		{
+			"namespace": "com.example",
+			"name": "Person",
+			"target": "Java",
+			"type": "record",
+			"fields": [
+				{
+					"name": "name",
+					"type": "String"
+				},
+				{
+					"name": "age",
+					"type": "int",
+					"since": "0.1.0",
+					"default": "0"
+				}
+			]
+		}
+	]
+}

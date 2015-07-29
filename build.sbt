@@ -9,16 +9,24 @@ lazy val commonSettings = Seq(
 
 lazy val root = (project in file(".")).
   settings(commonSettings).
-  aggregate(library)
+  aggregate(library, plugin)
+
+lazy val plugin = (project in file("plugin")).
+  settings(commonSettings).
+  settings(
+    sbtPlugin := true,
+    name := "datatype-plugin",
+    ScriptedPlugin.scriptedSettings,
+    scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+      Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+    },
+    publishLocal <<= (publishLocal) dependsOn (publishLocal in library)
+  ).
+  dependsOn(library)
 
 lazy val library = project.
   settings(commonSettings).
   settings(
     name := "datatype",
-    libraryDependencies ++= jsonDependencies ++ Seq(specs2 % Test),
-    publishArtifact in (Test, packageBin) := true, // for scripted + SchemaExample
-    scriptedLaunchOpts := { scriptedLaunchOpts.value ++
-      Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
-    }
-  ).
-  settings(ScriptedPlugin.scriptedSettings)    
+    libraryDependencies ++= jsonDependencies ++ Seq(specs2 % Test)
+  )

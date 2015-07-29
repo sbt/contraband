@@ -1,0 +1,16 @@
+{
+	"types": [
+		{
+			"name": "Person",
+			"namespace": "com.example",
+			"target": "Scala",
+			"type": "record",
+			"fields": [
+				{
+					"name": "name",
+					"type": "String"
+				}
+			]
+		}
+	]
+}

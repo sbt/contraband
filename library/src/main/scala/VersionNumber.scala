@@ -15,6 +15,15 @@ final class VersionNumber private[sbt] (
     else Some(numbers(idx))
   def size: Int = numbers.size
 
+  def <(o: VersionNumber)(implicit ord: Ordering[VersionNumber]): Boolean =
+    ord.compare(this, o) < 0
+  def <=(o: VersionNumber)(implicit ord: Ordering[VersionNumber]): Boolean =
+    ord.compare(this, o) <= 0
+  def >(o: VersionNumber)(implicit ord: Ordering[VersionNumber]): Boolean =
+    ord.compare(this, o) > 0
+  def >=(o: VersionNumber)(implicit ord: Ordering[VersionNumber]): Boolean =
+    ord.compare(this, o) >= 0
+
   private[this] val versionStr: String =
     numbers.mkString(".") +
       (tags match {

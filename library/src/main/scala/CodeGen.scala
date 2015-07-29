@@ -1,4 +1,70 @@
 package sbt.datatype
+import scala.compat.Platform.EOL
+import java.io.File
+
+/**
+ * The base for code generators.
+ */
+abstract class CodeGenerator {
+
+  implicit class MergeableMap[T](m: Map[T, String]) {
+    def merge(o: Map[T, String]): Map[T, String] =
+      (o foldLeft m) { case (acc, (k, v)) =>
+        val existing = acc get k getOrElse ""
+
+        acc get k match {
+          case None =>
+            acc + (k -> v)
+
+          case Some(existing) =>
+            // Remove `package blah` from what we want to add
+            val content = v.lines.toList.tail mkString EOL
+            acc + (k -> (existing + EOL + EOL + content))
+        }
+      }
+  }
+
+  implicit protected class IndentationAwareString(code: String) {
+    final def indented(implicit config: IndentationConfiguration): String = indentWith(config)
+
+    final def indentWith(config: IndentationConfiguration): String = {
+      val buffer = new IndentationAwareBuffer(config)
+      code.lines foreach buffer .+=
+      buffer.toString
+    }
+  }
+
+
+  /** Run an operation `op` for each different version number that affects the fields `fields`. */
+  protected final def perVersionNumber[T](since: VersionNumber, fields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
+    val versionNumbers = (since :: fields.map(_.since)).sorted.distinct
+    versionNumbers map { v =>
+      val (provided, byDefault) = fields partition (_.since <= v)
+      op(provided, byDefault)
+    }
+  }
+
+  /** Generate the code corresponding to all definitions in `s`. */
+  def generate(s: Schema): Map[File, String]
+
+  /** Generate the code corresponding to `d`. */
+  protected final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[File, String] =
+    d match {
+      case p: Protocol    => generate(p, parent, superFields)
+      case r: Record      => generate(r, parent, superFields)
+      case e: Enumeration => generate(e)
+    }
+
+  /** Generate the code corresponding to the protocol `p`. */
+  protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
+
+  /** Generate the code corresponding to the record `r`. */
+  protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
+
+  /** Generate the code corresponding to the enumeration `e`. */
+  protected def generate(e: Enumeration): Map[File, String]
+
+}
 
 object CodeGen {
   def generate(ps: ProtocolSchema): String =

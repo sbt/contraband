@@ -1,0 +1,24 @@
+{
+	"types": [
+		{
+			"name": "Greeting",
+			"namespace": "com.example.interfaces",
+			"target": "Scala",
+			"type": "protocol",
+			"fields": [
+				{
+					"name": "message",
+					"type": "String"
+				}
+			],
+			"types": [
+				{
+					"name": "SimpleGreeting",
+					"namespace": "com.example",
+					"target": "Java",
+					"type": "record"
+				}
+			]
+		}
+	]
+}
