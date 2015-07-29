@@ -558,4 +558,18 @@ object NewSchema {
           |    }
           |}""".stripMargin)
 
+  val growableAddOneFieldExample = """{
+  "name": "growableAddOneField",
+  "target": "Scala",
+  "type": "record",
+  "fields": [
+    {
+      "name": "field",
+      "type": "int",
+      "since": "0.1.0",
+      "default": "0"
+    }
+  ]
+}""".stripMargin
+
 }

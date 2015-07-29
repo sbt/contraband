@@ -26,12 +26,14 @@ abstract class GCodeGenSpec(language: String) extends Specification {
 
     generate(Record) should
       generate a simple record                   $recordGenerateSimple
+      grow a record from 0 to 1 field            $recordGrowZeroToOneField
 
     generate(Schema) should
       generate a complete schema                 $schemaGenerateComplete
       generate and indent a complete schema      $schemaGenerateCompletePlusIndent
       generate correct type references           $schemaGenerateTypeReferences
       generate correct type references (no lazy) $schemaGenerateTypeReferencesNoLazy
+
   """
 
   def enumerationGenerateSimple: MatchResult[_]
@@ -43,6 +45,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   def schemaGenerateCompletePlusIndent: MatchResult[_]
   def schemaGenerateTypeReferences: MatchResult[_]
   def schemaGenerateTypeReferencesNoLazy: MatchResult[_]
+  def recordGrowZeroToOneField: MatchResult[_]
 
 }
 

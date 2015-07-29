@@ -18,7 +18,7 @@ object JavaCodeGen extends CodeGenerator {
     s.definitions flatMap (generate(_, None, Nil) mapValues (_.indented)) toMap
 
   override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val Protocol(name, _, namespace, doc, fields, children) = p
+    val Protocol(name, _, namespace, _, doc, fields, children) = p
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
 
     val code =
@@ -37,7 +37,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val Record(name, _, namespace, doc, fields) = r
+    val Record(name, _, namespace, _, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
 
     val code =
@@ -56,7 +56,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   override def generate(e: Enumeration): Map[File, String] = {
-    val Enumeration(name, _, namespace, doc, values) = e
+    val Enumeration(name, _, namespace, _, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>
       s"""${genDoc(doc)}
@@ -125,7 +125,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def genConstructors(cl: ClassLike, parent: Option[Protocol], superFields: List[Field]) =
-    perVersionNumber(cl.fields ++ superFields) { (provided, byDefault) =>
+    perVersionNumber(cl.since, cl.fields ++ superFields) { (provided, byDefault) =>
       val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _${f.name}") mkString ", "
       val superFieldsValues = superFields map {
         case f if provided contains f  => s"_${f.name}"

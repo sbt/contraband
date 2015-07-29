@@ -42,14 +42,14 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val allFields = r.fields ++ superFields
 
     val alternativeCtors =
-      genAlternativeConstructors(allFields) mkString EOL
+      genAlternativeConstructors(r.since, allFields) mkString EOL
 
     // If there are no fields, we still need an `apply` method with an empty parameter list.
     val applyOverloads =
       if (allFields.isEmpty) {
         s"def apply(): ${r.name} = new ${r.name}()"
       } else {
-        perVersionNumber(allFields) { (provided, byDefault) =>
+        perVersionNumber(r.since, allFields) { (provided, byDefault) =>
           val applyParameters =
             provided map genParam mkString ", "
 
@@ -96,7 +96,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val allFields = p.fields ++ superFields
 
     val alternativeCtors =
-      genAlternativeConstructors(allFields) mkString EOL
+      genAlternativeConstructors(p.since, allFields) mkString EOL
 
     val ctorParameters =
       genCtorParameters(p, allFields) mkString ", "
@@ -196,8 +196,8 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     }
   }
 
-  private def genAlternativeConstructors(allFields: List[Field]) =
-    perVersionNumber(allFields) {
+  private def genAlternativeConstructors(since: VersionNumber, allFields: List[Field]) =
+    perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
         val ctorParameters =
           provided map genParam mkString ", "

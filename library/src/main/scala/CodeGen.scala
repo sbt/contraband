@@ -36,8 +36,8 @@ abstract class CodeGenerator {
 
 
   /** Run an operation `op` for each different version number that affects the fields `fields`. */
-  protected final def perVersionNumber[T](fields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
-    val versionNumbers = fields.map(_.since).sorted.distinct
+  protected final def perVersionNumber[T](since: VersionNumber, fields: List[Field])(op: (List[Field], List[Field]) => T): List[T] = {
+    val versionNumbers = (since :: fields.map(_.since)).sorted.distinct
     versionNumbers map { v =>
       val (provided, byDefault) = fields partition (_.since <= v)
       op(provided, byDefault)

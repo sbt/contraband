@@ -143,6 +143,32 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
+  override def recordGrowZeroToOneField = {
+    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val record = Record parse growableAddOneFieldExample
+    val code = gen generate record
+
+    code.head._2.unindent must containTheSameElementsAs(
+      """final class growableAddOneField(
+        |  val field: Int)  {
+        |  def this() = this(0)
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: growableAddOneField => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (17 + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "growableAddOneField(" + field + ")"
+        |  }
+        |}
+        |object growableAddOneField {
+        |  def apply(): growableAddOneField = new growableAddOneField(0)
+        |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
+        |}""".stripMargin.unindent)
+  }
+
   override def schemaGenerateTypeReferences = {
     val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesExample

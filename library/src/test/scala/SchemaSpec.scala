@@ -59,7 +59,7 @@ class SchemaSpec extends Specification {
 
   def definitionParseProtocol = {
     Definition parse emptyProtocolExample match {
-      case Protocol(name, target, namespace, doc, fields, children) =>
+      case Protocol(name, target, namespace, _, doc, fields, children) =>
         name must_== "emptyProtocolExample"
         target must_== "Scala"
         namespace must_== None
@@ -74,7 +74,7 @@ class SchemaSpec extends Specification {
 
   def definitionParseRecord = {
     Definition parse emptyRecordExample match {
-      case Record(name, target, namespace, doc, fields) =>
+      case Record(name, target, namespace, _, doc, fields) =>
         name must_== "emptyRecordExample"
         target must_== "Scala"
         namespace must_== None
@@ -88,7 +88,7 @@ class SchemaSpec extends Specification {
 
   def definitionParseEnumeration = {
     Definition parse emptyEnumerationExample match {
-      case Enumeration(name, target, namespace, doc, values) =>
+      case Enumeration(name, target, namespace, _, doc, values) =>
         name must_== "emptyEnumerationExample"
         target must_== "Scala"
         namespace must_== None
@@ -105,7 +105,7 @@ class SchemaSpec extends Specification {
 
   def protocolParseSimple = {
     Protocol parse simpleProtocolExample match {
-      case Protocol(name, target, namespace, doc, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, children) =>
         name must_== "simpleProtocolExample"
         target must_== "Scala"
         namespace must_== None
@@ -118,33 +118,33 @@ class SchemaSpec extends Specification {
 
   def protocolParseOneChild = {
     Protocol parse oneChildProtocolExample match {
-      case Protocol(name, target, namespace, doc, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, children) =>
         name must_== "oneChildProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== Some("example of protocol")
         fields must haveSize(0)
         children must haveSize(1)
-        children(0) must_== Record("childRecord", "Scala", None, None, Nil)
+        children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), None, Nil)
     }
   }
 
   def protocolParseNested = {
     Protocol parse nestedProtocolExample match {
-      case Protocol(name, target, namespace, doc, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, children) =>
         name must_== "nestedProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== Some("example of nested protocols")
         fields must haveSize(0)
         children must haveSize(1)
-        children(0) must_== Protocol("nestedProtocol", "Scala", None, None, Nil, Nil)
+        children(0) must_== Protocol("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), None, Nil, Nil)
     }
   }
 
   def recordParseSimple = {
     Record parse simpleRecordExample match {
-      case Record(name, target, namespace, doc, fields) =>
+      case Record(name, target, namespace, _, doc, fields) =>
         name must_== "simpleRecordExample"
         target must_== "Scala"
         namespace must_== None
@@ -156,7 +156,7 @@ class SchemaSpec extends Specification {
 
   def enumerationParseSimple = {
     Enumeration parse simpleEnumerationExample match {
-      case Enumeration(name, target, namespace, doc, values) =>
+      case Enumeration(name, target, namespace, _, doc, values) =>
         name must_== "simpleEnumerationExample"
         target must_== "Scala"
         namespace must_== None

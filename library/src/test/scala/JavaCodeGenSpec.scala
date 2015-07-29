@@ -63,6 +63,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         new File("oneChildProtocolExample.java") ->
           """/** example of protocol */
             |public abstract class oneChildProtocolExample  {
+            |    public oneChildProtocolExample() {
+            |        super();
+            |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |        return true;
@@ -83,6 +86,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
         new File("childRecord.java") ->
           """public final class childRecord extends oneChildProtocolExample {
+            |    public childRecord() {
+            |        super();
+            |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -113,6 +119,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
             |public abstract class nestedProtocolExample  {
+            |    public nestedProtocolExample() {
+            |        super();
+            |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -133,6 +142,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
         new File("nestedProtocol.java") ->
           """public abstract class nestedProtocol extends nestedProtocolExample {
+            |    public nestedProtocol() {
+            |        super();
+            |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -187,6 +199,47 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public String toString() {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
+            |    }
+            |}""".stripMargin.unindent
+      ).toList
+    )
+  }
+
+  override def recordGrowZeroToOneField = {
+    val record = Record parse growableAddOneFieldExample
+    val code = JavaCodeGen generate record
+
+    code mapValues (_.unindent) must containTheSameElementsAs(
+      Map(
+        new File("growableAddOneField.java") ->
+          """public final class growableAddOneField  {
+            |    private int field;
+            |    public growableAddOneField() {
+            |        super();
+            |        field = 0;
+            |    }
+            |    public growableAddOneField(int _field) {
+            |        super();
+            |        field = _field;
+            |    }
+            |    public int field() {
+            |        return this.field;
+            |    }
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof growableAddOneField)) {
+            |            return false;
+            |        } else {
+            |            growableAddOneField o = (growableAddOneField)obj;
+            |            return (field() == o.field());
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 37 * (17 + (new Integer(field())).hashCode());
+            |    }
+            |    public String toString() {
+            |        return "growableAddOneField("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
       ).toList

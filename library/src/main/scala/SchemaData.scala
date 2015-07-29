@@ -55,6 +55,7 @@ sealed trait SchemaElement {
 sealed trait Definition extends SchemaElement {
   def namespace: Option[String]
   def targetLang: String
+  def since: VersionNumber
 }
 
 sealed trait ClassLike extends Definition {
@@ -97,6 +98,7 @@ object Schema extends Parser[Schema] {
 case class Protocol(name: String,
   targetLang: String,
   namespace: Option[String],
+  since: VersionNumber,
   doc: Option[String],
   fields: List[Field],
   children: List[Definition]) extends ClassLike
@@ -106,6 +108,7 @@ object Protocol extends Parser[Protocol] {
     Protocol(json -> "name",
       json -> "target",
       json ->? "namespace",
+      json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "doc",
       json ->* "fields" map Field.parse,
       json ->* "types" map Definition.parse)
@@ -123,6 +126,7 @@ object Protocol extends Parser[Protocol] {
 case class Record(name: String,
   targetLang: String,
   namespace: Option[String],
+  since: VersionNumber,
   doc: Option[String],
   fields: List[Field]) extends ClassLike
 
@@ -131,6 +135,7 @@ object Record extends Parser[Record] {
     Record(json -> "name",
       json -> "target",
       json ->? "namespace",
+      json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "doc",
       json ->* "fields" map Field.parse)
 }
@@ -147,6 +152,7 @@ object Record extends Parser[Record] {
 case class Enumeration(name: String,
   targetLang: String,
   namespace: Option[String],
+  since: VersionNumber,
   doc: Option[String],
   values: List[EnumerationValue]) extends Definition
 
@@ -155,6 +161,7 @@ object Enumeration extends Parser[Enumeration] {
     Enumeration(json -> "name",
       json -> "target",
       json ->? "namespace",
+      json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "doc",
       json ->* "types" map EnumerationValue.parse)
 }
