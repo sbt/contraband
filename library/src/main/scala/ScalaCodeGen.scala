@@ -39,7 +39,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val allFields = superFields ++ r.fields
+    val allFields = r.fields ++ superFields
 
     val alternativeCtors =
       genAlternativeConstructors(allFields) mkString EOL
@@ -93,7 +93,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
   override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val allFields = superFields ++ p.fields
+    val allFields = p.fields ++ superFields
 
     val alternativeCtors =
       genAlternativeConstructors(allFields) mkString EOL
@@ -124,7 +124,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), superFields ++ p.fields))) reduce (_ merge _)
+    Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), p.fields ++ superFields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
@@ -150,7 +150,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
     val comparisonCode =
       if (allFields exists (_.tpe.lzy)) {
         "super.equals(o) // We have lazy members, so use object identity to avoid circularity."
@@ -167,7 +167,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
     val computationCode =
       if (allFields exists (_.tpe.lzy)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
@@ -181,7 +181,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
 
     if (allFields exists (_.tpe.lzy)) {
       s"""override def toString: String = {

@@ -22,7 +22,7 @@ class MixedCodeGen(genScalaFileName: Definition => File, scalaSealprotocols: Boo
       case "Java"  => javaGen.generate(childLessProtocol, parent, superFields) mapValues (_ indentWith javaGen.indentationConfiguration)
     }
 
-    (parentResult :: (p.children map (generate(_, Some(p), superFields ++ p.fields)))) reduce (_ merge _)
+    (parentResult :: (p.children map (generate(_, Some(p), p.fields ++ superFields)))) reduce (_ merge _)
 
   }
 

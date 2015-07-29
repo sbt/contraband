@@ -33,7 +33,7 @@ object JavaCodeGen extends CodeGenerator {
          |    ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) ++ (children flatMap (generate(_, Some(p), superFields ++ fields)))
+    Map(genFile(p) -> code) ++ (children flatMap (generate(_, Some(p), fields ++ superFields)))
   }
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
@@ -124,7 +124,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def genConstructors(cl: ClassLike, parent: Option[Protocol], superFields: List[Field]) =
-    perVersionNumber(superFields ++ cl.fields) { (provided, byDefault) =>
+    perVersionNumber(cl.fields ++ superFields) { (provided, byDefault) =>
       val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _${f.name}") mkString ", "
       val superFieldsValues = superFields map {
         case f if provided contains f  => s"_${f.name}"
@@ -143,7 +143,7 @@ object JavaCodeGen extends CodeGenerator {
     } mkString (EOL + EOL)
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return this == obj; // We have lazy members, so use object identity to avoid circularity."
@@ -177,7 +177,7 @@ object JavaCodeGen extends CodeGenerator {
     else s"${f.name}().hashCode()"
 
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
@@ -192,7 +192,7 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+    val allFields = cl.fields ++ superFields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."

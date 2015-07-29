@@ -329,11 +329,11 @@ object NewSchema {
       |
       |/** A Greeting with attachments */
       |final class GreetingWithAttachments(
-      |  message: => String,
-      |  header: GreetingHeader,
       |  /** The files attached to the greeting */
-      |  val attachments: Array[java.io.File]) extends com.example.Greetings(message, header) {
-      |  def this(message: => String, attachments: Array[java.io.File]) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+      |  val attachments: Array[java.io.File],
+      |  message: => String,
+      |  header: GreetingHeader) extends com.example.Greetings(message, header) {
+      |  def this(attachments: Array[java.io.File], message: => String) = this(attachments, message, new GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  override def equals(o: Any): Boolean = o match {
       |    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -348,8 +348,8 @@ object NewSchema {
       |}
       |
       |object GreetingWithAttachments {
-      |  def apply(message: => String, attachments: Array[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new GreetingHeader(new java.util.Date(), "Unknown"), attachments)
-      |  def apply(message: => String, header: GreetingHeader, attachments: Array[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
+      |  def apply(attachments: Array[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def apply(attachments: Array[java.io.File], message: => String, header: GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
       |}
       |
       |/** Meta information of a Greeting */
@@ -462,12 +462,12 @@ object NewSchema {
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
           |
-          |    public GreetingWithAttachments(Lazy<String> _message, java.io.File[] _attachments) {
+          |    public GreetingWithAttachments(java.io.File[] _attachments, Lazy<String> _message) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
           |
-          |    public GreetingWithAttachments(Lazy<String> _message, GreetingHeader _header, java.io.File[] _attachments) {
+          |    public GreetingWithAttachments(java.io.File[] _attachments, Lazy<String> _message, GreetingHeader _header) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
