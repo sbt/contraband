@@ -85,7 +85,8 @@ object JavaCodeGen extends CodeGenerator {
     s"""${genDoc(f.doc)}
        |private ${genRealTpe(f.tpe)} ${f.name};""".stripMargin
 
-  def isPrimitive(tpe: TpeRef) = !tpe.repeated && ! tpe.lzy && tpe.name != boxedType(tpe.name)
+  private def isPrimitive(tpe: TpeRef) = !tpe.repeated && !tpe.lzy && tpe.name != boxedType(tpe.name)
+  private def isPrimitiveArray(tpe: TpeRef) = tpe.repeated && !tpe.lzy && tpe.name != boxedType(tpe.name)
 
   private def boxedType(tpe: String): String = tpe match {
     case "boolean" => "Boolean"
@@ -152,9 +153,10 @@ object JavaCodeGen extends CodeGenerator {
           if (allFields.isEmpty) "return true;"
           else
             allFields.map {
-              case f if f.tpe.repeated =>     s"java.util.Arrays.deepEquals(${f.name}(), o.${f.name}())"
-              case f if isPrimitive(f.tpe) => s"(${f.name}() == o.${f.name}())"
-              case f                   => s"${f.name}().equals(o.${f.name}())"
+              case f if isPrimitive(f.tpe)      => s"(${f.name}() == o.${f.name}())"
+              case f if isPrimitiveArray(f.tpe) => s"java.util.Arrays.equals(${f.name}(), o.${f.name}())"
+              case f if f.tpe.repeated          => s"java.util.Arrays.deepEquals(${f.name}(), o.${f.name}())"
+              case f                            => s"${f.name}().equals(o.${f.name}())"
             }.mkString("return ", " && ", ";")
 
         s"""if (this == obj) {

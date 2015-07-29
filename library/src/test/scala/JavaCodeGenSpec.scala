@@ -271,7 +271,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            primitiveTypesNoLazyExample o = (primitiveTypesNoLazyExample)obj;
-            |            return (simpleInteger() == o.simpleInteger()) && java.util.Arrays.deepEquals(arrayInteger(), o.arrayInteger());
+            |            return (simpleInteger() == o.simpleInteger()) && java.util.Arrays.equals(arrayInteger(), o.arrayInteger());
             |        }
             |    }
             |    public int hashCode() {
