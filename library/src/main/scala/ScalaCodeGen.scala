@@ -170,7 +170,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val allFields = superFields ++ cl.fields
     val computationCode =
       if (allFields exists (_.tpe.lzy)) {
-        s"super.hashCode"
+        s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
         (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${f.name}.##)" }
       }
@@ -182,12 +182,18 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
     val allFields = superFields ++ cl.fields
-    val fieldsToString =
-      allFields.map(_.name).mkString(" + ", """ + ", " + """, " + ")
 
-    s"""override def toString: String = {
-       |  "${cl.name}("$fieldsToString")"
-       |}""".stripMargin
+    if (allFields exists (_.tpe.lzy)) {
+      s"""override def toString: String = {
+         |  super.toString // Avoid evaluating lazy members in toString to avoid circularity.
+         |}""".stripMargin
+    } else {
+      val fieldsToString =
+        allFields.map(_.name).mkString(" + ", """ + ", " + """, " + ")
+      s"""override def toString: String = {
+         |  "${cl.name}("$fieldsToString")"
+         |}""".stripMargin
+    }
   }
 
   private def genAlternativeConstructors(allFields: List[Field]) =

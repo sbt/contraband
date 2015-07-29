@@ -180,7 +180,7 @@ object JavaCodeGen extends CodeGenerator {
     val allFields = superFields ++ cl.fields
     val body =
       if (allFields exists (_.tpe.lzy)) {
-        "return super.hashCode();"
+        "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
         val computation = (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${hashCode(f)})" }
         s"return $computation;"
@@ -193,13 +193,17 @@ object JavaCodeGen extends CodeGenerator {
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
     val allFields = superFields ++ cl.fields
-    val code =
-      allFields.map{ f =>
-        s""" + "${f.name}: " + ${f.name}()"""
-      }.mkString(s""" "${cl.name}(" """, " + \", \"", " + \")\"")
+    val body =
+      if (allFields exists (_.tpe.lzy)) {
+        "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."
+      } else {
+        allFields.map{ f =>
+          s""" + "${f.name}: " + ${f.name}()"""
+        }.mkString(s"""return "${cl.name}(" """, " + \", \"", " + \")\";")
+      }
 
     s"""public String toString() {
-       |    return $code;
+       |    $body
        |}""".stripMargin
   }
 

@@ -49,7 +49,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
-        |        return  "simpleProtocolExample("  + "field: " + field() + ")";
+        |        return "simpleProtocolExample("  + "field: " + field() + ")";
         |    }
         |}""".stripMargin.unindent)
   }
@@ -77,7 +77,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 17;
             |    }
             |    public String toString() {
-            |        return  "oneChildProtocolExample("  + ")";
+            |        return "oneChildProtocolExample("  + ")";
             |    }
             |}""".stripMargin.unindent,
 
@@ -97,7 +97,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 17;
             |    }
             |    public String toString() {
-            |        return  "childRecord("  + ")";
+            |        return "childRecord("  + ")";
             |    }
             |}""".stripMargin.unindent
       ).toList
@@ -127,7 +127,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 17;
             |    }
             |    public String toString() {
-            |        return  "nestedProtocolExample("  + ")";
+            |        return "nestedProtocolExample("  + ")";
             |    }
             |}""".stripMargin.unindent,
 
@@ -147,7 +147,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 17;
             |    }
             |    public String toString() {
-            |        return  "nestedProtocol("  + ")";
+            |        return "nestedProtocol("  + ")";
             |    }
             |}""".stripMargin.unindent
       ).toList
@@ -186,7 +186,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 37 * (17 + field().hashCode());
             |    }
             |    public String toString() {
-            |        return  "simpleRecordExample("  + "field: " + field() + ")";
+            |        return "simpleRecordExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
       ).toList
@@ -231,10 +231,10 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
             |    }
             |    public int hashCode() {
-            |        return super.hashCode();
+            |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
             |    }
             |    public String toString() {
-            |        return  "primitiveTypesExample("  + "simpleInteger: " + simpleInteger() + ", " + "lazyInteger: " + lazyInteger() + ", " + "arrayInteger: " + arrayInteger() + ", " + "lazyArrayInteger: " + lazyArrayInteger() + ")";
+            |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
             |    }
             |}""".stripMargin.unindent
       ).toList
@@ -278,7 +278,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 37 * (37 * (17 + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
             |    }
             |    public String toString() {
-            |        return  "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
+            |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
             |    }
             |}""".stripMargin.unindent
       ).toList

@@ -297,10 +297,10 @@ object NewSchema {
       |    case _ => false
       |  }
       |  override def hashCode: Int = {
-      |    super.hashCode
+      |    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
       |  }
       |  override def toString: String = {
-      |    "Greetings(" + message + ", " + header + ")"
+      |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
       |}
       |
@@ -315,10 +315,10 @@ object NewSchema {
       |    case _ => false
       |  }
       |  override def hashCode: Int = {
-      |    super.hashCode
+      |    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
       |  }
       |  override def toString: String = {
-      |    "SimpleGreeting(" + message + ", " + header + ")"
+      |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
       |}
       |
@@ -340,10 +340,10 @@ object NewSchema {
       |    case _ => false
       |  }
       |  override def hashCode: Int = {
-      |    super.hashCode
+      |    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
       |  }
       |  override def toString: String = {
-      |    "GreetingWithAttachments(" + message + ", " + header + ", " + attachments + ")"
+      |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
       |}
       |
@@ -368,10 +368,10 @@ object NewSchema {
       |    case _ => false
       |  }
       |  override def hashCode: Int = {
-      |    super.hashCode
+      |    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
       |  }
       |  override def toString: String = {
-      |    "GreetingHeader(" + created + ", " + priority + ", " + author + ")"
+      |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
       |}
       |
@@ -436,11 +436,11 @@ object NewSchema {
           |    }
           |
           |    public int hashCode() {
-          |        return super.hashCode();
+          |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
           |    public String toString() {
-          |        return  "GreetingHeader("  + "created: " + created() + ", " + "priority: " + priority() + ", " + "author: " + author() + ")";
+          |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
 
@@ -481,11 +481,11 @@ object NewSchema {
           |    }
           |
           |    public int hashCode() {
-          |        return super.hashCode();
+          |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
           |    public String toString() {
-          |        return  "GreetingWithAttachments("  + "message: " + message() + ", " + "header: " + header() + ", " + "attachments: " + attachments() + ")";
+          |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
 
@@ -524,11 +524,11 @@ object NewSchema {
           |    }
           |
           |    public int hashCode() {
-          |        return super.hashCode();
+          |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
           |    public String toString() {
-          |        return  "Greetings("  + "message: " + message() + ", " + "header: " + header() + ")";
+          |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
 
@@ -550,11 +550,11 @@ object NewSchema {
           |    }
           |
           |    public int hashCode() {
-          |        return super.hashCode();
+          |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
           |    public String toString() {
-          |        return  "SimpleGreeting("  + "message: " + message() + ", " + "header: " + header() + ")";
+          |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin)
 

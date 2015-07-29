@@ -166,10 +166,10 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    super.hashCode
+        |    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
         |  }
         |  override def toString: String = {
-        |    "primitiveTypesExample(" + simpleInteger + ", " + lazyInteger + ", " + arrayInteger + ", " + lazyArrayInteger + ")"
+        |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
         |  }
         |}
         |
