@@ -320,6 +320,15 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
+      |  private[this] def copy(message: => String = message, header: GreetingHeader = header): SimpleGreeting = {
+      |    new SimpleGreeting(message, header)
+      |  }
+      |  def withMessage(message: => String): SimpleGreeting = {
+      |    copy(message = message)
+      |  }
+      |  def withHeader(header: GreetingHeader): SimpleGreeting = {
+      |    copy(header = header)
+      |  }
       |}
       |
       |object SimpleGreeting {
@@ -344,6 +353,18 @@ object NewSchema {
       |  }
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
+      |  }
+      |  private[this] def copy(attachments: Array[java.io.File] = attachments, message: => String = message, header: GreetingHeader = header): GreetingWithAttachments = {
+      |    new GreetingWithAttachments(attachments, message, header)
+      |  }
+      |  def withAttachments(attachments: Array[java.io.File]): GreetingWithAttachments = {
+      |    copy(attachments = attachments)
+      |  }
+      |  def withMessage(message: => String): GreetingWithAttachments = {
+      |    copy(message = message)
+      |  }
+      |  def withHeader(header: GreetingHeader): GreetingWithAttachments = {
+      |    copy(header = header)
       |  }
       |}
       |
@@ -372,6 +393,18 @@ object NewSchema {
       |  }
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
+      |  }
+      |  private[this] def copy(created: => java.util.Date = created, priority: PriorityLevel = priority, author: String = author): GreetingHeader = {
+      |    new GreetingHeader(created, priority, author)
+      |  }
+      |  def withCreated(created: => java.util.Date): GreetingHeader = {
+      |    copy(created = created)
+      |  }
+      |  def withPriority(priority: PriorityLevel): GreetingHeader = {
+      |    copy(priority = priority)
+      |  }
+      |  def withAuthor(author: String): GreetingHeader = {
+      |    copy(author = author)
       |  }
       |}
       |
