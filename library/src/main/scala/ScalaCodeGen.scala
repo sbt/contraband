@@ -83,6 +83,8 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  ${genEquals(r, superFields)}
          |  ${genHashCode(r, superFields)}
          |  ${genToString(r, superFields)}
+         |  ${genCopy(r, superFields)}
+         |  ${genWith(r, superFields)}
          |}
          |
          |object ${r.name} {
@@ -242,5 +244,25 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
 
   private def genPackage(d: Definition): String =
     d.namespace map (ns => s"package $ns") getOrElse ""
+
+  private def genCopy(r: Record, superFields: List[Field]) = {
+    val allFields = r.fields ++ superFields
+    val params = allFields map (f => s"${f.name}: ${genRealTpe(f.tpe, isParam = true)} = ${f.name}") mkString ", "
+    val constructorCall = allFields map (_.name) mkString ", "
+    s"""private[this] def copy($params): ${r.name} = {
+       |  new ${r.name}($constructorCall)
+       |}""".stripMargin
+  }
+
+  private def genWith(r: Record, superFields: List[Field]) = {
+    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
+    val allFields = r.fields ++ superFields
+
+    allFields map { f =>
+      s"""def with${capitalize(f.name)}(${f.name}: ${genRealTpe(f.tpe, isParam = true)}): ${r.name} = {
+         |  copy(${f.name} = ${f.name})
+         |}""".stripMargin
+    } mkString (EOL + EOL)
+  }
 
 }
