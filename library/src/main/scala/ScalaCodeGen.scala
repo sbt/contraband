@@ -13,7 +13,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
       s.endsWith("{") ||
       (s.contains(" class ") && s.endsWith("(")) // Constructor definition
     override def reduceIndentTrigger(s: String) = s.startsWith("}")
-    override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(")  {") // End of constructor definition
+    override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith("extends Serializable {") // End of constructor definition
   }
 
 
@@ -30,7 +30,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val code =
       s"""${genPackage(e)}
          |${genDoc(e.doc)}
-         |sealed abstract class ${e.name}
+         |sealed abstract class ${e.name} extends Serializable
          |object ${e.name} {
          |  $values
          |}""".stripMargin
@@ -69,7 +69,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val superCtorArguments = superFields map (_.name) mkString ", "
 
     val extendsCode =
-      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse ""
+      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse "extends Serializable"
 
     val lazyMembers =
       genLazyMembers(r.fields) mkString EOL
@@ -107,7 +107,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
       superFields map (_.name) mkString ", "
 
     val extendsCode =
-      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse ""
+      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse "extends Serializable"
 
     val lazyMembers =
       genLazyMembers(p.fields) mkString EOL

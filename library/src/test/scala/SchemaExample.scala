@@ -287,7 +287,7 @@ object NewSchema {
       |sealed abstract class Greetings(
       |  _message: => String,
       |  /** The header of the Greeting */
-      |  val header: GreetingHeader)  {
+      |  val header: GreetingHeader) extends Serializable {
       |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  /** The message of the Greeting */
@@ -379,7 +379,7 @@ object NewSchema {
       |  /** The priority of this Greeting */
       |  val priority: PriorityLevel,
       |  /** The author of the Greeting */
-      |  val author: String)  {
+      |  val author: String) extends Serializable {
       |  def this(created: => java.util.Date, author: String) = this(created, PriorityLevel.Medium, author)
       |
       |  /** Creation date */
@@ -414,7 +414,7 @@ object NewSchema {
       |}
       |
       |/** Priority levels */
-      |sealed abstract class PriorityLevel
+      |sealed abstract class PriorityLevel extends Serializable
       |object PriorityLevel {
       |
       |  case object Low extends PriorityLevel
@@ -429,7 +429,7 @@ object NewSchema {
       new File("com/example/GreetingHeader.java") ->
         """package com.example;
           |/** Meta information of a Greeting */
-          |public final class GreetingHeader  {
+          |public final class GreetingHeader implements java.io.Serializable {
           |
           |    /** Creation date */
           |    private Lazy<java.util.Date> created;
@@ -525,7 +525,7 @@ object NewSchema {
       new File("com/example/Greetings.java") ->
         """package com.example;
           |/** A greeting protocol */
-          |public abstract class Greetings  {
+          |public abstract class Greetings implements java.io.Serializable {
           |
           |    /** The message of the Greeting */
           |    private Lazy<String> message;

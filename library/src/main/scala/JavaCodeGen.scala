@@ -19,7 +19,7 @@ object JavaCodeGen extends CodeGenerator {
 
   override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val Protocol(name, _, namespace, _, doc, fields, children) = p
-    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
+    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
       s"""${genPackage(p)}
@@ -38,7 +38,7 @@ object JavaCodeGen extends CodeGenerator {
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val Record(name, _, namespace, _, doc, fields) = r
-    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse ""
+    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
       s"""${genPackage(r)}

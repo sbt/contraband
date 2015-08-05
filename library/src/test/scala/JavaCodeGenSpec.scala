@@ -26,7 +26,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
-        |public abstract class simpleProtocolExample  {
+        |public abstract class simpleProtocolExample implements java.io.Serializable {
         |    private type field;
         |    public simpleProtocolExample(type _field) {
         |        super();
@@ -62,7 +62,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
       Map(
         new File("oneChildProtocolExample.java") ->
           """/** example of protocol */
-            |public abstract class oneChildProtocolExample  {
+            |public abstract class oneChildProtocolExample implements java.io.Serializable {
             |    public oneChildProtocolExample() {
             |        super();
             |    }
@@ -118,7 +118,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
       Map(
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
-            |public abstract class nestedProtocolExample  {
+            |public abstract class nestedProtocolExample implements java.io.Serializable {
             |    public nestedProtocolExample() {
             |        super();
             |    }
@@ -174,7 +174,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
       Map(
         new File("simpleRecordExample.java") ->
           """/** Example of simple record */
-            |public final class simpleRecordExample  {
+            |public final class simpleRecordExample implements java.io.Serializable {
             |
             |    private type field;
             |    public simpleRecordExample(type _field) {
@@ -212,7 +212,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
         new File("growableAddOneField.java") ->
-          """public final class growableAddOneField  {
+          """public final class growableAddOneField implements java.io.Serializable {
             |    private int field;
             |    public growableAddOneField() {
             |        super();
@@ -253,7 +253,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
         new File("primitiveTypesExample.java") ->
-          """public final class primitiveTypesExample  {
+          """public final class primitiveTypesExample implements java.io.Serializable {
             |    private int simpleInteger;
             |
             |    private Lazy<Integer> lazyInteger;
@@ -301,7 +301,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
         new File("primitiveTypesNoLazyExample.java") ->
-          """public final class primitiveTypesNoLazyExample  {
+          """public final class primitiveTypesNoLazyExample implements java.io.Serializable {
             |
             |    private int simpleInteger;
             |

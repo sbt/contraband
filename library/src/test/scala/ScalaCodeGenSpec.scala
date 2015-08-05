@@ -17,7 +17,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
-        |sealed abstract class simpleEnumerationExample
+        |sealed abstract class simpleEnumerationExample extends Serializable
         |object simpleEnumerationExample {
         |  /** First type */
         |  case object first extends simpleEnumerationExample
@@ -34,7 +34,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
         |sealed abstract class simpleProtocolExample(
-        |  val field: type)  {
+        |  val field: type) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleProtocolExample => (this.field == x.field)
         |    case _ => false
@@ -55,7 +55,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of protocol */
-        |sealed abstract class oneChildProtocolExample()  {
+        |sealed abstract class oneChildProtocolExample() extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: oneChildProtocolExample => true
         |    case _ => false
@@ -95,7 +95,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of nested protocols */
-        |sealed abstract class nestedProtocolExample()  {
+        |sealed abstract class nestedProtocolExample() extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocolExample => true
         |    case _ => false
@@ -129,7 +129,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple record */
         |final class simpleRecordExample(
-        |val field: type)  {
+        |val field: type) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleRecordExample => (this.field == x.field)
         |    case _ => false
@@ -159,7 +159,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """final class growableAddOneField(
-        |  val field: Int)  {
+        |  val field: Int) extends Serializable {
         |  def this() = this(0)
         |  override def equals(o: Any): Boolean = o match {
         |    case x: growableAddOneField => (this.field == x.field)
@@ -196,7 +196,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  _lazyInteger: => Int,
         |
         |  val arrayInteger: Array[Int],
-        |  _lazyArrayInteger: => Array[Int])  {
+        |  _lazyArrayInteger: => Array[Int]) extends Serializable {
         |
         |
         |  lazy val lazyInteger: Int = _lazyInteger
@@ -244,7 +244,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |  val simpleInteger: Int,
         |
-        |  val arrayInteger: Array[Int])  {
+        |  val arrayInteger: Array[Int]) extends Serializable {
         |
         |
         |  override def equals(o: Any): Boolean = o match {
