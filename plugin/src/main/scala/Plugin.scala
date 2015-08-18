@@ -33,7 +33,7 @@ object DatatypePlugin extends AutoPlugin {
           (sourceManaged in generateDatatypes).value,
           (datatypeScalaFileNames in generateDatatypes).value,
           (datatypeScalaSealProtocols in generateDatatypes).value,
-          streams.value.log)
+          streams.value)
       }
     )
   }
@@ -50,10 +50,10 @@ object DatatypePlugin extends AutoPlugin {
 
 object Generate {
 
-  def apply(base: File, target: File, scalaFileNames: Definition => File, scalaSealProtocols: Boolean, log: Logger): Seq[File] = {
-    val input: Array[Schema] = IO listFiles base map (f => Schema parse (IO read f))
+  private def generate(definitions: Array[File], target: File, scalaFileNames: Definition => File, scalaSealProtocols: Boolean, log: Logger): Seq[File] = {
+    val input = definitions map (f => Schema parse (IO read f))
 
-    val generator: CodeGenerator = new MixedCodeGen(scalaFileNames, scalaSealProtocols)
+    val generator = new MixedCodeGen(scalaFileNames, scalaSealProtocols)
 
     input flatMap generator.generate map {
       case (file, code) =>
@@ -63,5 +63,12 @@ object Generate {
 
         outputFile
     }
+  }
+
+  def apply(base: File, target: File, scalaFileNames: Definition => File, scalaSealProtocols: Boolean, s: TaskStreams): Seq[File] = {
+    val definitions = IO listFiles base
+    def gen() = generate(definitions, target, scalaFileNames, scalaSealProtocols, s.log)
+    val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
+    f(definitions.toSet).toSeq
   }
 }
