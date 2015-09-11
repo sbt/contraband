@@ -32,6 +32,7 @@ lazy val plugin = (project in file("plugin")).
 lazy val library = project.
   settings(commonSettings).
   settings(
+    sbtPlugin := true,
     name := "datatype",
     description := "Code generation library to generate growable datatypes.",
     libraryDependencies ++= jsonDependencies ++ Seq(specs2 % Test)
