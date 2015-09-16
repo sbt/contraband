@@ -2,7 +2,7 @@
 -> compile
 
 # Add the first version of the datatype. Compilation succeeds.
-$ copy-file changes/person-0.json src/datatype/person.json
+$ copy-file changes/person-0.json src/main/datatype/person.json
 > compile
 
 # We use a new version of the datatype which has not been defined yet. Compilation fails.
@@ -10,11 +10,11 @@ $ copy-file changes/Example-1.scala src/main/scala/com/example/Example.scala
 -> compile
 
 # And so on.
-$ copy-file changes/person-1.json src/datatype/person.json
+$ copy-file changes/person-1.json src/main/datatype/person.json
 > compile
 
 $ copy-file changes/Example-2.scala src/main/scala/com/example/Example.scala
 -> compile
 
-$ copy-file changes/person-2.json src/datatype/person.json
+$ copy-file changes/person-2.json src/main/datatype/person.json
 > compile
