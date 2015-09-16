@@ -19,7 +19,7 @@ lazy val plugin = (project in file("plugin")).
   settings(commonSettings).
   settings(
     sbtPlugin := true,
-    name := "datatype-plugin",
+    name := "sbt-datatype",
     description := "sbt plugin to generate growable datatypes.",
     ScriptedPlugin.scriptedSettings,
     scriptedLaunchOpts := { scriptedLaunchOpts.value ++
