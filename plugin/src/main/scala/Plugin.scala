@@ -21,7 +21,7 @@ object DatatypePlugin extends AutoPlugin {
     }
 
     lazy val baseDatatypeSettings: Seq[Def.Setting[_]] = Seq(
-      datatypeSource in generateDatatypes := sourceDirectory.value / "datatype",
+      datatypeSource in generateDatatypes := Defaults.configSrcSub(sourceDirectory).value / "datatype",
       sourceManaged in generateDatatypes := sourceManaged.value,
       datatypeScalaFileNames in generateDatatypes := scalaDef2File,
       // We cannot enable this by default, because the default function for naming Scala files that we provide
@@ -44,7 +44,7 @@ object DatatypePlugin extends AutoPlugin {
   override def trigger = allRequirements
 
   override lazy val projectSettings =
-    baseDatatypeSettings
+    inConfig(Compile)(baseDatatypeSettings) ++ inConfig(Test)(baseDatatypeSettings)
 
 }
 
