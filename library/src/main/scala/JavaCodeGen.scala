@@ -12,6 +12,8 @@ object JavaCodeGen extends CodeGenerator {
     override val indentElement = "    "
     override def augmentIndentAfterTrigger(s: String) = s endsWith "{"
     override def reduceIndentTrigger(s: String) = s startsWith "}"
+    override def enterMultilineJavadoc(s: String) = s == "/**"
+    override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
   override def generate(s: Schema): Map[File, String] =
@@ -73,7 +75,14 @@ object JavaCodeGen extends CodeGenerator {
     Map(genFile(e) -> code)
   }
 
-  private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
+  private def genDoc(doc: Option[List[String]]) = doc map {
+    case l :: Nil => s"/** $l */"
+    case lines =>
+      val doc = lines map (l => s" * $l") mkString EOL
+      s"""/**
+         |$doc
+         | */""".stripMargin
+  } getOrElse ""
 
   private def genFile(d: Definition) = {
     val fileName = d.name + ".java"

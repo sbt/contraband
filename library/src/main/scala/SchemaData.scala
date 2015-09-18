@@ -27,6 +27,16 @@ trait Parser[T] {
 
     /** Retrieves the array field `key` from `jValue`. */
     def ->*(key: String): List[JValue] = this ->*? key getOrElse Nil
+
+    /** Optionally retrieves an array of strings or a single string */
+    def multiLineOpt(key: String): Option[List[String]] = (jValue \ key).toOption map {
+      case JString(value) => List(value)
+      case JArray(values) => values collect { case JString(value) => value }
+      case other          => sys.error(s"Expected string or array, found $other.")
+    }
+
+    /** Retrieves an array and concatenates its string values in multiple lines, or retrieves a string. */
+    def multiLine(key: String): List[String] = multiLineOpt(key) getOrElse sys.error(s"Undefined $key or wrong type: $jValue")
   }
 
   /** Parse an instance of `T` from `input`. */
@@ -44,7 +54,7 @@ trait Parser[T] {
 
 sealed trait SchemaElement {
   def name: String
-  def doc: Option[String]
+  def doc: Option[List[String]]
 }
 
 /**
@@ -99,7 +109,7 @@ case class Protocol(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[String],
+  doc: Option[List[String]],
   fields: List[Field],
   children: List[Definition]) extends ClassLike
 
@@ -109,7 +119,7 @@ object Protocol extends Parser[Protocol] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json ->? "doc",
+      json multiLineOpt "doc",
       json ->* "fields" map Field.parse,
       json ->* "types" map Definition.parse)
 }
@@ -127,7 +137,7 @@ case class Record(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[String],
+  doc: Option[List[String]],
   fields: List[Field]) extends ClassLike
 
 object Record extends Parser[Record] {
@@ -136,7 +146,7 @@ object Record extends Parser[Record] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json ->? "doc",
+      json multiLineOpt "doc",
       json ->* "fields" map Field.parse)
 }
 
@@ -153,7 +163,7 @@ case class Enumeration(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[String],
+  doc: Option[List[String]],
   values: List[EnumerationValue]) extends Definition
 
 object Enumeration extends Parser[Enumeration] {
@@ -162,7 +172,7 @@ object Enumeration extends Parser[Enumeration] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json ->? "doc",
+      json multiLineOpt "doc",
       json ->* "types" map EnumerationValue.parse)
 }
 
@@ -174,13 +184,13 @@ object Enumeration extends Parser[Enumeration] {
                           (, "doc": string constant)? }
   */
 case class EnumerationValue(name: String,
-  doc: Option[String]) extends SchemaElement
+  doc: Option[List[String]]) extends SchemaElement
 
 object EnumerationValue extends Parser[EnumerationValue] {
   override def parse(json: JValue): EnumerationValue =
     json match {
       case JString(name) => EnumerationValue(name, None)
-      case json          => EnumerationValue(json -> "name", json ->? "doc")
+      case json          => EnumerationValue(json -> "name", json multiLineOpt "doc")
   }
 }
 
@@ -194,7 +204,7 @@ object EnumerationValue extends Parser[EnumerationValue] {
  *             (, "default": string constant)? }
  */
 case class Field(name: String,
-  doc: Option[String],
+  doc: Option[List[String]],
   tpe: TpeRef,
   since: VersionNumber,
   default: Option[String]) extends SchemaElement
@@ -202,7 +212,7 @@ case class Field(name: String,
 object Field extends Parser[Field] {
   override def parse(json: JValue): Field =
     Field(json -> "name",
-      json ->? "doc",
+      json multiLineOpt "doc",
       TpeRef(json -> "type"),
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "default")
