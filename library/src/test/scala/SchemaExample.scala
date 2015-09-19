@@ -198,7 +198,10 @@ object NewSchema {
       "fields": [
         {
           "name": "message",
-          "doc": "The message of the Greeting",
+          "doc": [
+            "The message of the Greeting",
+            "This is a multiline doc comment"
+          ],
           "type": "lazy String"
         },
         {
@@ -290,7 +293,10 @@ object NewSchema {
       |  val header: GreetingHeader) extends Serializable {
       |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
       |
-      |  /** The message of the Greeting */
+      |  /**
+      |   * The message of the Greeting
+      |   * This is a multiline doc comment
+      |   */
       |  lazy val message: String = _message
       |  override def equals(o: Any): Boolean = o match {
       |    case x: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -527,7 +533,10 @@ object NewSchema {
           |/** A greeting protocol */
           |public abstract class Greetings implements java.io.Serializable {
           |
-          |    /** The message of the Greeting */
+          |    /**
+          |     * The message of the Greeting
+          |     * This is a multiline doc comment
+          |     */
           |    private Lazy<String> message;
           |    /** The header of the Greeting */
           |    private GreetingHeader header;
@@ -604,5 +613,15 @@ object NewSchema {
     }
   ]
 }""".stripMargin
+
+  val multiLineDocExample =
+    """{
+      |  "name": "multiLineDocField",
+      |  "type": "int",
+      |  "doc": [
+      |    "A field whose documentation",
+      |    "spans over multiple lines"
+      |  ]
+      |}""".stripMargin
 
 }

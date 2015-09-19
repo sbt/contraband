@@ -14,6 +14,8 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
       (s.contains(" class ") && s.endsWith("(")) // Constructor definition
     override def reduceIndentTrigger(s: String) = s.startsWith("}")
     override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith("extends Serializable {") // End of constructor definition
+    override def enterMultilineJavadoc(s: String) = s == "/**"
+    override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
 
@@ -129,7 +131,14 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), p.fields ++ superFields))) reduce (_ merge _)
   }
 
-  private def genDoc(doc: Option[String]) = doc map (d => s"/** $d */") getOrElse ""
+  private def genDoc(doc: Option[List[String]]) = doc map {
+    case l :: Nil => s"/** $l */"
+    case lines =>
+      val doc = lines map (l => s" * $l") mkString EOL
+      s"""/**
+         |$doc
+         | */""".stripMargin
+  } getOrElse ""
 
   private def genParam(f: Field): String = s"${f.name}: ${genRealTpe(f.tpe, isParam = true)}"
 

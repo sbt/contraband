@@ -34,6 +34,7 @@ class SchemaSpec extends Specification {
 
     Field.parse should
       parse                                      $fieldParse
+      parse multiline doc comments               $multiLineDoc
 
     TpeRef.apply should
       parse simple types                         $tpeRefParseSimple
@@ -162,7 +163,7 @@ class SchemaSpec extends Specification {
         namespace must_== None
         doc must_== Some("Example of simple enumeration")
         values must haveSize(2)
-        values(0) must_== EnumerationValue("first", Some("First type"))
+        values(0) must_== EnumerationValue("first", Some(List("First type")))
         values(1) must_== EnumerationValue("second", None)
     }
   }
@@ -212,6 +213,18 @@ class SchemaSpec extends Specification {
         name must_== "lazyArrayTpeRefExample"
         lzy must_== true
         repeated must_== true
+    }
+  }
+
+  def multiLineDoc = {
+    Field parse multiLineDocExample match {
+      case Field(name, doc, tpe, since, default) =>
+        name must_== "multiLineDocField"
+        doc must_== Some(List("A field whose documentation",
+                              "spans over multiple lines"))
+
+      case _ =>
+        true must_== false
     }
   }
 
