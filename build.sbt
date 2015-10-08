@@ -2,7 +2,7 @@ import Dependencies._
 
 lazy val commonSettings = Seq(
     organization in ThisBuild := "org.scala-sbt",
-    version in ThisBuild := "0.1.0-SNAPSHOT",
+    version in ThisBuild := "0.1.1-SNAPSHOT",
     crossScalaVersions := Seq("2.11.6", "2.10.5"),
     scalaVersion := "2.10.5",
     licenses += ("Apache-2.0", url("https://github.com/sbt/sbt-datatype/blob/master/LICENSE")),
@@ -12,8 +12,17 @@ lazy val commonSettings = Seq(
   )
 
 lazy val root = (project in file(".")).
-  settings(commonSettings).
-  aggregate(library, plugin)
+  aggregate(library, plugin).
+  settings(
+    commonSettings,
+    name := "datatype root",
+    publish := {},
+    publishLocal := {},
+    publishArtifact in Compile := false,
+    publishArtifact in Test := false,
+    publishArtifact := false,
+    bintrayReleaseOnPublish in ThisBuild := false
+  )
 
 lazy val plugin = (project in file("plugin")).
   settings(commonSettings).
