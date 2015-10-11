@@ -1,0 +1,39 @@
+This is the initial release of [sbt-datatype](http://www.scala-sbt.org/0.13/docs/Datatype.html).
+
+sbt-datatype is a code generator that uses Apache Avro-like schema to generate datatypes for Java or Scala.
+Scala code will generate abstract classes and pseudo case classes.
+
+The benefit of using this over using normal traits and case classes is that sbt-datatype provides support for growing the datatypes while retaining binary compatibility. Here's an example of the datatype schema:
+
+    {
+      "types": [
+        {
+          "name": "Greeting",
+          "type": "record",
+          "namespace": "com.example",
+          "target": "Scala",
+          "fields": [
+            {
+              "name": "message",
+              "type": "String"
+            },
+            {
+              "name": "date",
+              "type": "java.util.Date",
+              "since": "0.2.0",
+              "default": "new java.util.Date()"
+            }
+          ]
+        }
+      ]
+    }
+
+Using `since` as a hint, sbt-datatype will generate two `apply` methods under `Greeting`:
+
+    object Greeting {
+      def apply(message: String): Greeting = new Greeting(message, new java.util.Date())
+      def apply(message: String, date: java.util.Date): Greeting = new Greeting(message, date)
+    }
+
+This way any code that was using `Greeting("hello")` will not break. It also won't generate `unapply`, which is problematic in keeping the binary compatibility.
+See [sbt-datatype](http://www.scala-sbt.org/0.13/docs/Datatype.html) for more details.
