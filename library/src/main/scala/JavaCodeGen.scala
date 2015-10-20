@@ -5,7 +5,7 @@ import java.io.File
 /**
  * Code generator for Java.
  */
-object JavaCodeGen extends CodeGenerator {
+class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -111,8 +111,8 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def genRealTpe(tpe: TpeRef): String = tpe match {
-    case TpeRef(name, true, true)   => s"Lazy<$name[]>"
-    case TpeRef(name, true, false)  => s"Lazy<${boxedType(name)}>"
+    case TpeRef(name, true, true)   => s"$lazyInterface<$name[]>"
+    case TpeRef(name, true, false)  => s"$lazyInterface<${boxedType(name)}>"
     case TpeRef(name, false, true)  => s"$name[]"
     case TpeRef(name, false, false) => name
   }
@@ -158,7 +158,8 @@ object JavaCodeGen extends CodeGenerator {
     val allFields = (r.fields ++ superFields).zipWithIndex
     def nonParam(f: (Field, Int)): String = {
       val field = f._1
-      if (field.tpe.lzy) {
+      if (r.fields contains field) field.name
+      else if (field.tpe.lzy) {
         val tpeSig =
           if (field.tpe.repeated) s"${field.tpe.name}[]"
           else field.tpe.name
