@@ -49,6 +49,7 @@ object JavaCodeGen extends CodeGenerator {
          |    ${genFields(fields)}
          |    ${genConstructors(r, parent, superFields)}
          |    ${genAccessors(fields)}
+         |    ${genWith(r, superFields)}
          |    ${genEquals(r, superFields)}
          |    ${genHashCode(r, superFields)}
          |    ${genToString(r, superFields)}
@@ -151,6 +152,20 @@ object JavaCodeGen extends CodeGenerator {
          |    $assignments
          |}""".stripMargin
     } mkString (EOL + EOL)
+
+  private def genWith(r: Record, superFields: List[Field]) = {
+    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
+    val allFields = (r.fields ++ superFields).zipWithIndex
+    def nonParam(f: (Field, Int)): String = s"${f._1.name}()"
+
+    allFields map { case (f, idx) =>
+      val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
+      val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
+      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.tpe)} ${f.name}) {
+         |    return new ${r.name}($params);
+         |}""".stripMargin
+    } mkString (EOL + EOL)
+  }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
     val allFields = cl.fields ++ superFields

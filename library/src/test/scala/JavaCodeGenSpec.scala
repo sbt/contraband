@@ -184,6 +184,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public type field() {
             |        return this.field;
             |    }
+            |    public simpleRecordExample withField(type field) {
+            |        return new simpleRecordExample(field);
+            |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -224,6 +227,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public int field() {
             |        return this.field;
+            |    }
+            |    public growableAddOneField withField(int field) {
+            |        return new growableAddOneField(field);
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -280,6 +286,18 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public int[] lazyArrayInteger() {
             |        return this.lazyArrayInteger.get();
             |    }
+            |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
+            |        return new primitiveTypesExample(simpleInteger, lazyInteger(), arrayInteger(), lazyArrayInteger());
+            |    }
+            |    public primitiveTypesExample withLazyInteger(Lazy<Integer> lazyInteger) {
+            |        return new primitiveTypesExample(simpleInteger(), lazyInteger, arrayInteger(), lazyArrayInteger());
+            |    }
+            |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
+            |        return new primitiveTypesExample(simpleInteger(), lazyInteger(), arrayInteger, lazyArrayInteger());
+            |    }
+            |    public primitiveTypesExample withLazyArrayInteger(Lazy<int[]> lazyArrayInteger) {
+            |        return new primitiveTypesExample(simpleInteger(), lazyInteger(), arrayInteger(), lazyArrayInteger);
+            |    }
             |    public boolean equals(Object obj) {
             |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
             |    }
@@ -316,6 +334,12 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public int[] arrayInteger() {
             |        return this.arrayInteger;
+            |    }
+            |    public primitiveTypesNoLazyExample withSimpleInteger(int simpleInteger) {
+            |        return new primitiveTypesNoLazyExample(simpleInteger, arrayInteger());
+            |    }
+            |    public primitiveTypesNoLazyExample withArrayInteger(int[] arrayInteger) {
+            |        return new primitiveTypesNoLazyExample(simpleInteger(), arrayInteger);
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {

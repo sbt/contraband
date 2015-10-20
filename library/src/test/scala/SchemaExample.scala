@@ -470,6 +470,18 @@ object NewSchema {
           |        return this.author;
           |    }
           |
+          |    public GreetingHeader withCreated(Lazy<java.util.Date> created) {
+          |        return new GreetingHeader(created, priority(), author());
+          |    }
+          |
+          |    public GreetingHeader withPriority(PriorityLevel priority) {
+          |        return new GreetingHeader(created(), priority, author());
+          |    }
+          |
+          |    public GreetingHeader withAuthor(String author) {
+          |        return new GreetingHeader(created(), priority(), author);
+          |    }
+          |
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
@@ -513,6 +525,18 @@ object NewSchema {
           |
           |    public java.io.File[] attachments() {
           |        return this.attachments;
+          |    }
+          |
+          |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
+          |        return new GreetingWithAttachments(attachments, message(), header());
+          |    }
+          |
+          |    public GreetingWithAttachments withMessage(Lazy<String> message) {
+          |        return new GreetingWithAttachments(attachments(), message, header());
+          |    }
+          |
+          |    public GreetingWithAttachments withHeader(GreetingHeader header) {
+          |        return new GreetingWithAttachments(attachments(), message(), header);
           |    }
           |
           |    public boolean equals(Object obj) {
@@ -585,6 +609,14 @@ object NewSchema {
           |
           |    public SimpleGreeting(Lazy<String> _message, GreetingHeader _header) {
           |        super(_message, _header);
+          |    }
+          |
+          |    public SimpleGreeting withMessage(Lazy<String> message) {
+          |        return new SimpleGreeting(message, header());
+          |    }
+          |
+          |    public SimpleGreeting withHeader(GreetingHeader header) {
+          |        return new SimpleGreeting(message(), header);
           |    }
           |
           |    public boolean equals(Object obj) {
