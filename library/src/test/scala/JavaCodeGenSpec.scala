@@ -287,16 +287,16 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return this.lazyArrayInteger.get();
             |    }
             |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
-            |        return new primitiveTypesExample(simpleInteger, lazyInteger(), arrayInteger(), lazyArrayInteger());
+            |        return new primitiveTypesExample(simpleInteger, new Lazy<Integer>() { public Integer get() { return lazyInteger(); } }, arrayInteger(), new Lazy<int[]>() { public int[] get() { return lazyArrayInteger(); } });
             |    }
             |    public primitiveTypesExample withLazyInteger(Lazy<Integer> lazyInteger) {
-            |        return new primitiveTypesExample(simpleInteger(), lazyInteger, arrayInteger(), lazyArrayInteger());
+            |        return new primitiveTypesExample(simpleInteger(), lazyInteger, arrayInteger(), new Lazy<int[]>() { public int[] get() { return lazyArrayInteger(); } });
             |    }
             |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
-            |        return new primitiveTypesExample(simpleInteger(), lazyInteger(), arrayInteger, lazyArrayInteger());
+            |        return new primitiveTypesExample(simpleInteger(), new Lazy<Integer>() { public Integer get() { return lazyInteger(); } }, arrayInteger, new Lazy<int[]>() { public int[] get() { return lazyArrayInteger(); } });
             |    }
             |    public primitiveTypesExample withLazyArrayInteger(Lazy<int[]> lazyArrayInteger) {
-            |        return new primitiveTypesExample(simpleInteger(), lazyInteger(), arrayInteger(), lazyArrayInteger);
+            |        return new primitiveTypesExample(simpleInteger(), new Lazy<Integer>() { public Integer get() { return lazyInteger(); } }, arrayInteger(), lazyArrayInteger);
             |    }
             |    public boolean equals(Object obj) {
             |        return this == obj; // We have lazy members, so use object identity to avoid circularity.

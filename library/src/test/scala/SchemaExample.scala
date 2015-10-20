@@ -475,11 +475,11 @@ object NewSchema {
           |    }
           |
           |    public GreetingHeader withPriority(PriorityLevel priority) {
-          |        return new GreetingHeader(created(), priority, author());
+          |        return new GreetingHeader(new Lazy<java.util.Date>() { public java.util.Date get() { return created(); } }, priority, author());
           |    }
           |
           |    public GreetingHeader withAuthor(String author) {
-          |        return new GreetingHeader(created(), priority(), author);
+          |        return new GreetingHeader(new Lazy<java.util.Date>() { public java.util.Date get() { return created(); } }, priority(), author);
           |    }
           |
           |    public boolean equals(Object obj) {
@@ -528,7 +528,7 @@ object NewSchema {
           |    }
           |
           |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
-          |        return new GreetingWithAttachments(attachments, message(), header());
+          |        return new GreetingWithAttachments(attachments, new Lazy<String>() { public String get() { return message(); } }, header());
           |    }
           |
           |    public GreetingWithAttachments withMessage(Lazy<String> message) {
@@ -536,7 +536,7 @@ object NewSchema {
           |    }
           |
           |    public GreetingWithAttachments withHeader(GreetingHeader header) {
-          |        return new GreetingWithAttachments(attachments(), message(), header);
+          |        return new GreetingWithAttachments(attachments(), new Lazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
           |    public boolean equals(Object obj) {
@@ -616,7 +616,7 @@ object NewSchema {
           |    }
           |
           |    public SimpleGreeting withHeader(GreetingHeader header) {
-          |        return new SimpleGreeting(message(), header);
+          |        return new SimpleGreeting(new Lazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
           |    public boolean equals(Object obj) {

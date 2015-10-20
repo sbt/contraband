@@ -156,7 +156,15 @@ object JavaCodeGen extends CodeGenerator {
   private def genWith(r: Record, superFields: List[Field]) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
     val allFields = (r.fields ++ superFields).zipWithIndex
-    def nonParam(f: (Field, Int)): String = s"${f._1.name}()"
+    def nonParam(f: (Field, Int)): String = {
+      val field = f._1
+      if (field.tpe.lzy) {
+        val tpeSig =
+          if (field.tpe.repeated) s"${field.tpe.name}[]"
+          else field.tpe.name
+        s"new ${genRealTpe(field.tpe)}() { public ${boxedType(tpeSig)} get() { return ${field.name}(); } }"
+      } else s"${f._1.name}()"
+    }
 
     allFields map { case (f, idx) =>
       val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
