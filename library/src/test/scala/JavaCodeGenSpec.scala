@@ -9,7 +9,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def enumerationGenerateSimple = {
     val enumeration = Enumeration parse simpleEnumerationExample
-    val code = JavaCodeGen generate enumeration
+    val code = new JavaCodeGen("com.example.MyLazy") generate enumeration
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
@@ -22,7 +22,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateSimple = {
     val protocol = Protocol parse simpleProtocolExample
-    val code = JavaCodeGen generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple protocol */
@@ -56,7 +56,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateOneChild = {
     val protocol = Protocol parse oneChildProtocolExample
-    val code = JavaCodeGen generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -112,7 +112,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateNested = {
     val protocol = Protocol parse nestedProtocolExample
-    val code = JavaCodeGen generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -168,7 +168,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGenerateSimple = {
     val record = Record parse simpleRecordExample
-    val code = JavaCodeGen generate record
+    val code = new JavaCodeGen("com.example.MyLazy") generate record
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -183,6 +183,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public type field() {
             |        return this.field;
+            |    }
+            |    public simpleRecordExample withField(type field) {
+            |        return new simpleRecordExample(field);
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -207,7 +210,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGrowZeroToOneField = {
     val record = Record parse growableAddOneFieldExample
-    val code = JavaCodeGen generate record
+    val code = new JavaCodeGen("com.example.MyLazy") generate record
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -224,6 +227,9 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public int field() {
             |        return this.field;
+            |    }
+            |    public growableAddOneField withField(int field) {
+            |        return new growableAddOneField(field);
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -248,7 +254,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
-    val code = JavaCodeGen generate schema
+    val code = new JavaCodeGen("com.example.MyLazy") generate schema
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -256,12 +262,12 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
           """public final class primitiveTypesExample implements java.io.Serializable {
             |    private int simpleInteger;
             |
-            |    private Lazy<Integer> lazyInteger;
+            |    private com.example.MyLazy<Integer> lazyInteger;
             |
             |    private int[] arrayInteger;
             |
-            |    private Lazy<int[]> lazyArrayInteger;
-            |    public primitiveTypesExample(int _simpleInteger, Lazy<Integer> _lazyInteger, int[] _arrayInteger, Lazy<int[]> _lazyArrayInteger) {
+            |    private com.example.MyLazy<int[]> lazyArrayInteger;
+            |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, com.example.MyLazy<int[]> _lazyArrayInteger) {
             |        super();
             |        simpleInteger = _simpleInteger;
             |        lazyInteger = _lazyInteger;
@@ -280,6 +286,18 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public int[] lazyArrayInteger() {
             |        return this.lazyArrayInteger.get();
             |    }
+            |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
+            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
+            |    }
+            |    public primitiveTypesExample withLazyInteger(com.example.MyLazy<Integer> lazyInteger) {
+            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
+            |    }
+            |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
+            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
+            |    }
+            |    public primitiveTypesExample withLazyArrayInteger(com.example.MyLazy<int[]> lazyArrayInteger) {
+            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
+            |    }
             |    public boolean equals(Object obj) {
             |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
             |    }
@@ -296,7 +314,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = Schema parse primitiveTypesNoLazyExample
-    val code = JavaCodeGen generate schema
+    val code = new JavaCodeGen("com.example.MyLazy") generate schema
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -316,6 +334,12 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    }
             |    public int[] arrayInteger() {
             |        return this.arrayInteger;
+            |    }
+            |    public primitiveTypesNoLazyExample withSimpleInteger(int simpleInteger) {
+            |        return new primitiveTypesNoLazyExample(simpleInteger, arrayInteger);
+            |    }
+            |    public primitiveTypesNoLazyExample withArrayInteger(int[] arrayInteger) {
+            |        return new primitiveTypesNoLazyExample(simpleInteger, arrayInteger);
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
@@ -340,14 +364,14 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
-    val code = JavaCodeGen generate schema
+    val code = new JavaCodeGen("com.example.MyLazy") generate schema
 
     code mapValues (_.unindent) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.unindent) toList)
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = Schema parse completeExample
-    val code = JavaCodeGen generate schema
+    val code = new JavaCodeGen("com.example.MyLazy") generate schema
 
     code mapValues (_.withoutEmptyLines) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.withoutEmptyLines) toList)
   }

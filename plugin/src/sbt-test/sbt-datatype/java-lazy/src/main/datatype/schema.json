@@ -1,0 +1,34 @@
+{
+	"types": [
+		{
+			"type": "protocol",
+			"namespace": "com.example",
+			"target": "Java",
+			"name": "A",
+			"fields": [
+				{
+					"name": "normalField",
+					"type": "int"
+				},
+				{
+					"name": "lazyField",
+					"type": "lazy int"
+				}
+			],
+			"types": [
+				{
+					"type": "record",
+					"namespace": "com.example",
+					"target": "Java",
+					"name": "B",
+					"fields": [
+						{
+							"name": "dummyField",
+							"type": "int"
+						}
+					]
+				}
+			]
+		}
+	]
+}

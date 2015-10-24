@@ -438,20 +438,20 @@ object NewSchema {
           |public final class GreetingHeader implements java.io.Serializable {
           |
           |    /** Creation date */
-          |    private Lazy<java.util.Date> created;
+          |    private com.example.MyLazy<java.util.Date> created;
           |    /** The priority of this Greeting */
           |    private PriorityLevel priority;
           |    /** The author of the Greeting */
           |    private String author;
           |
-          |    public GreetingHeader(Lazy<java.util.Date> _created, String _author) {
+          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, String _author) {
           |        super();
           |        created = _created;
           |        priority = PriorityLevel.Medium;
           |        author = _author;
           |    }
           |
-          |    public GreetingHeader(Lazy<java.util.Date> _created, PriorityLevel _priority, String _author) {
+          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, PriorityLevel _priority, String _author) {
           |        super();
           |        created = _created;
           |        priority = _priority;
@@ -468,6 +468,18 @@ object NewSchema {
           |
           |    public String author() {
           |        return this.author;
+          |    }
+          |
+          |    public GreetingHeader withCreated(com.example.MyLazy<java.util.Date> created) {
+          |        return new GreetingHeader(created, priority, author);
+          |    }
+          |
+          |    public GreetingHeader withPriority(PriorityLevel priority) {
+          |        return new GreetingHeader(created, priority, author);
+          |    }
+          |
+          |    public GreetingHeader withAuthor(String author) {
+          |        return new GreetingHeader(created, priority, author);
           |    }
           |
           |    public boolean equals(Object obj) {
@@ -501,18 +513,30 @@ object NewSchema {
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
           |
-          |    public GreetingWithAttachments(java.io.File[] _attachments, Lazy<String> _message) {
+          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
           |
-          |    public GreetingWithAttachments(java.io.File[] _attachments, Lazy<String> _message, GreetingHeader _header) {
+          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message, GreetingHeader _header) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
           |
           |    public java.io.File[] attachments() {
           |        return this.attachments;
+          |    }
+          |
+          |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
+          |        return new GreetingWithAttachments(attachments, new com.example.MyLazy<String>() { public String get() { return message(); } }, header());
+          |    }
+          |
+          |    public GreetingWithAttachments withMessage(com.example.MyLazy<String> message) {
+          |        return new GreetingWithAttachments(attachments, message, header());
+          |    }
+          |
+          |    public GreetingWithAttachments withHeader(GreetingHeader header) {
+          |        return new GreetingWithAttachments(attachments, new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
           |    public boolean equals(Object obj) {
@@ -537,17 +561,17 @@ object NewSchema {
           |     * The message of the Greeting
           |     * This is a multiline doc comment
           |     */
-          |    private Lazy<String> message;
+          |    private com.example.MyLazy<String> message;
           |    /** The header of the Greeting */
           |    private GreetingHeader header;
           |
-          |    public Greetings(Lazy<String> _message) {
+          |    public Greetings(com.example.MyLazy<String> _message) {
           |        super();
           |        message = _message;
           |        header = new GreetingHeader(new java.util.Date(), "Unknown");
           |    }
           |
-          |    public Greetings(Lazy<String> _message, GreetingHeader _header) {
+          |    public Greetings(com.example.MyLazy<String> _message, GreetingHeader _header) {
           |        super();
           |        message = _message;
           |        header = _header;
@@ -579,12 +603,20 @@ object NewSchema {
           |/** A Greeting in its simplest form */
           |public final class SimpleGreeting extends com.example.Greetings {
           |
-          |    public SimpleGreeting(Lazy<String> _message) {
+          |    public SimpleGreeting(com.example.MyLazy<String> _message) {
           |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
           |    }
           |
-          |    public SimpleGreeting(Lazy<String> _message, GreetingHeader _header) {
+          |    public SimpleGreeting(com.example.MyLazy<String> _message, GreetingHeader _header) {
           |        super(_message, _header);
+          |    }
+          |
+          |    public SimpleGreeting withMessage(com.example.MyLazy<String> message) {
+          |        return new SimpleGreeting(message, header());
+          |    }
+          |
+          |    public SimpleGreeting withHeader(GreetingHeader header) {
+          |        return new SimpleGreeting(new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
           |    public boolean equals(Object obj) {

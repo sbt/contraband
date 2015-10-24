@@ -5,7 +5,7 @@ import java.io.File
 /**
  * Code generator for Java.
  */
-object JavaCodeGen extends CodeGenerator {
+class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -49,6 +49,7 @@ object JavaCodeGen extends CodeGenerator {
          |    ${genFields(fields)}
          |    ${genConstructors(r, parent, superFields)}
          |    ${genAccessors(fields)}
+         |    ${genWith(r, superFields)}
          |    ${genEquals(r, superFields)}
          |    ${genHashCode(r, superFields)}
          |    ${genToString(r, superFields)}
@@ -110,8 +111,8 @@ object JavaCodeGen extends CodeGenerator {
   }
 
   private def genRealTpe(tpe: TpeRef): String = tpe match {
-    case TpeRef(name, true, true)   => s"Lazy<$name[]>"
-    case TpeRef(name, true, false)  => s"Lazy<${boxedType(name)}>"
+    case TpeRef(name, true, true)   => s"$lazyInterface<$name[]>"
+    case TpeRef(name, true, false)  => s"$lazyInterface<${boxedType(name)}>"
     case TpeRef(name, false, true)  => s"$name[]"
     case TpeRef(name, false, false) => name
   }
@@ -151,6 +152,29 @@ object JavaCodeGen extends CodeGenerator {
          |    $assignments
          |}""".stripMargin
     } mkString (EOL + EOL)
+
+  private def genWith(r: Record, superFields: List[Field]) = {
+    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
+    val allFields = (r.fields ++ superFields).zipWithIndex
+    def nonParam(f: (Field, Int)): String = {
+      val field = f._1
+      if (r.fields contains field) field.name
+      else if (field.tpe.lzy) {
+        val tpeSig =
+          if (field.tpe.repeated) s"${field.tpe.name}[]"
+          else field.tpe.name
+        s"new ${genRealTpe(field.tpe)}() { public ${boxedType(tpeSig)} get() { return ${field.name}(); } }"
+      } else s"${f._1.name}()"
+    }
+
+    allFields map { case (f, idx) =>
+      val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
+      val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
+      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.tpe)} ${f.name}) {
+         |    return new ${r.name}($params);
+         |}""".stripMargin
+    } mkString (EOL + EOL)
+  }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
     val allFields = cl.fields ++ superFields
