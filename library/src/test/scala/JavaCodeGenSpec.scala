@@ -166,6 +166,52 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     )
   }
 
+  override def protocolGenerateAbstractMethods = {
+    val schema = Schema parse generateArgDocExample
+    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+
+    code mapValues (_.withoutEmptyLines) must containTheSameElementsAs(
+      Map(
+        new File("generateArgDocExample.java") ->
+          """public abstract class generateArgDocExample implements java.io.Serializable {
+            |    /** I'm a field. */
+            |    private int field;
+            |    public generateArgDocExample(int _field) {
+            |        super();
+            |        field = _field;
+            |    }
+            |    public int field() {
+            |        return this.field;
+            |    }
+            |    /**
+            |     * A very simple example of abstract method.
+            |     * Abstract methods can only appear in protocol definitions.
+            |     * @param arg0 The first argument of the method.
+            |                   Make sure it is awesome.
+            |     * @param arg1 This argument is not important, so it gets single line doc.
+            |     */
+            |    public abstract int[] methodExample(com.example.MyLazy<int[]> arg0,boolean arg1);
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof generateArgDocExample)) {
+            |            return false;
+            |        } else {
+            |            generateArgDocExample o = (generateArgDocExample)obj;
+            |            return (field() == o.field());
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 37 * (17 + (new Integer(field())).hashCode());
+            |    }
+            |    public String toString() {
+            |        return "generateArgDocExample("  + "field: " + field() + ")";
+            |    }
+            |}""".stripMargin.withoutEmptyLines
+      ).toList
+    )
+  }
+
   override def recordGenerateSimple = {
     val record = Record parse simpleRecordExample
     val code = new JavaCodeGen("com.example.MyLazy") generate record
