@@ -1,0 +1,15 @@
+  [13]: https://github.com/sbt/sbt-datatype/pull/13
+  [@Duhemm]: https://github.com/Duhemm
+
+### generate `withXXX` methods for Java
+
+Similar to Scala code generator, `withXXX` methods are generated for Java too.
+[#13][13] by [@Duhemm][@Duhemm]
+
+### configurable `Lazy` holder
+
+The holder class for lazy value can now be configured.
+
+    datatypeJavaLazy in (Compile, generateDatatypes) := "com.example.Lazy"
+
+[#13][13] by [@Duhemm][@Duhemm]

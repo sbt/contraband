@@ -2,7 +2,7 @@ import Dependencies._
 
 lazy val commonSettings = Seq(
     organization in ThisBuild := "org.scala-sbt",
-    version in ThisBuild := "0.1.1-SNAPSHOT",
+    version in ThisBuild := "0.1.1",
     crossScalaVersions := Seq("2.11.6", "2.10.5"),
     scalaVersion := "2.10.5",
     licenses += ("Apache-2.0", url("https://github.com/sbt/sbt-datatype/blob/master/LICENSE")),
