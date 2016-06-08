@@ -1,6 +1,15 @@
 package com.example;
 
 public class Main {
+
+	public static <T> MyLazy<T> makeLazy(T value) {
+		return new MyLazy<T>() {
+			public T get() {
+				return value;
+			}
+		};
+	}
+
 	public static void main(String[] args) {
 		MyLazy<Integer> lazy = new MyLazy<Integer>() { public Integer get() { return 1 / 0; } };
 		B b = new B(0, 1, lazy);

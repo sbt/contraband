@@ -632,6 +632,138 @@ object NewSchema {
           |    }
           |}""".stripMargin)
 
+  val completeExampleCodeSerializer =
+    """package com.example
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |import _root_.serializer.Serializer._
+      |class GreetingsFormat extends JsonFormat[Greetings] {
+      |  private val format = unionFormat2[Greetings, SimpleGreeting, GreetingWithAttachments]
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Greetings = {
+      |    format.read(jsOpt, unbuilder)
+      |  }
+      |  override def write[J](obj: Greetings, builder: Builder[J]): Unit = {
+      |    format.write(obj, builder)
+      |  }
+      |}
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |import _root_.serializer.Serializer._
+      |class SimpleGreetingFormat extends JsonFormat[SimpleGreeting] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): SimpleGreeting = {
+      |    jsOpt match {
+      |      case Some(js) =>
+      |      unbuilder.beginObject(js)
+      |      val message = unbuilder.readField[String]("message")
+      |      val header = unbuilder.readField[GreetingHeader]("header")
+      |      unbuilder.endObject()
+      |      new SimpleGreeting(message, header)
+      |      case None =>
+      |      deserializationError("Expected JsObject but found None")
+      |    }
+      |  }
+      |  override def write[J](obj: SimpleGreeting, builder: Builder[J]): Unit = {
+      |    builder.beginObject()
+      |    builder.addField("message", obj.message)
+      |    builder.addField("header", obj.header)
+      |    builder.endObject()
+      |  }
+      |}
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |import _root_.serializer.Serializer._
+      |class GreetingWithAttachmentsFormat extends JsonFormat[GreetingWithAttachments] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingWithAttachments = {
+      |    jsOpt match {
+      |      case Some(js) =>
+      |      unbuilder.beginObject(js)
+      |      val attachments = unbuilder.readField[Array[java.io.File]]("attachments")
+      |      val message = unbuilder.readField[String]("message")
+      |      val header = unbuilder.readField[GreetingHeader]("header")
+      |      unbuilder.endObject()
+      |      new GreetingWithAttachments(attachments, message, header)
+      |      case None =>
+      |      deserializationError("Expected JsObject but found None")
+      |    }
+      |  }
+      |  override def write[J](obj: GreetingWithAttachments, builder: Builder[J]): Unit = {
+      |    builder.beginObject()
+      |    builder.addField("attachments", obj.attachments)
+      |    builder.addField("message", obj.message)
+      |    builder.addField("header", obj.header)
+      |    builder.endObject()
+      |  }
+      |}
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |import _root_.serializer.Serializer._
+      |class GreetingHeaderFormat extends JsonFormat[GreetingHeader] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingHeader = {
+      |    jsOpt match {
+      |      case Some(js) =>
+      |      unbuilder.beginObject(js)
+      |      val created = unbuilder.readField[java.util.Date]("created")
+      |      val priority = unbuilder.readField[PriorityLevel]("priority")
+      |      val author = unbuilder.readField[String]("author")
+      |      unbuilder.endObject()
+      |      new GreetingHeader(created, priority, author)
+      |      case None =>
+      |      deserializationError("Expected JsObject but found None")
+      |    }
+      |  }
+      |  override def write[J](obj: GreetingHeader, builder: Builder[J]): Unit = {
+      |    builder.beginObject()
+      |    builder.addField("created", obj.created)
+      |    builder.addField("priority", obj.priority)
+      |    builder.addField("author", obj.author)
+      |    builder.endObject()
+      |  }
+      |}
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |class PriorityLevelFormat extends JsonFormat[PriorityLevel] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): PriorityLevel = {
+      |    jsOpt match {
+      |      case Some(js) =>
+      |      unbuilder.readString(js) match {
+      |        case "Low" => PriorityLevel.Low
+      |        case "Medium" => PriorityLevel.Medium
+      |        case "High" => PriorityLevel.High
+      |      }
+      |      case None =>
+      |      deserializationError("Expected JsString but found None")
+      |    }
+      |  }
+      |  override def write[J](obj: PriorityLevel, builder: Builder[J]): Unit = {
+      |    val str = obj match {
+      |      case PriorityLevel.Low => "Low"
+      |      case PriorityLevel.Medium => "Medium"
+      |      case PriorityLevel.High => "High"
+      |    }
+      |    builder.writeString(str)
+      |  }
+      |}
+      |import _root_.sjsonnew._
+      |import _root_.sjsonnew.BasicJsonProtocol._
+      |import _root_.com.example.Greetings
+      |import _root_.com.example.SimpleGreeting
+      |import _root_.com.example.GreetingWithAttachments
+      |import _root_.com.example.GreetingHeader
+      |import _root_.com.example.PriorityLevel
+      |import _root_.com.example.GreetingsFormat
+      |import _root_.com.example.SimpleGreetingFormat
+      |import _root_.com.example.GreetingWithAttachmentsFormat
+      |import _root_.com.example.GreetingHeaderFormat
+      |import _root_.com.example.PriorityLevelFormat
+      |object Serializer  {
+      |  implicit val GreetingsFormat: JsonFormat[Greetings] = new GreetingsFormat()
+      |  implicit val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new SimpleGreetingFormat()
+      |  implicit val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new GreetingWithAttachmentsFormat()
+      |  implicit val GreetingHeaderFormat: JsonFormat[GreetingHeader] = new GreetingHeaderFormat()
+      |  implicit val PriorityLevelFormat: JsonFormat[PriorityLevel] = new PriorityLevelFormat()
+      |}""".stripMargin
+
+
   val growableAddOneFieldExample = """{
   "name": "growableAddOneField",
   "target": "Scala",
