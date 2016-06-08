@@ -2,7 +2,7 @@ package com.example;
 
 public class Main {
 
-	public static <T> MyLazy<T> makeLazy(T value) {
+	public static <T> MyLazy<T> makeLazy(final T value) {
 		return new MyLazy<T>() {
 			public T get() {
 				return value;
