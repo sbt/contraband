@@ -114,6 +114,9 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     val lazyMembers =
       genLazyMembers(p.fields) mkString EOL
 
+    val abstractMethods =
+      genAbstractMethods(p.abstractMethods) mkString EOL
+
     val classDef =
       if (sealProtocols) "sealed abstract class" else "abstract class"
 
@@ -123,6 +126,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |$classDef ${p.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
+         |  $abstractMethods
          |  ${genEquals(p, superFields)}
          |  ${genHashCode(p, superFields)}
          |  ${genToString(p, superFields)}
@@ -131,14 +135,15 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), p.fields ++ superFields))) reduce (_ merge _)
   }
 
-  private def genDoc(doc: Option[List[String]]) = doc map {
+  private def genDoc(doc: List[String]) = doc match {
+    case Nil => ""
     case l :: Nil => s"/** $l */"
     case lines =>
       val doc = lines map (l => s" * $l") mkString EOL
       s"""/**
          |$doc
          | */""".stripMargin
-  } getOrElse ""
+  }
 
   private def genParam(f: Field): String = s"${f.name}: ${genRealTpe(f.tpe, isParam = true)}"
 
@@ -244,6 +249,21 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     fields filter (_.tpe.lzy) map { f =>
         s"""${genDoc(f.doc)}
            |lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
+    }
+
+  private def genAbstractMethods(abstractMethods: List[AbstractMethod]): List[String] =
+    abstractMethods map { case AbstractMethod(name, doc, retTpe, args) =>
+      val params = args map (a => s"${a.name}: ${genRealTpe(a.tpe, isParam = true)}") mkString ", "
+      val argsDoc = args flatMap {
+        case Arg(name, Nil, _)        => Nil
+        case Arg(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
+        case Arg(name, doc, _)        =>
+          val prefix = s"@param $name "
+          doc.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
+      }
+
+      s"""${genDoc(doc ++ argsDoc)}
+         |def $name($params): ${genRealTpe(retTpe, isParam = false)}"""
     }
 
   private def fullyQualifiedName(d: Definition): String = {

@@ -121,6 +121,36 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
+  override def protocolGenerateAbstractMethods = {
+    val schema = Schema parse generateArgDocExample
+    val code = new ScalaCodeGen(genFileName, sealProtocols = false) generate schema
+
+    code.head._2.withoutEmptyLines must containTheSameElementsAs(
+      """abstract class generateArgDocExample(
+        |  /** I'm a field. */
+        |  val field: Int) extends Serializable {
+        |  /**
+        |   * A very simple example of abstract method.
+        |   * Abstract methods can only appear in protocol definitions.
+        |   * @param arg0 The first argument of the method.
+        |                 Make sure it is awesome.
+        |   * @param arg1 This argument is not important, so it gets single line doc.
+        |   */
+        |  def methodExample(arg0: => Array[Int], arg1: Boolean): Array[Int]
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: generateArgDocExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (17 + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "generateArgDocExample(" + field + ")"
+        |  }
+        |}""".stripMargin.withoutEmptyLines)
+
+  }
+
   override def recordGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
     val record = Record parse simpleRecordExample

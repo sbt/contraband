@@ -60,12 +60,13 @@ class SchemaSpec extends Specification {
 
   def definitionParseProtocol = {
     Definition parse emptyProtocolExample match {
-      case Protocol(name, target, namespace, _, doc, fields, children) =>
+      case Protocol(name, target, namespace, _, doc, fields, abstractMethods, children) =>
         name must_== "emptyProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== None
         fields must haveSize(0)
+        abstractMethods must haveSize(0)
         children must haveSize(0)
 
       case _ =>
@@ -106,40 +107,43 @@ class SchemaSpec extends Specification {
 
   def protocolParseSimple = {
     Protocol parse simpleProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "simpleProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== Some("example of simple protocol")
         fields must haveSize(1)
-        fields(0) must_== Field("field", None, TpeRef("type", false, false), Field.emptyVersion, None)
+        fields(0) must_== Field("field", Nil, TpeRef("type", false, false), Field.emptyVersion, None)
+        abstractMethods must haveSize(0)
         children must haveSize(0)
     }
   }
 
   def protocolParseOneChild = {
     Protocol parse oneChildProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "oneChildProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== Some("example of protocol")
         fields must haveSize(0)
+        abstractMethods must haveSize(0)
         children must haveSize(1)
-        children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), None, Nil)
+        children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil, Nil)
     }
   }
 
   def protocolParseNested = {
     Protocol parse nestedProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, children) =>
+      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "nestedProtocolExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== Some("example of nested protocols")
         fields must haveSize(0)
+        abstractMethods must haveSize(0)
         children must haveSize(1)
-        children(0) must_== Protocol("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), None, Nil, Nil)
+        children(0) must_== Protocol("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
     }
   }
 
@@ -151,7 +155,7 @@ class SchemaSpec extends Specification {
         namespace must_== None
         doc must_== Some("Example of simple record")
         fields must haveSize(1)
-        fields(0) must_== Field("field", None, TpeRef("type", false, false), Field.emptyVersion, None)
+        fields(0) must_== Field("field", Nil, TpeRef("type", false, false), Field.emptyVersion, None)
     }
   }
 
@@ -163,8 +167,8 @@ class SchemaSpec extends Specification {
         namespace must_== None
         doc must_== Some("Example of simple enumeration")
         values must haveSize(2)
-        values(0) must_== EnumerationValue("first", Some(List("First type")))
-        values(1) must_== EnumerationValue("second", None)
+        values(0) must_== EnumerationValue("first", List("First type"))
+        values(1) must_== EnumerationValue("second", Nil)
     }
   }
 
@@ -178,6 +182,16 @@ class SchemaSpec extends Specification {
         default must_== Some("2 + 2")
     }
 
+  }
+
+  def abstractMethodParse = {
+    AbstractMethod parse abstractMethodExample match {
+      case AbstractMethod(name, doc, retTpe, args) =>
+        name must_== "abstractMethodExample"
+        doc must_== "Example of abstract method"
+        retTpe must_== TpeRef("type", false, false)
+        args must_== List(Arg("arg0", Nil, TpeRef("type2", false, false)))
+    }
   }
 
   def tpeRefParseSimple = {
@@ -220,8 +234,8 @@ class SchemaSpec extends Specification {
     Field parse multiLineDocExample match {
       case Field(name, doc, tpe, since, default) =>
         name must_== "multiLineDocField"
-        doc must_== Some(List("A field whose documentation",
-                              "spans over multiple lines"))
+        doc must_== List("A field whose documentation",
+                              "spans over multiple lines")
 
       case _ =>
         true must_== false
