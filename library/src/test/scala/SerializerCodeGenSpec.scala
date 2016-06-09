@@ -149,6 +149,29 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}""".stripMargin.unindent)
   }
 
+  def protocolGenerateAbstractMethods = {
+    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val schema = Schema parse generateArgDocExample
+    val code = gen generate schema
+
+    code.head._2.unindent must containTheSameElementsAs(
+      """import _root_.sjsonnew._
+        |import _root_.sjsonnew.BasicJsonProtocol._
+        |class generateArgDocExampleFormat extends JsonFormat[generateArgDocExample] {
+        |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): generateArgDocExample = {
+        |    deserializationError("No known implementation of generateArgDocExample.")
+        |  }
+        |  override def write[J](obj: generateArgDocExample, builder: Builder[J]): Unit = {
+        |    serializationError("No known implementation of generateArgDocExample.")
+        |  }
+        |}
+        |import _root_.sjsonnew._
+        |import _root_.sjsonnew.BasicJsonProtocol._
+        |object Serializer  {
+        |  implicit val generateArgDocExampleFormat: JsonFormat[generateArgDocExample] = new generateArgDocExampleFormat()
+        |}""".stripMargin.unindent)
+  }
+
   override def recordGenerateSimple = {
     val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
     val record = Record parse simpleRecordExample

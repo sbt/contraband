@@ -145,7 +145,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
     val currentNamespace = d.namespace getOrElse ""
     def imports(d: Definition): List[String] =
       d match {
-        case Protocol(name, _, Some(namespace), _, _, _, children) if namespace != currentNamespace =>
+        case Protocol(name, _, Some(namespace), _, _, _, _, children) if namespace != currentNamespace =>
           s"_root_.$namespace.$name" :: children.flatMap(imports)
         case p: Protocol =>
           p.children.flatMap(imports)
@@ -171,7 +171,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
   }
 
   private def genSerializerObject(s: Schema): Map[File, String] = {
-    val syntheticDef = Protocol(serializerName, "Scala", None, VersionNumber("1.0.0"), None, Nil, s.definitions)
+    val syntheticDef = Protocol(serializerName, "Scala", None, VersionNumber("1.0.0"), Nil, Nil, Nil, s.definitions)
     val imports = sjsonImports ++ getRequiredImports(syntheticDef)
     val otherJsonFormats = getRequiredImports(syntheticDef) map (imp => s"import ${imp}Format") mkString EOL
     val pack = serializerPackage map (p => s"package $p") getOrElse ""
