@@ -52,7 +52,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
 
   override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     def accessField(f: Field) = {
-      if (f.tpe.lzy && r.targetLang == "Java") megaType(instantiateJavaLazy(f.name))
+      if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else f.name
     }
     val allFields = r.fields ++ superFields
@@ -205,14 +205,14 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
     }
   }
 
-  private def megaType(t: String) = t.replace("<", "[").replace(">", "]")
+  private def scalaifyType(t: String) = t.replace("<", "[").replace(">", "]")
 
   private def genRealTpe(tpe: TpeRef) = {
-    val scalaTpe = lookupTpe(megaType(tpe.name))
+    val scalaTpe = lookupTpe(scalaifyType(tpe.name))
     if (tpe.repeated) s"Array[$scalaTpe]" else scalaTpe
   }
 
-  private def lookupTpe(tpe: String): String = megaType(tpe) match {
+  private def lookupTpe(tpe: String): String = scalaifyType(tpe) match {
     case "boolean" => "Boolean"
     case "byte"    => "Byte"
     case "char"    => "Char"
