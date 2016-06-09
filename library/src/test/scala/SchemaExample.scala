@@ -131,6 +131,18 @@ object NewSchema {
   "default": "2 + 2"
 }"""
 
+  val abstractMethodExample = """{
+  "name": "abstractMethodExample",
+  "doc": "Example of abstract method",
+  "type": "type",
+  "args": [
+    {
+      "name": "arg0",
+      "type": "type2"
+    }
+  ]
+}"""
+
   val simpleTpeRefExample = "simpleTpeRefExample"
   val lazyTpeRefExample = "lazy lazyTpeRefExample"
   val arrayTpeRefExample = "arrayTpeRefExample*"
@@ -184,7 +196,47 @@ object NewSchema {
   ]
 }"""
 
-
+  val generateArgDocExample = """{
+  "types": [
+    {
+      "name": "generateArgDocExample",
+      "target": "Scala",
+      "type": "protocol",
+      "fields": [
+        {
+          "name": "field",
+          "type": "int",
+          "doc": "I'm a field."
+        }
+      ],
+      "methods": [
+        {
+          "name": "methodExample",
+          "doc": [
+            "A very simple example of abstract method.",
+            "Abstract methods can only appear in protocol definitions."
+          ],
+          "type": "int*",
+          "args": [
+            {
+              "name": "arg0",
+              "type": "lazy int*",
+              "doc": [
+                "The first argument of the method.",
+                "Make sure it is awesome."
+              ]
+            },
+            {
+              "name": "arg1",
+              "type": "boolean",
+              "doc": "This argument is not important, so it gets single line doc."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}"""
 
   val completeExample = """{
   "types": [

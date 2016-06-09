@@ -23,6 +23,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
       generate a simple protocol                 $protocolGenerateSimple
       generate a simple protocol with one child  $protocolGenerateOneChild
       generate nested protocols                  $protocolGenerateNested
+      generate abstract methods                  $protocolGenerateAbstractMethods
 
     generate(Record) should
       generate a simple record                   $recordGenerateSimple
@@ -40,6 +41,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   def protocolGenerateSimple: MatchResult[_]
   def protocolGenerateOneChild: MatchResult[_]
   def protocolGenerateNested: MatchResult[_]
+  def protocolGenerateAbstractMethods: MatchResult[_]
   def recordGenerateSimple: MatchResult[_]
   def schemaGenerateComplete: MatchResult[_]
   def schemaGenerateCompletePlusIndent: MatchResult[_]

@@ -54,7 +54,7 @@ trait Parser[T] {
 
 sealed trait SchemaElement {
   def name: String
-  def doc: Option[List[String]]
+  def doc: List[String]
 }
 
 /**
@@ -103,14 +103,16 @@ object Schema extends Parser[Schema] {
  *                (, "namespace": string constant)?
  *                (, "doc": string constant)?
  *                (, "fields": [ Field* ])?
+ *                (, "methods": [ AbstractMethod* ])?
  *                (, "types": [ Definition* ])? }
  */
 case class Protocol(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[List[String]],
+  doc: List[String],
   fields: List[Field],
+  abstractMethods: List[AbstractMethod],
   children: List[Definition]) extends ClassLike
 
 object Protocol extends Parser[Protocol] {
@@ -119,8 +121,9 @@ object Protocol extends Parser[Protocol] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json multiLineOpt "doc",
+      json multiLineOpt "doc" getOrElse Nil,
       json ->* "fields" map Field.parse,
+      json ->* "methods" map AbstractMethod.parse,
       json ->* "types" map Definition.parse)
 }
 
@@ -137,7 +140,7 @@ case class Record(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[List[String]],
+  doc: List[String],
   fields: List[Field]) extends ClassLike
 
 object Record extends Parser[Record] {
@@ -146,7 +149,7 @@ object Record extends Parser[Record] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json multiLineOpt "doc",
+      json multiLineOpt "doc" getOrElse Nil,
       json ->* "fields" map Field.parse)
 }
 
@@ -163,7 +166,7 @@ case class Enumeration(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
-  doc: Option[List[String]],
+  doc: List[String],
   values: List[EnumerationValue]) extends Definition
 
 object Enumeration extends Parser[Enumeration] {
@@ -172,7 +175,7 @@ object Enumeration extends Parser[Enumeration] {
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-      json multiLineOpt "doc",
+      json multiLineOpt "doc" getOrElse Nil,
       json ->* "types" map EnumerationValue.parse)
 }
 
@@ -184,13 +187,13 @@ object Enumeration extends Parser[Enumeration] {
                           (, "doc": string constant)? }
   */
 case class EnumerationValue(name: String,
-  doc: Option[List[String]]) extends SchemaElement
+  doc: List[String]) extends SchemaElement
 
 object EnumerationValue extends Parser[EnumerationValue] {
   override def parse(json: JValue): EnumerationValue =
     json match {
-      case JString(name) => EnumerationValue(name, None)
-      case json          => EnumerationValue(json -> "name", json multiLineOpt "doc")
+      case JString(name) => EnumerationValue(name, Nil)
+      case json          => EnumerationValue(json -> "name", json multiLineOpt "doc" getOrElse Nil)
   }
 }
 
@@ -204,7 +207,7 @@ object EnumerationValue extends Parser[EnumerationValue] {
  *             (, "default": string constant)? }
  */
 case class Field(name: String,
-  doc: Option[List[String]],
+  doc: List[String],
   tpe: TpeRef,
   since: VersionNumber,
   default: Option[String]) extends SchemaElement
@@ -212,10 +215,49 @@ case class Field(name: String,
 object Field extends Parser[Field] {
   override def parse(json: JValue): Field =
     Field(json -> "name",
-      json multiLineOpt "doc",
+      json multiLineOpt "doc" getOrElse Nil,
       TpeRef(json -> "type"),
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json ->? "default")
+}
+
+/**
+ * An abstract method defined in a protocol.
+ * Syntax:
+ *   AbstractMethod := {   "name": ID,
+ *                         "type": ID
+ *                      (, "args": [ Arg* ])?
+ *                      (, "doc": string constant)? }
+ */
+case class AbstractMethod(name: String,
+  doc: List[String],
+  retTpe: TpeRef,
+  args: List[Arg]) extends SchemaElement
+
+object AbstractMethod extends Parser[AbstractMethod] {
+  override def parse(json: JValue): AbstractMethod =
+    AbstractMethod(json -> "name",
+      json multiLineOpt "doc" getOrElse Nil,
+      TpeRef(json -> "type"),
+      json ->* "args" map Arg.parse)
+}
+
+/**
+ * An argument of a method.
+ * Syntax:
+ *   Arg := {   "name": ID,
+ *              "type": ID
+ *            (, "doc": string constant)? }
+ */
+case class Arg(name: String,
+  doc: List[String],
+  tpe: TpeRef) extends SchemaElement
+
+object Arg extends Parser[Arg] {
+  override def parse(json: JValue): Arg =
+    Arg(json -> "name",
+      json multiLineOpt "doc" getOrElse Nil,
+      TpeRef(json -> "type"))
 }
 
 case class TpeRef(name: String, lzy: Boolean, repeated: Boolean)
