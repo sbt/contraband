@@ -5,17 +5,17 @@ import java.io.File
 import org.specs2._
 import NewSchema._
 
-class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
+class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   val outputFile = new File("output.scala")
-  val serializerPackage = Some("serializer")
-  val serializerName = "Serializer"
-  val serializerParents = Nil
+  val codecPackage = Some("codec")
+  val codecName = "Codec"
+  val codecParents = Nil
   val genFileName = (_: Definition) => outputFile
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
 
   override def enumerationGenerateSimple = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -46,7 +46,7 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val protocol = Protocol parse simpleProtocolExample
     val code = gen generate protocol
 
@@ -63,19 +63,19 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val simpleProtocolExampleFormat: JsonFormat[simpleProtocolExample] = new simpleProtocolExampleFormat()
         |}""".stripMargin.unindent)
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val protocol = Protocol parse oneChildProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |import _root_.sjsonnew.BasicJsonProtocol._
         |class oneChildProtocolExampleFormat extends JsonFormat[oneChildProtocolExample] {
         |  private val format = unionFormat1[oneChildProtocolExample, childRecord]
@@ -87,7 +87,7 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |  }
         |}
         |import _root_.sjsonnew._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |import _root_.sjsonnew.BasicJsonProtocol._
         |class childRecordFormat extends JsonFormat[childRecord] {
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): childRecord = {
@@ -107,21 +107,21 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val oneChildProtocolExampleFormat: JsonFormat[oneChildProtocolExample] = new oneChildProtocolExampleFormat()
         |  implicit val childRecordFormat: JsonFormat[childRecord] = new childRecordFormat()
         |}""".stripMargin.unindent)
   }
 
   override def protocolGenerateNested = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val protocol = Protocol parse nestedProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |class nestedProtocolExampleFormat extends JsonFormat[nestedProtocolExample] {
         |  private val format = unionFormat1[nestedProtocolExample, nestedProtocol]
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): nestedProtocolExample = {
@@ -143,14 +143,14 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val nestedProtocolExampleFormat: JsonFormat[nestedProtocolExample] = new nestedProtocolExampleFormat()
         |  implicit val nestedProtocolFormat: JsonFormat[nestedProtocol] = new nestedProtocolFormat()
         |}""".stripMargin.unindent)
   }
 
   def protocolGenerateAbstractMethods = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val schema = Schema parse generateArgDocExample
     val code = gen generate schema
 
@@ -167,20 +167,20 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val generateArgDocExampleFormat: JsonFormat[generateArgDocExample] = new generateArgDocExampleFormat()
         |}""".stripMargin.unindent)
   }
 
   override def recordGenerateSimple = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |class simpleRecordExampleFormat extends JsonFormat[simpleRecordExample] {
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleRecordExample = {
         |    jsOpt match {
@@ -201,20 +201,20 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val simpleRecordExampleFormat: JsonFormat[simpleRecordExample] = new simpleRecordExampleFormat()
         |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |class growableAddOneFieldFormat extends JsonFormat[growableAddOneField] {
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): growableAddOneField = {
         |    jsOpt match {
@@ -235,20 +235,20 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val growableAddOneFieldFormat: JsonFormat[growableAddOneField] = new growableAddOneFieldFormat()
         |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val schema = Schema parse primitiveTypesExample
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |class primitiveTypesExampleFormat extends JsonFormat[primitiveTypesExample] {
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesExample = {
         |    jsOpt match {
@@ -275,20 +275,20 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val primitiveTypesExampleFormat: JsonFormat[primitiveTypesExample] = new primitiveTypesExampleFormat()
         |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |import _root_.serializer.Serializer._
+        |import _root_.codec.Codec._
         |class primitiveTypesNoLazyExampleFormat extends JsonFormat[primitiveTypesNoLazyExample] {
         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesNoLazyExample = {
         |    jsOpt match {
@@ -311,25 +311,25 @@ class SerializedCodeGenSpec extends GCodeGenSpec("Serializer") {
         |}
         |import _root_.sjsonnew._
         |import _root_.sjsonnew.BasicJsonProtocol._
-        |object Serializer  {
+        |object Codec  {
         |  implicit val primitiveTypesNoLazyExampleFormat: JsonFormat[primitiveTypesNoLazyExample] = new primitiveTypesNoLazyExampleFormat()
         |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code.head._2.unindent must containTheSameElementsAs(completeExampleCodeSerializer.unindent)
+    code.head._2.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val gen = new SerializerCodeGen(genFileName, serializerPackage, serializerName, serializerParents, instantiateJavaLazy)
+    val gen = new CodecCodeGen(genFileName, codecPackage, codecName, codecParents, instantiateJavaLazy)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code.head._2.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeSerializer.withoutEmptyLines)
+    code.head._2.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeCodec.withoutEmptyLines)
   }
 
 }

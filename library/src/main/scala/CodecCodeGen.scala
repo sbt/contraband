@@ -3,9 +3,9 @@ import scala.compat.Platform.EOL
 import java.io.File
 
 /**
- * Code generator to produce a serializer for a given type.
+ * Code generator to produce a codec for a given type.
  */
-class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[String], serializerName: String, serializerParents: Seq[String], instantiateJavaLazy: String => String) extends CodeGenerator {
+class CodecCodeGen(genFile: Definition => File, codecPackage: Option[String], codecName: String, codecParents: Seq[String], instantiateJavaLazy: String => String) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -59,7 +59,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
     val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new ${r.name}(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${f.name})""") mkString EOL
-    val imports = sjsonImports ++ getRequiredImports(r) ++ importSerializer
+    val imports = sjsonImports ++ getRequiredImports(r) ++ importCodec
 
     val code =
       s"""${genPackage(r)}
@@ -104,7 +104,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
              |}""".stripMargin
 
         case xs =>
-          val imports = sjsonImports ++ getRequiredImports(p) ++ importSerializer
+          val imports = sjsonImports ++ getRequiredImports(p) ++ importCodec
           val unionFormat = s"unionFormat${xs.length}[${p.name}, ${xs map (_.name) mkString ", "}]"
           s"""${genPackage(p)}
              |${formatImports(imports)}
@@ -127,9 +127,9 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
 
   override def generate(s: Schema): Map[File, String] = {
     val datatypes = s.definitions map (generate (_, None, Nil)) reduce (_ merge _) mapValues (_.indented)
-    val serializer = genSerializerObject(s) mapValues (_.indented)
+    val codec = genCodecObject(s) mapValues (_.indented)
 
-    datatypes merge serializer
+    datatypes merge codec
   }
 
 
@@ -165,18 +165,18 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
   private def formatImports(imports: Seq[String]) =
     imports map (i => s"import $i") mkString EOL
 
-  private def importSerializer: Seq[String] = serializerPackage match {
-    case Some(p) => s"_root_.$p.$serializerName._" :: Nil
-    case None    => s"_root_.$serializerName._" :: Nil
+  private def importCodec: Seq[String] = codecPackage match {
+    case Some(p) => s"_root_.$p.$codecName._" :: Nil
+    case None    => s"_root_.$codecName._" :: Nil
   }
 
-  private def genSerializerObject(s: Schema): Map[File, String] = {
-    val syntheticDef = Protocol(serializerName, "Scala", None, VersionNumber("1.0.0"), Nil, Nil, Nil, s.definitions)
+  private def genCodecObject(s: Schema): Map[File, String] = {
+    val syntheticDef = Protocol(codecName, "Scala", None, VersionNumber("1.0.0"), Nil, Nil, Nil, s.definitions)
     val imports = sjsonImports ++ getRequiredImports(syntheticDef)
     val otherJsonFormats = getRequiredImports(syntheticDef) map (imp => s"import ${imp}Format") mkString EOL
-    val pack = serializerPackage map (p => s"package $p") getOrElse ""
+    val pack = codecPackage map (p => s"package $p") getOrElse ""
     val implicitVals = s.definitions flatMap genImplicits mkString EOL
-    val parentsString = serializerParents match {
+    val parentsString = codecParents match {
       case Nil => ""
       case x :: Nil => s"extends $x"
       case x :: xs  => s"""extends $x with ${xs mkString ","}"""
@@ -185,7 +185,7 @@ class SerializerCodeGen(genFile: Definition => File, serializerPackage: Option[S
       s"""$pack
          |${formatImports(imports)}
          |$otherJsonFormats
-         |object $serializerName $parentsString {
+         |object $codecName $parentsString {
          |  $implicitVals
          |}""".stripMargin
 

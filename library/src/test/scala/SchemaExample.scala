@@ -684,11 +684,11 @@ object NewSchema {
           |    }
           |}""".stripMargin)
 
-  val completeExampleCodeSerializer =
+  val completeExampleCodeCodec =
     """package com.example
       |import _root_.sjsonnew._
       |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.serializer.Serializer._
+      |import _root_.codec.Codec._
       |class GreetingsFormat extends JsonFormat[Greetings] {
       |  private val format = unionFormat2[Greetings, SimpleGreeting, GreetingWithAttachments]
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Greetings = {
@@ -700,7 +700,7 @@ object NewSchema {
       |}
       |import _root_.sjsonnew._
       |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.serializer.Serializer._
+      |import _root_.codec.Codec._
       |class SimpleGreetingFormat extends JsonFormat[SimpleGreeting] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): SimpleGreeting = {
       |    jsOpt match {
@@ -723,7 +723,7 @@ object NewSchema {
       |}
       |import _root_.sjsonnew._
       |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.serializer.Serializer._
+      |import _root_.codec.Codec._
       |class GreetingWithAttachmentsFormat extends JsonFormat[GreetingWithAttachments] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingWithAttachments = {
       |    jsOpt match {
@@ -748,7 +748,7 @@ object NewSchema {
       |}
       |import _root_.sjsonnew._
       |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.serializer.Serializer._
+      |import _root_.codec.Codec._
       |class GreetingHeaderFormat extends JsonFormat[GreetingHeader] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingHeader = {
       |    jsOpt match {
@@ -807,7 +807,7 @@ object NewSchema {
       |import _root_.com.example.GreetingWithAttachmentsFormat
       |import _root_.com.example.GreetingHeaderFormat
       |import _root_.com.example.PriorityLevelFormat
-      |object Serializer  {
+      |object Codec  {
       |  implicit val GreetingsFormat: JsonFormat[Greetings] = new GreetingsFormat()
       |  implicit val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new SimpleGreetingFormat()
       |  implicit val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new GreetingWithAttachmentsFormat()
