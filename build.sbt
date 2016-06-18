@@ -2,7 +2,6 @@ import Dependencies._
 
 lazy val commonSettings = Seq(
     organization in ThisBuild := "org.scala-sbt",
-    version in ThisBuild := "0.1.2-SNAPSHOT",
     crossScalaVersions := Seq("2.11.6", "2.10.5"),
     scalaVersion := "2.10.5",
     licenses += ("Apache-2.0", url("https://github.com/sbt/sbt-datatype/blob/master/LICENSE")),
@@ -11,8 +10,22 @@ lazy val commonSettings = Seq(
     bintrayVcsUrl := Some("git@github.com:sbt/sbt-datatype.git")
   )
 
+lazy val pluginSettings = commonSettings ++ Seq(
+  version := "0.2.0-SNAPSHOT",
+  sbtPlugin := true
+)
+
+lazy val datatypeCodecs = (project in file("datatype-codecs")).
+  settings(
+    commonSettings,
+    name := "datatype-codecs",
+    description := "Default codecs required to use with sbt-datatype",
+    version := "1.0.0-SNAPSHOT", // needs to be bumped in the plugin definition as well
+    libraryDependencies += sjsonnewCore
+  )
+
 lazy val root = (project in file(".")).
-  aggregate(library, plugin).
+  aggregate(datatypeCodecs, library, plugin).
   settings(
     commonSettings,
     name := "datatype root",
@@ -25,9 +38,8 @@ lazy val root = (project in file(".")).
   )
 
 lazy val plugin = (project in file("plugin")).
-  settings(commonSettings).
   settings(
-    sbtPlugin := true,
+    pluginSettings,
     name := "sbt-datatype",
     description := "sbt plugin to generate growable datatypes.",
     ScriptedPlugin.scriptedSettings,
@@ -39,9 +51,8 @@ lazy val plugin = (project in file("plugin")).
   dependsOn(library)
 
 lazy val library = project.
-  settings(commonSettings).
   settings(
-    sbtPlugin := true,
+    pluginSettings,
     name := "datatype",
     description := "Code generation library to generate growable datatypes.",
     libraryDependencies ++= jsonDependencies ++ Seq(specs2 % Test)

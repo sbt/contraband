@@ -4,8 +4,19 @@ import java.io.File
 
 /**
  * Code generator to produce a codec for a given type.
+ *
+ * @param genFile             A function that maps a `Definition` to the `File` in which we should write it.
+ * @param codecName           The name of the full codec object to generate.
+ * @param codecNamespace      The package to which the full codec object should belong.
+ * @param codecParents        The parents that appear in the self type of all codecs, and the full codec inherits from.
+ * @param instantiateJavaLazy How to transform an expression to its lazy equivalent in Java.
+ * @param formatsForType      Given a `TpeRef` t, returns the list of codecs needed to encode t.
  */
-class CodecCodeGen(genFile: Definition => File, codecPackage: Option[String], codecName: String, codecParents: Seq[String], instantiateJavaLazy: String => String) extends CodeGenerator {
+class CodecCodeGen(genFile: Definition => File,
+  codecName: String, codecNamespace: Option[String],
+  codecParents: List[String],
+  instantiateJavaLazy: String => String,
+  formatsForType: TpeRef => List[String]) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -18,39 +29,40 @@ class CodecCodeGen(genFile: Definition => File, codecPackage: Option[String], co
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
-  override def generate(e: Enumeration): Map[File, String] = {
+  override def generate(s: Schema, e: Enumeration): Map[File, String] = {
     val readerValues = e.values map { case EnumerationValue(v, _) => s"""case "$v" => ${e.name}.$v""" }
     val writerValues = e.values map { case EnumerationValue(v, _) => s"""case ${e.name}.$v => "$v"""" }
-    val imports = sjsonImports ++ getRequiredImports(e)
+    val selfType = makeSelfType(s, e, Nil)
 
     val code =
       s"""${genPackage(e)}
-         |${formatImports(imports)}
-         |class ${e.name}Format extends JsonFormat[${e.name}] {
-         |
-         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${e.name} = {
-         |    jsOpt match {
-         |      case Some(js) =>
-         |        unbuilder.readString(js) match {
-         |          ${readerValues mkString EOL}
-         |        }
-         |      case None =>
-         |        deserializationError("Expected JsString but found None")
+         |$sjsonImports
+         |trait ${e.name}Format { $selfType
+         |  implicit lazy val ${e.name}Format: JsonFormat[${e.name}] = new JsonFormat[${e.name}] {
+         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${e.name} = {
+         |      jsOpt match {
+         |        case Some(js) =>
+         |          unbuilder.readString(js) match {
+         |            ${readerValues mkString EOL}
+         |          }
+         |        case None =>
+         |          deserializationError("Expected JsString but found None")
+         |      }
          |    }
-         |  }
          |
-         |  override def write[J](obj: ${e.name}, builder: Builder[J]): Unit = {
-         |    val str = obj match {
-         |      ${writerValues mkString EOL}
+         |    override def write[J](obj: ${e.name}, builder: Builder[J]): Unit = {
+         |      val str = obj match {
+         |        ${writerValues mkString EOL}
+         |      }
+         |      builder.writeString(str)
          |    }
-         |    builder.writeString(str)
          |  }
          |}""".stripMargin
 
     Map(genFile(e) -> code)
   }
 
-  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     def accessField(f: Field) = {
       if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else f.name
@@ -59,151 +71,145 @@ class CodecCodeGen(genFile: Definition => File, codecPackage: Option[String], co
     val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new ${r.name}(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${f.name})""") mkString EOL
-    val imports = sjsonImports ++ getRequiredImports(r) ++ importCodec
+    val selfType = makeSelfType(s, r, superFields)
 
     val code =
       s"""${genPackage(r)}
-         |${formatImports(imports)}
-         |class ${r.name}Format extends JsonFormat[${r.name}] {
+         |$sjsonImports
+         |trait ${r.name}Format { $selfType
+         |  implicit lazy val ${r.name}Format: JsonFormat[${r.name}] = new JsonFormat[${r.name}] {
+         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${r.name} = {
+         |      jsOpt match {
+         |        case Some(js) =>
+         |          unbuilder.beginObject(js)
+         |          $getFields
+         |          unbuilder.endObject()
+         |          $reconstruct
+         |        case None =>
+         |          deserializationError("Expected JsObject but found None")
+         |      }
+         |    }
          |
-         |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${r.name} = {
-         |    jsOpt match {
-         |      case Some(js) =>
-         |        unbuilder.beginObject(js)
-         |        $getFields
-         |        unbuilder.endObject()
-         |        $reconstruct
-         |      case None =>
-         |        deserializationError("Expected JsObject but found None")
+         |    override def write[J](obj: ${r.name}, builder: Builder[J]): Unit = {
+         |      builder.beginObject()
+         |      $writeFields
+         |      builder.endObject()
          |    }
          |  }
-         |
-         |  override def write[J](obj: ${r.name}, builder: Builder[J]): Unit = {
-         |    builder.beginObject()
-         |    $writeFields
-         |    builder.endObject()
-         |  }
-         |}""".stripMargin
+         |} """.stripMargin
 
     Map(genFile(r) -> code)
   }
-  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+
+  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val code =
       p.children match {
         case Nil =>
-          val imports = sjsonImports
           s"""${genPackage(p)}
-             |${formatImports(imports)}
-             |class ${p.name}Format extends JsonFormat[${p.name}] {
-             |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${p.name} = {
-             |    deserializationError("No known implementation of ${p.name}.")
-             |  }
-             |  override def write[J](obj: ${p.name}, builder: Builder[J]): Unit = {
-             |    serializationError("No known implementation of ${p.name}.")
+             |$sjsonImports
+             |trait ${p.name}Format {
+             |  implicit lazy val ${p.name}Format: JsonFormat[${p.name}] = new JsonFormat[${p.name}] {
+             |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${p.name} = {
+             |      deserializationError("No known implementation of ${p.name}.")
+             |    }
+             |    override def write[J](obj: ${p.name}, builder: Builder[J]): Unit = {
+             |      serializationError("No known implementation of ${p.name}.")
+             |    }
              |  }
              |}""".stripMargin
 
         case xs =>
-          val imports = sjsonImports ++ getRequiredImports(p) ++ importCodec
-          val unionFormat = s"unionFormat${xs.length}[${p.name}, ${xs map (_.name) mkString ", "}]"
+          val unionFormat = s"unionFormat${xs.length}[${p.name}, ${xs map (c => c.namespace.getOrElse("_root_") + "." + c.name) mkString ", "}]"
+
+          val selfType = getAllRequiredFormats(s, p, superFields).distinct match {
+            case Nil => ""
+            case fms => fms.mkString("self: ", " with ", " =>")
+          }
           s"""${genPackage(p)}
-             |${formatImports(imports)}
-             |class ${p.name}Format extends JsonFormat[${p.name}] {
-             |  private val format = $unionFormat
-             |
-             |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${p.name} = {
-             |    format.read(jsOpt, unbuilder)
-             |  }
-             |
-             |  override def write[J](obj: ${p.name}, builder: Builder[J]): Unit = {
-             |    format.write(obj, builder)
-             |  }
+             |$sjsonImports
+             |trait ${p.name}Format { $selfType
+             |  implicit lazy val ${p.name}Format: JsonFormat[${p.name}] = $unionFormat
              |}""".stripMargin
 
       }
 
-    Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), p.fields ++ superFields))) reduce (_ merge _)
+    Map(genFile(p) -> code) :: (p.children map (generate(s, _, Some(p), p.fields ++ superFields))) reduce (_ merge _)
   }
 
   override def generate(s: Schema): Map[File, String] = {
-    val datatypes = s.definitions map (generate (_, None, Nil)) reduce (_ merge _) mapValues (_.indented)
-    val codec = genCodecObject(s) mapValues (_.indented)
+    val codecs = s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapValues (_.indented)
+    val fullCodec = generateFullCodec(s)
 
-    datatypes merge codec
+    codecs merge fullCodec
   }
 
+  /**
+   * Returns the list of fully qualified codec names that we (non-transitively) need to generate a codec for `d`,
+   * knowing that it inherits fields `superFields` in the context of schema `s`.
+   */
+  private def getRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = {
+    val typeFormats =
+      d match {
+        case Protocol(name, _, namespace, _, _, fields, _, _) =>
+          val allFields = fields ++ superFields
+          allFields flatMap (f => formatsForType(f.tpe))
+
+        case Record(_, _, _, _, _, fields) =>
+          val allFields = fields ++ superFields
+          allFields flatMap (f => formatsForType(f.tpe))
+
+        case _: Enumeration =>
+          "sbt.datatype.StringFormat" :: Nil
+      }
+
+    val unionFormat = if (requiresUnionFormats(s, d, superFields)) "sjsonnew.UnionFormats" :: Nil else Nil
+
+    typeFormats ++ unionFormat ++ codecParents
+  }
+
+  private def getAllRequiredFormats(s: Schema): List[String] = {
+    val topFormats =
+      s.definitions flatMap { d =>
+        val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false)
+        formatsForType(tpe)
+      }
+
+    val childrenFormats = s.definitions flatMap (getAllRequiredFormats(s, _, Nil))
+
+    topFormats ++ childrenFormats
+  }
+
+  /**
+   * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `d`,
+   * knowing that it inherits fields `superFields` in the context of schema `s`.
+   *
+   * If `d` is a `Protocol`, we recurse to get the codecs required by its children.
+   */
+  private def getAllRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = d match {
+    case p: Protocol =>
+      getRequiredFormats(s, p, superFields) ++
+        p.children.flatMap(c => getAllRequiredFormats(s, c, p.fields ++ superFields)) ++
+        p.children.map(c => s"""${c.namespace getOrElse "_root_"}.${c.name}Format""")
+    case r: Record =>
+      getRequiredFormats(s, r, superFields)
+    case e: Enumeration =>
+      getRequiredFormats(s, e, Nil)
+  }
+
+  /**
+   * Returns the self type declaration of the codec for `d`, knowing that it inherits fields `superFields`
+   * in the context of schema `s`.
+   */
+  private def makeSelfType(s: Schema, d: Definition, superFields: List[Field]): String =
+    getRequiredFormats(s, d, superFields).distinct match {
+      case Nil => ""
+      case fms => fms.mkString("self: ", " with ", " =>")
+    }
 
   private def genPackage(d: Definition): String =
     d.namespace map (ns => s"package $ns") getOrElse ""
 
-  private val sjsonImports: Seq[String] =
-    "_root_.sjsonnew._" ::
-      "_root_.sjsonnew.BasicJsonProtocol._" ::
-      Nil
-
-  private def getRequiredImports(d: Definition): Seq[String] = {
-    val currentNamespace = d.namespace getOrElse ""
-    def imports(d: Definition): List[String] =
-      d match {
-        case Protocol(name, _, Some(namespace), _, _, _, _, children) if namespace != currentNamespace =>
-          s"_root_.$namespace.$name" :: children.flatMap(imports)
-        case p: Protocol =>
-          p.children.flatMap(imports)
-        case Record(name, _, Some(namespace), _, _, _) if namespace != currentNamespace =>
-          s"_root_.$namespace.$name" :: Nil
-        case _: Record =>
-          Nil
-        case Enumeration(name, _, Some(namespace), _, _, _) if namespace != currentNamespace =>
-          s"_root_.$namespace.$name" :: Nil
-        case _: Enumeration =>
-          Nil
-      }
-
-    imports(d).distinct
-  }
-
-  private def formatImports(imports: Seq[String]) =
-    imports map (i => s"import $i") mkString EOL
-
-  private def importCodec: Seq[String] = codecPackage match {
-    case Some(p) => s"_root_.$p.$codecName._" :: Nil
-    case None    => s"_root_.$codecName._" :: Nil
-  }
-
-  private def genCodecObject(s: Schema): Map[File, String] = {
-    val syntheticDef = Protocol(codecName, "Scala", None, VersionNumber("1.0.0"), Nil, Nil, Nil, s.definitions)
-    val imports = sjsonImports ++ getRequiredImports(syntheticDef)
-    val otherJsonFormats = getRequiredImports(syntheticDef) map (imp => s"import ${imp}Format") mkString EOL
-    val pack = codecPackage map (p => s"package $p") getOrElse ""
-    val implicitVals = s.definitions flatMap genImplicits mkString EOL
-    val parentsString = codecParents match {
-      case Nil => ""
-      case x :: Nil => s"extends $x"
-      case x :: xs  => s"""extends $x with ${xs mkString ","}"""
-    }
-    val code =
-      s"""$pack
-         |${formatImports(imports)}
-         |$otherJsonFormats
-         |object $codecName $parentsString {
-         |  $implicitVals
-         |}""".stripMargin
-
-    Map(genFile(syntheticDef) -> code)
-
-  }
-
-  private def genImplicits(d: Definition): List[String] = {
-    def genImplicit(name: String) = s"implicit val ${name}Format: JsonFormat[$name] = new ${name}Format()"
-    d match {
-      case p: Protocol =>
-        genImplicit(p.name) :: (p.children flatMap genImplicits)
-      case r: Record =>
-        genImplicit(r.name) :: Nil
-      case e: Enumeration =>
-        genImplicit(e.name) :: Nil
-    }
-  }
+  private val sjsonImports: String = "import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }"
 
   private def scalaifyType(t: String) = t.replace("<", "[").replace(">", "]")
 
@@ -224,4 +230,84 @@ class CodecCodeGen(genFile: Definition => File, codecPackage: Option[String], co
     case other     => other
   }
 
+  private def generateFullCodec(s: Schema): Map[File, String] = {
+    val allFormats = getAllRequiredFormats(s).distinct
+    val selfType = allFormats match {
+      case Nil  => ""
+      case fmts => fmts.mkString("self: ", " with ", " =>")
+    }
+    val parents = codecName :: allFormats mkString ("extends ", " with ", "")
+    val code =
+      s"""${codecNamespace map (p => s"package $p") getOrElse ""}
+         |trait $codecName { $selfType }
+         |object $codecName $parents""".stripMargin
+
+    val syntheticDefinition = Protocol(codecName, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
+
+    Map(genFile(syntheticDefinition) -> code)
+  }
+
+  private def allChildrenOf(d: Definition): List[Definition] = d match {
+    case p: Protocol => p :: p.children.flatMap(allChildrenOf)
+    case r: Record => r :: Nil
+    case e: Enumeration => e :: Nil
+  }
+
+  private def definitionsMap(s: Schema): Map[String, Definition] = {
+    val allDefinitions = s.definitions flatMap allChildrenOf
+    allDefinitions.map(d => d.namespace.map(_ + ".").getOrElse("") + d.name -> d).toMap
+  }
+
+  private def requiresUnionFormats(s: Schema, d: Definition, superFields: List[Field]): Boolean = d match {
+    case _: Protocol => true
+    case r: Record =>
+      val defsMap = definitionsMap(s)
+      val allFields = r.fields ++ superFields
+      allFields exists { f => defsMap get f.tpe.name exists { case _: Protocol => true ; case _ => false } }
+    case _: Enumeration => false
+  }
+
+
+}
+
+object CodecCodeGen {
+  /** Removes all type parameters from `tpe` */
+  def removeTypeParameters(tpe: TpeRef): TpeRef = tpe.copy(name = removeTypeParameters(tpe.name))
+
+  /** Removes all type parameters from `tpe` */
+  def removeTypeParameters(tpe: String): String = tpe.replaceAll("<.+>", "").replaceAll("\\[.+\\]", "")
+
+  /**
+   * A function that, given a `TpeRef`, returns the list of `JsonFormat`s that are required to encode
+   * and decode the given `TpeRef`.
+   *
+   * A non-primitive types `com.example.Tpe` (except java.io.File) is mapped to `com.example.TpeFormat`.
+   */
+  val formatsForType: TpeRef => List[String] =
+    extensibleFormatsForType {
+      removeTypeParameters(_) match {
+        case TpeRef(name, _, _) if name contains "." => s"${name}Format" :: Nil
+        case TpeRef(name, _, _)                      => s"_root_.${name}Format" :: Nil
+      }
+    }
+
+  /**
+   * Creates a mapping that maps all primitive types to provided codecs and uses `forOthers`
+   * to determine mapping for non-primitive types.
+   */
+  def extensibleFormatsForType(forOthers: TpeRef => List[String]): TpeRef => List[String] = { tpe =>
+    val arrayFormat = if (tpe.repeated) List("sbt.datatype.ArrayFormat") else Nil
+    removeTypeParameters(tpe).name match {
+      case "boolean"      => "sbt.datatype.BooleanFormat" :: arrayFormat
+      case "byte"         => "sbt.datatype.ByteFormat" :: arrayFormat
+      case "char"         => "sbt.datatype.CharFormat" :: arrayFormat
+      case "float"        => "sbt.datatype.FloatFormat" :: arrayFormat
+      case "int"          => "sbt.datatype.IntFormat" :: arrayFormat
+      case "long"         => "sbt.datatype.LongFormat" :: arrayFormat
+      case "short"        => "sbt.datatype.ShortFormat" :: arrayFormat
+      case "double"       => "sbt.datatype.DoubleFormat" :: arrayFormat
+      case "String"       => "sbt.datatype.StringFormat" :: arrayFormat
+      case _              => forOthers(tpe) ++ arrayFormat
+    }
+  }
 }

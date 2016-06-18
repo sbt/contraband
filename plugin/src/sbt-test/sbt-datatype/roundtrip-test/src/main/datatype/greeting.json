@@ -1,0 +1,42 @@
+{
+	"types": [
+		{
+			"name": "Greeting",
+			"namespace": "com.example.interfaces",
+			"target": "Java",
+			"type": "protocol",
+			"fields": [
+				{
+					"name": "message",
+					"type": "String"
+				},
+				{
+					"name": "number",
+					"type": "int",
+					"since": "0.1.0",
+					"default": "0"
+				}
+			],
+			"types": [
+				{
+					"name": "SimpleGreeting",
+					"namespace": "com.example",
+					"target": "Scala",
+					"type": "record"
+				},
+				{
+					"name": "GreetingWithAttachments",
+					"namespace": "com.example",
+					"target": "Java",
+					"type": "record",
+					"fields": [
+						{
+							"name": "attachments",
+							"type": "java.io.File*"
+						}
+					]
+				}
+			]
+		}
+	]
+}

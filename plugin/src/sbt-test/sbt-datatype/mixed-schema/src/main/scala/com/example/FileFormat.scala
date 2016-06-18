@@ -1,8 +1,8 @@
-package com.example.serialization
+package com.example
 
 import java.io.File
 
-import sjsonnew._
+import sjsonnew.{ Builder, deserializationError, JsonFormat, Unbuilder }
 
 trait FileFormat {
   implicit val fileFormat: JsonFormat[File] = new JsonFormat[File] {

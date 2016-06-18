@@ -259,8 +259,8 @@ object NewSchema {
         {
           "name": "header",
           "doc": "The header of the Greeting",
-          "type": "GreetingHeader",
-          "default": "new GreetingHeader(new java.util.Date(), \"Unknown\")",
+          "type": "com.example.GreetingHeader",
+          "default": "new com.example.GreetingHeader(new java.util.Date(), \"Unknown\")",
           "since": "0.2.0"
         }
       ],
@@ -306,9 +306,9 @@ object NewSchema {
         {
           "name": "priority",
           "doc": "The priority of this Greeting",
-          "type": "PriorityLevel",
+          "type": "com.example.PriorityLevel",
           "since": "0.3.0",
-          "default": "PriorityLevel.Medium"
+          "default": "com.example.PriorityLevel.Medium"
         },
         {
           "name": "author",
@@ -342,8 +342,8 @@ object NewSchema {
       |sealed abstract class Greetings(
       |  _message: => String,
       |  /** The header of the Greeting */
-      |  val header: GreetingHeader) extends Serializable {
-      |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |  val header: com.example.GreetingHeader) extends Serializable {
+      |  def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  /**
       |   * The message of the Greeting
@@ -365,8 +365,8 @@ object NewSchema {
       |/** A Greeting in its simplest form */
       |final class SimpleGreeting(
       |  message: => String,
-      |  header: GreetingHeader) extends com.example.Greetings(message, header) {
-      |  def this(message: => String) = this(message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) {
+      |  def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  override def equals(o: Any): Boolean = o match {
       |    case x: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -378,20 +378,20 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
-      |  private[this] def copy(message: => String = message, header: GreetingHeader = header): SimpleGreeting = {
+      |  private[this] def copy(message: => String = message, header: com.example.GreetingHeader = header): SimpleGreeting = {
       |    new SimpleGreeting(message, header)
       |  }
       |  def withMessage(message: => String): SimpleGreeting = {
       |    copy(message = message)
       |  }
-      |  def withHeader(header: GreetingHeader): SimpleGreeting = {
+      |  def withHeader(header: com.example.GreetingHeader): SimpleGreeting = {
       |    copy(header = header)
       |  }
       |}
       |
       |object SimpleGreeting {
-      |  def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new GreetingHeader(new java.util.Date(), "Unknown"))
-      |  def apply(message: => String, header: GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
+      |  def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def apply(message: => String, header: com.example.GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
       |}
       |
       |/** A Greeting with attachments */
@@ -399,8 +399,8 @@ object NewSchema {
       |  /** The files attached to the greeting */
       |  val attachments: Array[java.io.File],
       |  message: => String,
-      |  header: GreetingHeader) extends com.example.Greetings(message, header) {
-      |  def this(attachments: Array[java.io.File], message: => String) = this(attachments, message, new GreetingHeader(new java.util.Date(), "Unknown"))
+      |  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) {
+      |  def this(attachments: Array[java.io.File], message: => String) = this(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  override def equals(o: Any): Boolean = o match {
       |    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -412,7 +412,7 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
-      |  private[this] def copy(attachments: Array[java.io.File] = attachments, message: => String = message, header: GreetingHeader = header): GreetingWithAttachments = {
+      |  private[this] def copy(attachments: Array[java.io.File] = attachments, message: => String = message, header: com.example.GreetingHeader = header): GreetingWithAttachments = {
       |    new GreetingWithAttachments(attachments, message, header)
       |  }
       |  def withAttachments(attachments: Array[java.io.File]): GreetingWithAttachments = {
@@ -421,24 +421,24 @@ object NewSchema {
       |  def withMessage(message: => String): GreetingWithAttachments = {
       |    copy(message = message)
       |  }
-      |  def withHeader(header: GreetingHeader): GreetingWithAttachments = {
+      |  def withHeader(header: com.example.GreetingHeader): GreetingWithAttachments = {
       |    copy(header = header)
       |  }
       |}
       |
       |object GreetingWithAttachments {
-      |  def apply(attachments: Array[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new GreetingHeader(new java.util.Date(), "Unknown"))
-      |  def apply(attachments: Array[java.io.File], message: => String, header: GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
+      |  def apply(attachments: Array[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def apply(attachments: Array[java.io.File], message: => String, header: com.example.GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
       |}
       |
       |/** Meta information of a Greeting */
       |final class GreetingHeader(
       |  _created: => java.util.Date,
       |  /** The priority of this Greeting */
-      |  val priority: PriorityLevel,
+      |  val priority: com.example.PriorityLevel,
       |  /** The author of the Greeting */
       |  val author: String) extends Serializable {
-      |  def this(created: => java.util.Date, author: String) = this(created, PriorityLevel.Medium, author)
+      |  def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
       |
       |  /** Creation date */
       |  lazy val created: java.util.Date = _created
@@ -452,13 +452,13 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
-      |  private[this] def copy(created: => java.util.Date = created, priority: PriorityLevel = priority, author: String = author): GreetingHeader = {
+      |  private[this] def copy(created: => java.util.Date = created, priority: com.example.PriorityLevel = priority, author: String = author): GreetingHeader = {
       |    new GreetingHeader(created, priority, author)
       |  }
       |  def withCreated(created: => java.util.Date): GreetingHeader = {
       |    copy(created = created)
       |  }
-      |  def withPriority(priority: PriorityLevel): GreetingHeader = {
+      |  def withPriority(priority: com.example.PriorityLevel): GreetingHeader = {
       |    copy(priority = priority)
       |  }
       |  def withAuthor(author: String): GreetingHeader = {
@@ -467,8 +467,8 @@ object NewSchema {
       |}
       |
       |object GreetingHeader {
-      |  def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, PriorityLevel.Medium, author)
-      |  def apply(created: => java.util.Date, priority: PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
+      |  def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, com.example.PriorityLevel.Medium, author)
+      |  def apply(created: => java.util.Date, priority: com.example.PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
       |}
       |
       |/** Priority levels */
@@ -492,18 +492,18 @@ object NewSchema {
           |    /** Creation date */
           |    private com.example.MyLazy<java.util.Date> created;
           |    /** The priority of this Greeting */
-          |    private PriorityLevel priority;
+          |    private com.example.PriorityLevel priority;
           |    /** The author of the Greeting */
           |    private String author;
           |
           |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, String _author) {
           |        super();
           |        created = _created;
-          |        priority = PriorityLevel.Medium;
+          |        priority = com.example.PriorityLevel.Medium;
           |        author = _author;
           |    }
           |
-          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, PriorityLevel _priority, String _author) {
+          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, com.example.PriorityLevel _priority, String _author) {
           |        super();
           |        created = _created;
           |        priority = _priority;
@@ -514,7 +514,7 @@ object NewSchema {
           |        return this.created.get();
           |    }
           |
-          |    public PriorityLevel priority() {
+          |    public com.example.PriorityLevel priority() {
           |        return this.priority;
           |    }
           |
@@ -526,7 +526,7 @@ object NewSchema {
           |        return new GreetingHeader(created, priority, author);
           |    }
           |
-          |    public GreetingHeader withPriority(PriorityLevel priority) {
+          |    public GreetingHeader withPriority(com.example.PriorityLevel priority) {
           |        return new GreetingHeader(created, priority, author);
           |    }
           |
@@ -566,11 +566,11 @@ object NewSchema {
           |    private java.io.File[] attachments;
           |
           |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message) {
-          |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
+          |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
           |
-          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message, GreetingHeader _header) {
+          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
@@ -587,7 +587,7 @@ object NewSchema {
           |        return new GreetingWithAttachments(attachments, message, header());
           |    }
           |
-          |    public GreetingWithAttachments withHeader(GreetingHeader header) {
+          |    public GreetingWithAttachments withHeader(com.example.GreetingHeader header) {
           |        return new GreetingWithAttachments(attachments, new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
@@ -615,15 +615,15 @@ object NewSchema {
           |     */
           |    private com.example.MyLazy<String> message;
           |    /** The header of the Greeting */
-          |    private GreetingHeader header;
+          |    private com.example.GreetingHeader header;
           |
           |    public Greetings(com.example.MyLazy<String> _message) {
           |        super();
           |        message = _message;
-          |        header = new GreetingHeader(new java.util.Date(), "Unknown");
+          |        header = new com.example.GreetingHeader(new java.util.Date(), "Unknown");
           |    }
           |
-          |    public Greetings(com.example.MyLazy<String> _message, GreetingHeader _header) {
+          |    public Greetings(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
           |        super();
           |        message = _message;
           |        header = _header;
@@ -633,7 +633,7 @@ object NewSchema {
           |        return this.message.get();
           |    }
           |
-          |    public GreetingHeader header() {
+          |    public com.example.GreetingHeader header() {
           |        return this.header;
           |    }
           |
@@ -656,10 +656,10 @@ object NewSchema {
           |public final class SimpleGreeting extends com.example.Greetings {
           |
           |    public SimpleGreeting(com.example.MyLazy<String> _message) {
-          |        super(_message, new GreetingHeader(new java.util.Date(), "Unknown"));
+          |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
           |    }
           |
-          |    public SimpleGreeting(com.example.MyLazy<String> _message, GreetingHeader _header) {
+          |    public SimpleGreeting(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
           |        super(_message, _header);
           |    }
           |
@@ -667,7 +667,7 @@ object NewSchema {
           |        return new SimpleGreeting(message, header());
           |    }
           |
-          |    public SimpleGreeting withHeader(GreetingHeader header) {
+          |    public SimpleGreeting withHeader(com.example.GreetingHeader header) {
           |        return new SimpleGreeting(new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
@@ -686,28 +686,19 @@ object NewSchema {
 
   val completeExampleCodeCodec =
     """package com.example
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.codec.Codec._
-      |class GreetingsFormat extends JsonFormat[Greetings] {
-      |  private val format = unionFormat2[Greetings, SimpleGreeting, GreetingWithAttachments]
-      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Greetings = {
-      |    format.read(jsOpt, unbuilder)
-      |  }
-      |  override def write[J](obj: Greetings, builder: Builder[J]): Unit = {
-      |    format.write(obj, builder)
-      |  }
+      |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      |trait GreetingsFormat { self: sbt.datatype.StringFormat with com.example.GreetingHeaderFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat =>
+      |implicit lazy val GreetingsFormat: JsonFormat[Greetings] = unionFormat2[Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.codec.Codec._
-      |class SimpleGreetingFormat extends JsonFormat[SimpleGreeting] {
+      |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      |trait SimpleGreetingFormat { self: sbt.datatype.StringFormat with com.example.GreetingHeaderFormat =>
+      |implicit lazy val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new JsonFormat[SimpleGreeting] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): SimpleGreeting = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
       |      val message = unbuilder.readField[String]("message")
-      |      val header = unbuilder.readField[GreetingHeader]("header")
+      |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
       |      unbuilder.endObject()
       |      new SimpleGreeting(message, header)
       |      case None =>
@@ -721,17 +712,17 @@ object NewSchema {
       |    builder.endObject()
       |  }
       |}
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.codec.Codec._
-      |class GreetingWithAttachmentsFormat extends JsonFormat[GreetingWithAttachments] {
+      |}
+      |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      |trait GreetingWithAttachmentsFormat { self: java.io.FileFormat with sbt.datatype.ArrayFormat with sbt.datatype.StringFormat with com.example.GreetingHeaderFormat =>
+      |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new JsonFormat[GreetingWithAttachments] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingWithAttachments = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
       |      val attachments = unbuilder.readField[Array[java.io.File]]("attachments")
       |      val message = unbuilder.readField[String]("message")
-      |      val header = unbuilder.readField[GreetingHeader]("header")
+      |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
       |      unbuilder.endObject()
       |      new GreetingWithAttachments(attachments, message, header)
       |      case None =>
@@ -746,16 +737,16 @@ object NewSchema {
       |    builder.endObject()
       |  }
       |}
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.codec.Codec._
-      |class GreetingHeaderFormat extends JsonFormat[GreetingHeader] {
+      |}
+      |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      |trait GreetingHeaderFormat { self: java.util.DateFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat =>
+      |implicit lazy val GreetingHeaderFormat: JsonFormat[GreetingHeader] = new JsonFormat[GreetingHeader] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingHeader = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
       |      val created = unbuilder.readField[java.util.Date]("created")
-      |      val priority = unbuilder.readField[PriorityLevel]("priority")
+      |      val priority = unbuilder.readField[com.example.PriorityLevel]("priority")
       |      val author = unbuilder.readField[String]("author")
       |      unbuilder.endObject()
       |      new GreetingHeader(created, priority, author)
@@ -771,9 +762,10 @@ object NewSchema {
       |    builder.endObject()
       |  }
       |}
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |class PriorityLevelFormat extends JsonFormat[PriorityLevel] {
+      |}
+      |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      |trait PriorityLevelFormat { self: sbt.datatype.StringFormat =>
+      |implicit lazy val PriorityLevelFormat: JsonFormat[PriorityLevel] = new JsonFormat[PriorityLevel] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): PriorityLevel = {
       |    jsOpt match {
       |      case Some(js) =>
@@ -795,25 +787,9 @@ object NewSchema {
       |    builder.writeString(str)
       |  }
       |}
-      |import _root_.sjsonnew._
-      |import _root_.sjsonnew.BasicJsonProtocol._
-      |import _root_.com.example.Greetings
-      |import _root_.com.example.SimpleGreeting
-      |import _root_.com.example.GreetingWithAttachments
-      |import _root_.com.example.GreetingHeader
-      |import _root_.com.example.PriorityLevel
-      |import _root_.com.example.GreetingsFormat
-      |import _root_.com.example.SimpleGreetingFormat
-      |import _root_.com.example.GreetingWithAttachmentsFormat
-      |import _root_.com.example.GreetingHeaderFormat
-      |import _root_.com.example.PriorityLevelFormat
-      |object Codec  {
-      |  implicit val GreetingsFormat: JsonFormat[Greetings] = new GreetingsFormat()
-      |  implicit val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new SimpleGreetingFormat()
-      |  implicit val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new GreetingWithAttachmentsFormat()
-      |  implicit val GreetingHeaderFormat: JsonFormat[GreetingHeader] = new GreetingHeaderFormat()
-      |  implicit val PriorityLevelFormat: JsonFormat[PriorityLevel] = new PriorityLevelFormat()
-      |}""".stripMargin
+      |}
+      |trait Codec { self: com.example.GreetingsFormat with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat => }
+      |object Codec extends Codec with com.example.GreetingsFormat with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat""".stripMargin
 
 
   val growableAddOneFieldExample = """{
