@@ -17,9 +17,9 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
   }
 
   override def generate(s: Schema): Map[File, String] =
-    s.definitions flatMap (generate(_, None, Nil) mapValues (_.indented)) toMap
+    s.definitions flatMap (generate(s, _, None, Nil) mapValues (_.indented)) toMap
 
-  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val Protocol(name, _, namespace, _, doc, fields, abstractMethods, children) = p
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -36,10 +36,10 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
          |    ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) ++ (children flatMap (generate(_, Some(p), fields ++ superFields)))
+    Map(genFile(p) -> code) ++ (children flatMap (generate(s, _, Some(p), fields ++ superFields)))
   }
 
-  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val Record(name, _, namespace, _, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -59,7 +59,7 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
     Map(genFile(r) -> code)
   }
 
-  override def generate(e: Enumeration): Map[File, String] = {
+  override def generate(s: Schema, e: Enumeration): Map[File, String] = {
     val Enumeration(name, _, namespace, _, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>

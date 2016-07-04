@@ -48,21 +48,21 @@ abstract class CodeGenerator {
   def generate(s: Schema): Map[File, String]
 
   /** Generate the code corresponding to `d`. */
-  protected final def generate(d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[File, String] =
+  protected final def generate(s: Schema, d: Definition, parent: Option[Protocol], superFields: List[Field]): Map[File, String] =
     d match {
-      case p: Protocol    => generate(p, parent, superFields)
-      case r: Record      => generate(r, parent, superFields)
-      case e: Enumeration => generate(e)
+      case p: Protocol    => generate(s, p, parent, superFields)
+      case r: Record      => generate(s, r, parent, superFields)
+      case e: Enumeration => generate(s, e)
     }
 
   /** Generate the code corresponding to the protocol `p`. */
-  protected def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
+  protected def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
 
   /** Generate the code corresponding to the record `r`. */
-  protected def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
+  protected def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String]
 
   /** Generate the code corresponding to the enumeration `e`. */
-  protected def generate(e: Enumeration): Map[File, String]
+  protected def generate(s: Schema, e: Enumeration): Map[File, String]
 
 }
 

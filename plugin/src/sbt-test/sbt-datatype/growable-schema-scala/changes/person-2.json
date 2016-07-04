@@ -18,9 +18,9 @@
 				},
 				{
 					"name": "gender",
-					"type": "Gender",
+					"type": "com.example.Gender",
 					"since": "0.2.0",
-					"default": "Gender.Unknown"
+					"default": "com.example.Gender.Unknown"
 				}
 			]
 		},

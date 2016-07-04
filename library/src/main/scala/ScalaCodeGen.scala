@@ -20,9 +20,9 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
 
 
   override def generate(s: Schema): Map[File, String] =
-    s.definitions map (generate (_, None, Nil)) reduce (_ merge _) mapValues (_.indented)
+    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapValues (_.indented)
 
-  override def generate(e: Enumeration): Map[File, String] = {
+  override def generate(s: Schema, e: Enumeration): Map[File, String] = {
     val values =
       e.values map { case (EnumerationValue(name, doc)) =>
         s"""${genDoc(doc)}
@@ -40,7 +40,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(e) -> code)
   }
 
-  override def generate(r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val allFields = r.fields ++ superFields
 
     val alternativeCtors =
@@ -96,7 +96,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(r) -> code)
   }
 
-  override def generate(p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
     val allFields = p.fields ++ superFields
 
     val alternativeCtors =
@@ -132,7 +132,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  ${genToString(p, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) :: (p.children map (generate(_, Some(p), p.fields ++ superFields))) reduce (_ merge _)
+    Map(genFile(p) -> code) :: (p.children map (generate(s, _, Some(p), p.fields ++ superFields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: List[String]) = doc match {
