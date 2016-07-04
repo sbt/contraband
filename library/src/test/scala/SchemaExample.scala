@@ -687,11 +687,11 @@ object NewSchema {
   val completeExampleCodeCodec =
     """package com.example
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingsFormat { self: sbt.datatype.StringFormat with com.example.GreetingHeaderFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat =>
+      |trait GreetingsFormat { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat =>
       |implicit lazy val GreetingsFormat: JsonFormat[Greetings] = unionFormat2[Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait SimpleGreetingFormat { self: sbt.datatype.StringFormat with com.example.GreetingHeaderFormat =>
+      |trait SimpleGreetingFormat { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat =>
       |implicit lazy val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new JsonFormat[SimpleGreeting] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): SimpleGreeting = {
       |    jsOpt match {
@@ -714,7 +714,7 @@ object NewSchema {
       |}
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingWithAttachmentsFormat { self: java.io.FileFormat with sbt.datatype.ArrayFormat with sbt.datatype.StringFormat with com.example.GreetingHeaderFormat =>
+      |trait GreetingWithAttachmentsFormat { self: java.io.FileFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat =>
       |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new JsonFormat[GreetingWithAttachments] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingWithAttachments = {
       |    jsOpt match {
@@ -739,7 +739,7 @@ object NewSchema {
       |}
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingHeaderFormat { self: java.util.DateFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat =>
+      |trait GreetingHeaderFormat { self: java.util.DateFormat with sjsonnew.BasicJsonProtocol with com.example.PriorityLevelFormat =>
       |implicit lazy val GreetingHeaderFormat: JsonFormat[GreetingHeader] = new JsonFormat[GreetingHeader] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingHeader = {
       |    jsOpt match {
@@ -764,7 +764,7 @@ object NewSchema {
       |}
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait PriorityLevelFormat { self: sbt.datatype.StringFormat =>
+      |trait PriorityLevelFormat { self: sjsonnew.BasicJsonProtocol =>
       |implicit lazy val PriorityLevelFormat: JsonFormat[PriorityLevel] = new JsonFormat[PriorityLevel] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): PriorityLevel = {
       |    jsOpt match {
@@ -788,8 +788,8 @@ object NewSchema {
       |  }
       |}
       |}
-      |trait Codec { self: com.example.GreetingsFormat with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat => }
-      |object Codec extends Codec with com.example.GreetingsFormat with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sbt.datatype.StringFormat with sjsonnew.UnionFormats with java.io.FileFormat with sbt.datatype.ArrayFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat""".stripMargin
+      |trait Codec { self: com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat => }
+      |object Codec extends Codec with com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat""".stripMargin
 
 
   val growableAddOneFieldExample = """{

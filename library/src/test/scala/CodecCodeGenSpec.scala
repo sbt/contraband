@@ -32,7 +32,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait simpleEnumerationExampleFormat { self: sbt.datatype.StringFormat =>
+        |trait simpleEnumerationExampleFormat { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[simpleEnumerationExample] = new JsonFormat[simpleEnumerationExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleEnumerationExample = {
         |      jsOpt match {
@@ -55,8 +55,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.simpleEnumerationExampleFormat with sbt.datatype.StringFormat => }
-        |object Codec extends Codec with _root_.simpleEnumerationExampleFormat with sbt.datatype.StringFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.simpleEnumerationExampleFormat with sjsonnew.BasicJsonProtocol => }
+        |object Codec extends Codec with _root_.simpleEnumerationExampleFormat with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
   }
 
   override def protocolGenerateSimple = {
@@ -76,8 +76,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.simpleProtocolExampleFormat with _root_.typeFormat with sjsonnew.UnionFormats => }
-        |object Codec extends Codec with _root_.simpleProtocolExampleFormat with _root_.typeFormat with sjsonnew.UnionFormats""".stripMargin.unindent)
+        |trait Codec { self: _root_.simpleProtocolExampleFormat with sjsonnew.BasicJsonProtocol with _root_.typeFormat with sjsonnew.UnionFormats => }
+        |object Codec extends Codec with _root_.simpleProtocolExampleFormat with sjsonnew.BasicJsonProtocol with _root_.typeFormat with sjsonnew.UnionFormats""".stripMargin.unindent)
   }
 
   override def protocolGenerateOneChild = {
@@ -109,8 +109,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.oneChildProtocolExampleFormat with sjsonnew.UnionFormats with _root_.childRecordFormat => }
-        |object Codec extends Codec with _root_.oneChildProtocolExampleFormat with sjsonnew.UnionFormats with _root_.childRecordFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.oneChildProtocolExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats with _root_.childRecordFormat => }
+        |object Codec extends Codec with _root_.oneChildProtocolExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats with _root_.childRecordFormat""".stripMargin.unindent)
   }
 
   override def protocolGenerateNested = {
@@ -134,8 +134,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.nestedProtocolExampleFormat with sjsonnew.UnionFormats with _root_.nestedProtocolFormat => }
-        |object Codec extends Codec with _root_.nestedProtocolExampleFormat with sjsonnew.UnionFormats with _root_.nestedProtocolFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.nestedProtocolExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats with _root_.nestedProtocolFormat => }
+        |object Codec extends Codec with _root_.nestedProtocolExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats with _root_.nestedProtocolFormat""".stripMargin.unindent)
   }
 
   def protocolGenerateAbstractMethods = {
@@ -155,8 +155,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.generateArgDocExampleFormat with sbt.datatype.IntFormat with sjsonnew.UnionFormats => }
-        |object Codec extends Codec with _root_.generateArgDocExampleFormat with sbt.datatype.IntFormat with sjsonnew.UnionFormats""".stripMargin.unindent)
+        |trait Codec { self: _root_.generateArgDocExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats => }
+        |object Codec extends Codec with _root_.generateArgDocExampleFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats""".stripMargin.unindent)
   }
 
   override def recordGenerateSimple = {
@@ -166,7 +166,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait simpleRecordExampleFormat { self: _root_.typeFormat =>
+        |trait simpleRecordExampleFormat { self: _root_.typeFormat with sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleRecordExampleFormat: JsonFormat[simpleRecordExample] = new JsonFormat[simpleRecordExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleRecordExample = {
         |      jsOpt match {
@@ -186,8 +186,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.simpleRecordExampleFormat with _root_.typeFormat => }
-        |object Codec extends Codec with _root_.simpleRecordExampleFormat with _root_.typeFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.simpleRecordExampleFormat with sjsonnew.BasicJsonProtocol with _root_.typeFormat => }
+        |object Codec extends Codec with _root_.simpleRecordExampleFormat with sjsonnew.BasicJsonProtocol with _root_.typeFormat""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
@@ -197,7 +197,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait growableAddOneFieldFormat { self: sbt.datatype.IntFormat =>
+        |trait growableAddOneFieldFormat { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val growableAddOneFieldFormat: JsonFormat[growableAddOneField] = new JsonFormat[growableAddOneField] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): growableAddOneField = {
         |      jsOpt match {
@@ -217,8 +217,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.growableAddOneFieldFormat with sbt.datatype.IntFormat => }
-        |object Codec extends Codec with _root_.growableAddOneFieldFormat with sbt.datatype.IntFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.growableAddOneFieldFormat with sjsonnew.BasicJsonProtocol => }
+        |object Codec extends Codec with _root_.growableAddOneFieldFormat with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
@@ -228,7 +228,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait primitiveTypesExampleFormat { self: sbt.datatype.IntFormat with sbt.datatype.ArrayFormat =>
+        |trait primitiveTypesExampleFormat { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[primitiveTypesExample] = new JsonFormat[primitiveTypesExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesExample = {
         |      jsOpt match {
@@ -255,8 +255,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.primitiveTypesExampleFormat with sbt.datatype.IntFormat with sbt.datatype.ArrayFormat => }
-        |object Codec extends Codec with _root_.primitiveTypesExampleFormat with sbt.datatype.IntFormat with sbt.datatype.ArrayFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.primitiveTypesExampleFormat with sjsonnew.BasicJsonProtocol => }
+        |object Codec extends Codec with _root_.primitiveTypesExampleFormat with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
@@ -266,7 +266,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait primitiveTypesNoLazyExampleFormat { self: sbt.datatype.IntFormat with sbt.datatype.ArrayFormat =>
+        |trait primitiveTypesNoLazyExampleFormat { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[primitiveTypesNoLazyExample] = new JsonFormat[primitiveTypesNoLazyExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesNoLazyExample = {
         |      jsOpt match {
@@ -288,8 +288,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.primitiveTypesNoLazyExampleFormat with sbt.datatype.IntFormat with sbt.datatype.ArrayFormat => }
-        |object Codec extends Codec with _root_.primitiveTypesNoLazyExampleFormat with sbt.datatype.IntFormat with sbt.datatype.ArrayFormat""".stripMargin.unindent)
+        |trait Codec { self: _root_.primitiveTypesNoLazyExampleFormat with sjsonnew.BasicJsonProtocol => }
+        |object Codec extends Codec with _root_.primitiveTypesNoLazyExampleFormat with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
@@ -333,8 +333,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.GreetingFormat with sjsonnew.UnionFormats => }
-        |object Codec extends Codec with _root_.GreetingFormat with sjsonnew.UnionFormats""".stripMargin.unindent)
+        |trait Codec { self: _root_.GreetingFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats => }
+        |object Codec extends Codec with _root_.GreetingFormat with sjsonnew.BasicJsonProtocol with sjsonnew.UnionFormats""".stripMargin.unindent)
   }
 
 }

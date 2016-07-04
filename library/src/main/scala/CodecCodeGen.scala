@@ -159,7 +159,7 @@ class CodecCodeGen(genFile: Definition => File,
           allFields flatMap (f => formatsForType(f.tpe))
 
         case _: Enumeration =>
-          "sbt.datatype.StringFormat" :: Nil
+          "sjsonnew.BasicJsonProtocol" :: Nil
       }
 
     val unionFormat = if (requiresUnionFormats(s, d, superFields)) "sjsonnew.UnionFormats" :: Nil else Nil
@@ -296,18 +296,10 @@ object CodecCodeGen {
    * to determine mapping for non-primitive types.
    */
   def extensibleFormatsForType(forOthers: TpeRef => List[String]): TpeRef => List[String] = { tpe =>
-    val arrayFormat = if (tpe.repeated) List("sbt.datatype.ArrayFormat") else Nil
+    val basicJsonProtcol = "sjsonnew.BasicJsonProtocol"
     removeTypeParameters(tpe).name match {
-      case "boolean"      => "sbt.datatype.BooleanFormat" :: arrayFormat
-      case "byte"         => "sbt.datatype.ByteFormat" :: arrayFormat
-      case "char"         => "sbt.datatype.CharFormat" :: arrayFormat
-      case "float"        => "sbt.datatype.FloatFormat" :: arrayFormat
-      case "int"          => "sbt.datatype.IntFormat" :: arrayFormat
-      case "long"         => "sbt.datatype.LongFormat" :: arrayFormat
-      case "short"        => "sbt.datatype.ShortFormat" :: arrayFormat
-      case "double"       => "sbt.datatype.DoubleFormat" :: arrayFormat
-      case "String"       => "sbt.datatype.StringFormat" :: arrayFormat
-      case _              => forOthers(tpe) ++ arrayFormat
+      case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => basicJsonProtcol :: Nil
+      case _ => forOthers(tpe) ++ (basicJsonProtcol :: Nil)
     }
   }
 }
