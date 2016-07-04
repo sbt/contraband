@@ -162,7 +162,7 @@ class CodecCodeGen(genFile: Definition => File,
           "sjsonnew.BasicJsonProtocol" :: Nil
       }
 
-    val unionFormat = if (requiresUnionFormats(s, d, superFields)) "sjsonnew.UnionFormats" :: Nil else Nil
+    val unionFormat = if (requiresUnionFormats(s, d, superFields)) "sjsonnew.BasicJsonProtocol" :: Nil else Nil
 
     typeFormats ++ unionFormat ++ codecParents
   }

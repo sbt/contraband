@@ -687,7 +687,7 @@ object NewSchema {
   val completeExampleCodeCodec =
     """package com.example
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingsFormat { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat =>
+      |trait GreetingsFormat { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat =>
       |implicit lazy val GreetingsFormat: JsonFormat[Greetings] = unionFormat2[Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
@@ -788,8 +788,8 @@ object NewSchema {
       |  }
       |}
       |}
-      |trait Codec { self: com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat => }
-      |object Codec extends Codec with com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with sjsonnew.UnionFormats with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat""".stripMargin
+      |trait Codec { self: com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat => }
+      |object Codec extends Codec with com.example.GreetingsFormat with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormat with com.example.PriorityLevelFormat with java.io.FileFormat with com.example.SimpleGreetingFormat with com.example.GreetingWithAttachmentsFormat with java.util.DateFormat""".stripMargin
 
 
   val growableAddOneFieldExample = """{
