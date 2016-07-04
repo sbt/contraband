@@ -31,7 +31,7 @@ object DatatypePlugin extends AutoPlugin {
 
     lazy val baseDatatypeSettings: Seq[Def.Setting[_]] = Seq(
       createDatatypes in generateDatatypes := true,
-      datatypeCodecsDependencies in generateDatatypes := Seq("org.scala-sbt" %% "datatype-codecs" % "1.0.0-SNAPSHOT"),
+      datatypeCodecsDependencies in generateDatatypes := Seq("com.eed3si9n" %% "sjson-new-core" % "0.4.0"),
       createCodecs in generateDatatypes := true,
       datatypeJavaLazy in generateDatatypes := "xsbti.api.Lazy",
       datatypeSource in generateDatatypes := Defaults.configSrcSub(sourceDirectory).value / "datatype",

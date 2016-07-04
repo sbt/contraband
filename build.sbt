@@ -15,17 +15,8 @@ lazy val pluginSettings = commonSettings ++ Seq(
   sbtPlugin := true
 )
 
-lazy val datatypeCodecs = (project in file("datatype-codecs")).
-  settings(
-    commonSettings,
-    name := "datatype-codecs",
-    description := "Default codecs required to use with sbt-datatype",
-    version := "1.0.0-SNAPSHOT", // needs to be bumped in the plugin definition as well
-    libraryDependencies += sjsonnewCore
-  )
-
 lazy val root = (project in file(".")).
-  aggregate(datatypeCodecs, library, plugin).
+  aggregate(library, plugin).
   settings(
     commonSettings,
     name := "datatype root",
@@ -46,7 +37,7 @@ lazy val plugin = (project in file("plugin")).
     scriptedLaunchOpts := { scriptedLaunchOpts.value ++
       Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
     },
-    publishLocal <<= (publishLocal) dependsOn (publishLocal in library, publishLocal in datatypeCodecs)
+    publishLocal <<= (publishLocal) dependsOn (publishLocal in library)
   ).
   dependsOn(library)
 
