@@ -159,7 +159,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple record */
         |final class simpleRecordExample(
-        |val field: type) extends Serializable {
+        |val field: java.net.URL) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleRecordExample => (this.field == x.field)
         |    case _ => false
@@ -170,15 +170,15 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleRecordExample(" + field + ")"
         |  }
-        |  private[this] def copy(field: type = field): simpleRecordExample = {
+        |  private[this] def copy(field: java.net.URL = field): simpleRecordExample = {
         |    new simpleRecordExample(field)
         |  }
-        |  def withField(field: type): simpleRecordExample = {
+        |  def withField(field: java.net.URL): simpleRecordExample = {
         |    copy(field = field)
         |  }
         |}
         |object simpleRecordExample {
-        |  def apply(field: type): simpleRecordExample = new simpleRecordExample(field)
+        |  def apply(field: java.net.URL): simpleRecordExample = new simpleRecordExample(field)
         |}""".stripMargin.unindent)
   }
 
