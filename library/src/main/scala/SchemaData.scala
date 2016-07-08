@@ -58,9 +58,9 @@ sealed trait SchemaElement {
 }
 
 /**
- * Base trait that represents `Protocol`s, `Record`s and `Enumeration`s.
+ * Base trait that represents `Interface`s, `Record`s and `Enumeration`s.
  * Syntax:
- *   Definition := Protocol | Record | Enumeration
+ *   Definition := Interface | Record | Enumeration
  */
 sealed trait Definition extends SchemaElement {
   def namespace: Option[String]
@@ -75,7 +75,7 @@ sealed trait ClassLike extends Definition {
 object Definition extends Parser[Definition] {
   override def parse(json: JValue): Definition = {
     json -> "type" match {
-      case "protocol"    => Protocol.parse(json)
+      case "interface"   => Interface.parse(json)
       case "record"      => Record.parse(json)
       case "enumeration" => Enumeration.parse(json)
       case other         => sys.error(s"Invalid type: $other")
@@ -96,9 +96,9 @@ object Schema extends Parser[Schema] {
 }
 
 /**
- * Protocols map to abstract classes.
+ * Interface maps to an abstract classes.
  * Syntax:
- *   Protocol := {   "name": ID,
+ *   Interface := {  "name": ID,
  *                   "target": ("Scala" | "Java" | "Mixed")
  *                (, "namespace": string constant)?
  *                (, "doc": string constant)?
@@ -106,7 +106,7 @@ object Schema extends Parser[Schema] {
  *                (, "methods": [ AbstractMethod* ])?
  *                (, "types": [ Definition* ])? }
  */
-case class Protocol(name: String,
+case class Interface(name: String,
   targetLang: String,
   namespace: Option[String],
   since: VersionNumber,
@@ -115,9 +115,9 @@ case class Protocol(name: String,
   abstractMethods: List[AbstractMethod],
   children: List[Definition]) extends ClassLike
 
-object Protocol extends Parser[Protocol] {
-  override def parse(json: JValue): Protocol =
-    Protocol(json -> "name",
+object Interface extends Parser[Interface] {
+  override def parse(json: JValue): Interface =
+    Interface(json -> "name",
       json -> "target",
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
@@ -198,7 +198,7 @@ object EnumerationValue extends Parser[EnumerationValue] {
 }
 
 /**
- * A field of a protocol or record.
+ * A field of an interface or record.
  * Syntax:
  *   Field := {   "name": ID,
  *                "type": ID
@@ -222,7 +222,7 @@ object Field extends Parser[Field] {
 }
 
 /**
- * An abstract method defined in a protocol.
+ * An abstract method defined in an interface.
  * Syntax:
  *   AbstractMethod := {   "name": ID,
  *                         "type": ID

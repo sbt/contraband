@@ -19,27 +19,27 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
   override def generate(s: Schema): Map[File, String] =
     s.definitions flatMap (generate(s, _, None, Nil) mapValues (_.indented)) toMap
 
-  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val Protocol(name, _, namespace, _, doc, fields, abstractMethods, children) = p
+  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+    val Interface(name, _, namespace, _, doc, fields, abstractMethods, children) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
-      s"""${genPackage(p)}
+      s"""${genPackage(i)}
          |${genDoc(doc)}
          |public abstract class $name $extendsCode {
          |    ${genFields(fields)}
-         |    ${genConstructors(p, parent, superFields)}
+         |    ${genConstructors(i, parent, superFields)}
          |    ${genAccessors(fields)}
          |    ${genAbstractMethods(abstractMethods)}
-         |    ${genEquals(p, superFields)}
-         |    ${genHashCode(p, superFields)}
-         |    ${genToString(p, superFields)}
+         |    ${genEquals(i, superFields)}
+         |    ${genHashCode(i, superFields)}
+         |    ${genToString(i, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) ++ (children flatMap (generate(s, _, Some(p), fields ++ superFields)))
+    Map(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), fields ++ superFields)))
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
     val Record(name, _, namespace, _, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -150,7 +150,7 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
        |public abstract ${genRealTpe(abstractMethod.retTpe)} ${abstractMethod.name}(${args mkString ","});"""
   }
 
-  private def genConstructors(cl: ClassLike, parent: Option[Protocol], superFields: List[Field]) =
+  private def genConstructors(cl: ClassLike, parent: Option[Interface], superFields: List[Field]) =
     perVersionNumber(cl.since, cl.fields ++ superFields) { (provided, byDefault) =>
       val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _${f.name}") mkString ", "
       val superFieldsValues = superFields map {

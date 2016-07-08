@@ -40,7 +40,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(e) -> code)
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
     val allFields = r.fields ++ superFields
 
     val alternativeCtors =
@@ -96,14 +96,14 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
     Map(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
-    val allFields = p.fields ++ superFields
+  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+    val allFields = i.fields ++ superFields
 
     val alternativeCtors =
-      genAlternativeConstructors(p.since, allFields) mkString EOL
+      genAlternativeConstructors(i.since, allFields) mkString EOL
 
     val ctorParameters =
-      genCtorParameters(p, allFields) mkString ", "
+      genCtorParameters(i, allFields) mkString ", "
 
     val superCtorArguments =
       superFields map (_.name) mkString ", "
@@ -112,27 +112,27 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
       parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse "extends Serializable"
 
     val lazyMembers =
-      genLazyMembers(p.fields) mkString EOL
+      genLazyMembers(i.fields) mkString EOL
 
     val abstractMethods =
-      genAbstractMethods(p.abstractMethods) mkString EOL
+      genAbstractMethods(i.abstractMethods) mkString EOL
 
     val classDef =
       if (sealProtocols) "sealed abstract class" else "abstract class"
 
     val code =
-      s"""${genPackage(p)}
-         |${genDoc(p.doc)}
-         |$classDef ${p.name}($ctorParameters) $extendsCode {
+      s"""${genPackage(i)}
+         |${genDoc(i.doc)}
+         |$classDef ${i.name}($ctorParameters) $extendsCode {
          |  $alternativeCtors
          |  $lazyMembers
          |  $abstractMethods
-         |  ${genEquals(p, superFields)}
-         |  ${genHashCode(p, superFields)}
-         |  ${genToString(p, superFields)}
+         |  ${genEquals(i, superFields)}
+         |  ${genHashCode(i, superFields)}
+         |  ${genToString(i, superFields)}
          |}""".stripMargin
 
-    Map(genFile(p) -> code) :: (p.children map (generate(s, _, Some(p), p.fields ++ superFields))) reduce (_ merge _)
+    Map(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: List[String]) = doc match {

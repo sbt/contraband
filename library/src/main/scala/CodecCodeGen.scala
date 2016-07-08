@@ -62,7 +62,7 @@ class CodecCodeGen(genFile: Definition => File,
     Map(genFile(e) -> code)
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
     def accessField(f: Field) = {
       if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else f.name
@@ -101,39 +101,40 @@ class CodecCodeGen(genFile: Definition => File,
     Map(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, p: Protocol, parent: Option[Protocol], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+    val name = i.name
     val code =
-      p.children match {
+      i.children match {
         case Nil =>
-          s"""${genPackage(p)}
+          s"""${genPackage(i)}
              |$sjsonImports
-             |trait ${p.name}Formats {
-             |  implicit lazy val ${p.name}Format: JsonFormat[${p.name}] = new JsonFormat[${p.name}] {
-             |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${p.name} = {
-             |      deserializationError("No known implementation of ${p.name}.")
+             |trait ${name}Formats {
+             |  implicit lazy val ${name}Format: JsonFormat[${name}] = new JsonFormat[${name}] {
+             |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${i.name} = {
+             |      deserializationError("No known implementation of ${i.name}.")
              |    }
-             |    override def write[J](obj: ${p.name}, builder: Builder[J]): Unit = {
-             |      serializationError("No known implementation of ${p.name}.")
+             |    override def write[J](obj: ${name}, builder: Builder[J]): Unit = {
+             |      serializationError("No known implementation of ${name}.")
              |    }
              |  }
              |}""".stripMargin
 
         case xs =>
-          val unionFormat = s"unionFormat${xs.length}[${p.name}, ${xs map (c => c.namespace.getOrElse("_root_") + "." + c.name) mkString ", "}]"
+          val unionFormat = s"unionFormat${xs.length}[${name}, ${xs map (c => c.namespace.getOrElse("_root_") + "." + c.name) mkString ", "}]"
 
-          val selfType = getAllRequiredFormats(s, p, superFields).distinct match {
+          val selfType = getAllRequiredFormats(s, i, superFields).distinct match {
             case Nil => ""
             case fms => fms.mkString("self: ", " with ", " =>")
           }
-          s"""${genPackage(p)}
+          s"""${genPackage(i)}
              |$sjsonImports
-             |trait ${p.name}Formats { $selfType
-             |  implicit lazy val ${p.name}Format: JsonFormat[${p.name}] = $unionFormat
+             |trait ${name}Formats { $selfType
+             |  implicit lazy val ${name}Format: JsonFormat[${name}] = $unionFormat
              |}""".stripMargin
 
       }
 
-    Map(genFile(p) -> code) :: (p.children map (generate(s, _, Some(p), p.fields ++ superFields))) reduce (_ merge _)
+    Map(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
   }
 
   override def generate(s: Schema): Map[File, String] = {
@@ -150,7 +151,7 @@ class CodecCodeGen(genFile: Definition => File,
   private def getRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = {
     val typeFormats =
       d match {
-        case Protocol(name, _, namespace, _, _, fields, _, _) =>
+        case Interface(name, _, namespace, _, _, fields, _, _) =>
           val allFields = fields ++ superFields
           allFields flatMap (f => formatsForType(f.tpe))
 
@@ -183,13 +184,13 @@ class CodecCodeGen(genFile: Definition => File,
    * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `d`,
    * knowing that it inherits fields `superFields` in the context of schema `s`.
    *
-   * If `d` is a `Protocol`, we recurse to get the codecs required by its children.
+   * If `d` is an `Interface`, we recurse to get the codecs required by its children.
    */
   private def getAllRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = d match {
-    case p: Protocol =>
-      getRequiredFormats(s, p, superFields) ++
-        p.children.flatMap(c => getAllRequiredFormats(s, c, p.fields ++ superFields)) ++
-        p.children.map(c => s"""${c.namespace getOrElse "_root_"}.${c.name}Formats""")
+    case i: Interface =>
+      getRequiredFormats(s, i, superFields) ++
+        i.children.flatMap(c => getAllRequiredFormats(s, c, i.fields ++ superFields)) ++
+        i.children.map(c => s"""${c.namespace getOrElse "_root_"}.${c.name}Formats""")
     case r: Record =>
       getRequiredFormats(s, r, superFields)
     case e: Enumeration =>
@@ -242,13 +243,13 @@ class CodecCodeGen(genFile: Definition => File,
          |trait $codecName { $selfType }
          |object $codecName $parents""".stripMargin
 
-    val syntheticDefinition = Protocol(codecName, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
+    val syntheticDefinition = Interface(codecName, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
 
     Map(genFile(syntheticDefinition) -> code)
   }
 
   private def allChildrenOf(d: Definition): List[Definition] = d match {
-    case p: Protocol => p :: p.children.flatMap(allChildrenOf)
+    case i: Interface => i :: i.children.flatMap(allChildrenOf)
     case r: Record => r :: Nil
     case e: Enumeration => e :: Nil
   }
@@ -259,11 +260,11 @@ class CodecCodeGen(genFile: Definition => File,
   }
 
   private def requiresUnionFormats(s: Schema, d: Definition, superFields: List[Field]): Boolean = d match {
-    case _: Protocol => true
+    case _: Interface => true
     case r: Record =>
       val defsMap = definitionsMap(s)
       val allFields = r.fields ++ superFields
-      allFields exists { f => defsMap get f.tpe.name exists { case _: Protocol => true ; case _ => false } }
+      allFields exists { f => defsMap get f.tpe.name exists { case _: Interface => true ; case _ => false } }
     case _: Enumeration => false
   }
 

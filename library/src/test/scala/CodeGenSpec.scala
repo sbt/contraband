@@ -19,7 +19,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
     generate(Enumeration) should
       generate a simple enumeration              $enumerationGenerateSimple
 
-    generate(Protocol) should
+    generate(Interface) should
       generate a simple protocol                 $protocolGenerateSimple
       generate a simple protocol with one child  $protocolGenerateOneChild
       generate nested protocols                  $protocolGenerateNested
