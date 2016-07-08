@@ -16,15 +16,15 @@ class SchemaSpec extends Specification {
       parse complete example                     $complete
 
     Definition.parse should
-      parse protocol                             $definitionParseProtocol
+      parse interface                            $definitionParseInterface
       parse record                               $definitionParseRecord
       parse enumeration                          $definitionParseEnumeration
       throw an error on invalid definition kind  $definitionParseInvalidDefinitionKind
 
-    Protocol.parse should
-      parse simple protocol                      $protocolParseSimple
-      parse protocol with one child              $protocolParseOneChild
-      parse nested protocols                     $protocolParseNested
+    Interface.parse should
+      parse simple interface                     $protocolParseSimple
+      parse interface with one child             $protocolParseOneChild
+      parse nested interfaces                    $protocolParseNested
 
     Record.parse should
       parse simple record                        $recordParseSimple
@@ -58,10 +58,10 @@ class SchemaSpec extends Specification {
     s.definitions must haveSize(3)
   }
 
-  def definitionParseProtocol = {
-    Definition parse emptyProtocolExample match {
-      case Protocol(name, target, namespace, _, doc, fields, abstractMethods, children) =>
-        name must_== "emptyProtocolExample"
+  def definitionParseInterface = {
+    Definition parse emptyInterfaceExample match {
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children) =>
+        name must_== "emptyInterfaceExample"
         target must_== "Scala"
         namespace must_== None
         doc must_== None
@@ -106,12 +106,12 @@ class SchemaSpec extends Specification {
     Definition parse invalidDefinitionKindExample must throwA[RuntimeException]
 
   def protocolParseSimple = {
-    Protocol parse simpleProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
+    Interface parse simpleProtocolExample match {
+      case Interface(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "simpleProtocolExample"
         target must_== "Scala"
         namespace must_== None
-        doc must_== Some("example of simple protocol")
+        doc must_== Some("example of simple interface")
         fields must haveSize(1)
         fields(0) must_== Field("field", Nil, TpeRef("type", false, false), Field.emptyVersion, None)
         abstractMethods must haveSize(0)
@@ -120,12 +120,12 @@ class SchemaSpec extends Specification {
   }
 
   def protocolParseOneChild = {
-    Protocol parse oneChildProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
+    Interface parse oneChildProtocolExample match {
+      case Interface(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "oneChildProtocolExample"
         target must_== "Scala"
         namespace must_== None
-        doc must_== Some("example of protocol")
+        doc must_== Some("example of interface")
         fields must haveSize(0)
         abstractMethods must haveSize(0)
         children must haveSize(1)
@@ -134,8 +134,8 @@ class SchemaSpec extends Specification {
   }
 
   def protocolParseNested = {
-    Protocol parse nestedProtocolExample match {
-      case Protocol(name, target, namespace, doc, _, fields, abstractMethods, children) =>
+    Interface parse nestedProtocolExample match {
+      case Interface(name, target, namespace, doc, _, fields, abstractMethods, children) =>
         name must_== "nestedProtocolExample"
         target must_== "Scala"
         namespace must_== None
@@ -143,7 +143,7 @@ class SchemaSpec extends Specification {
         fields must haveSize(0)
         abstractMethods must haveSize(0)
         children must haveSize(1)
-        children(0) must_== Protocol("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
+        children(0) must_== Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
     }
   }
 

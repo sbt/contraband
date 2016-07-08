@@ -1,7 +1,7 @@
 {
 	"types": [
 		{
-			"type": "protocol",
+			"type": "interface",
 			"namespace": "com.example",
 			"target": "Java",
 			"name": "A",

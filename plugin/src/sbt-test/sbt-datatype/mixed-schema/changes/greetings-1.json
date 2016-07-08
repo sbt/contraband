@@ -4,7 +4,7 @@
 			"name": "Greeting",
 			"namespace": "com.example.interfaces",
 			"target": "Java",
-			"type": "protocol",
+			"type": "interface",
 			"fields": [
 				{
 					"name": "message",

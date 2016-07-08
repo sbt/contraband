@@ -61,7 +61,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def protocolGenerateSimple = {
     val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Protocol parse simpleProtocolExample
+    val protocol = Interface parse simpleProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -82,7 +82,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def protocolGenerateOneChild = {
     val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Protocol parse oneChildProtocolExample
+    val protocol = Interface parse oneChildProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -115,7 +115,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def protocolGenerateNested = {
     val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Protocol parse nestedProtocolExample
+    val protocol = Interface parse nestedProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -315,7 +315,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
                                  |    {
                                  |      "name": "Greeting",
                                  |      "target": "Java",
-                                 |      "type": "protocol"
+                                 |      "type": "interface"
                                  |    }
                                  |  ]
                                  |}""".stripMargin

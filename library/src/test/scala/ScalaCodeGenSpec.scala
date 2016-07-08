@@ -28,11 +28,11 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   override def protocolGenerateSimple = {
     val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
-    val protocol = Protocol parse simpleProtocolExample
+    val protocol = Interface parse simpleProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
-      """/** example of simple protocol */
+      """/** example of simple interface */
         |sealed abstract class simpleProtocolExample(
         |  val field: type) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
@@ -50,11 +50,11 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   override def protocolGenerateOneChild = {
     val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
-    val protocol = Protocol parse oneChildProtocolExample
+    val protocol = Interface parse oneChildProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
-      """/** example of protocol */
+      """/** example of interface */
         |sealed abstract class oneChildProtocolExample() extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: oneChildProtocolExample => true
@@ -90,7 +90,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   override def protocolGenerateNested = {
     val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
-    val protocol = Protocol parse nestedProtocolExample
+    val protocol = Interface parse nestedProtocolExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -131,7 +131,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  val field: Int) extends Serializable {
         |  /**
         |   * A very simple example of abstract method.
-        |   * Abstract methods can only appear in protocol definitions.
+        |   * Abstract methods can only appear in interface definitions.
         |   * @param arg0 The first argument of the method.
         |                 Make sure it is awesome.
         |   * @param arg1 This argument is not important, so it gets single line doc.

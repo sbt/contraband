@@ -32,10 +32,10 @@ object NewSchema {
 
   val emptySchemaExample = """{}"""
 
-  val emptyProtocolExample = """{
-  "type": "protocol",
+  val emptyInterfaceExample = """{
+  "type": "interface",
   "target": "Scala",
-  "name": "emptyProtocolExample"
+  "name": "emptyInterfaceExample"
 }"""
 
   val emptyRecordExample = """{
@@ -56,8 +56,8 @@ object NewSchema {
 }"""
 
   val simpleProtocolExample = """{
-  "type": "protocol",
-  "doc": "example of simple protocol",
+  "type": "interface",
+  "doc": "example of simple interface",
   "name": "simpleProtocolExample",
   "target": "Scala",
   "fields": [
@@ -70,9 +70,9 @@ object NewSchema {
 
   val oneChildProtocolExample = """{
   "name": "oneChildProtocolExample",
-  "type": "protocol",
+  "type": "interface",
   "target": "Scala",
-  "doc": "example of protocol",
+  "doc": "example of interface",
   "types": [
     {
       "name": "childRecord",
@@ -85,13 +85,13 @@ object NewSchema {
   val nestedProtocolExample = """{
   "name": "nestedProtocolExample",
   "target": "Scala",
-  "type": "protocol",
+  "type": "interface",
   "doc": "example of nested protocols",
   "types": [
     {
       "name": "nestedProtocol",
       "target": "Scala",
-      "type": "protocol"
+      "type": "interface"
     }
   ]
 }"""
@@ -201,7 +201,7 @@ object NewSchema {
     {
       "name": "generateArgDocExample",
       "target": "Scala",
-      "type": "protocol",
+      "type": "interface",
       "fields": [
         {
           "name": "field",
@@ -214,7 +214,7 @@ object NewSchema {
           "name": "methodExample",
           "doc": [
             "A very simple example of abstract method.",
-            "Abstract methods can only appear in protocol definitions."
+            "Abstract methods can only appear in interface definitions."
           ],
           "type": "int*",
           "args": [
@@ -244,8 +244,8 @@ object NewSchema {
       "name": "Greetings",
       "namespace": "com.example",
       "target": "Scala",
-      "doc": "A greeting protocol",
-      "type": "protocol",
+      "doc": "A greeting interface",
+      "type": "interface",
 
       "fields": [
         {
@@ -338,7 +338,7 @@ object NewSchema {
 
   val completeExampleCodeScala =
     """package com.example
-      |/** A greeting protocol */
+      |/** A greeting interface */
       |sealed abstract class Greetings(
       |  _message: => String,
       |  /** The header of the Greeting */
@@ -606,7 +606,7 @@ object NewSchema {
 
       new File("com/example/Greetings.java") ->
         """package com.example;
-          |/** A greeting protocol */
+          |/** A greeting interface */
           |public abstract class Greetings implements java.io.Serializable {
           |
           |    /**
