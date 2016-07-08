@@ -222,15 +222,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
           """/** Example of simple record */
             |public final class simpleRecordExample implements java.io.Serializable {
             |
-            |    private type field;
-            |    public simpleRecordExample(type _field) {
+            |    private java.net.URL field;
+            |    public simpleRecordExample(java.net.URL _field) {
             |        super();
             |        field = _field;
             |    }
-            |    public type field() {
+            |    public java.net.URL field() {
             |        return this.field;
             |    }
-            |    public simpleRecordExample withField(type field) {
+            |    public simpleRecordExample withField(java.net.URL field) {
             |        return new simpleRecordExample(field);
             |    }
             |    public boolean equals(Object obj) {

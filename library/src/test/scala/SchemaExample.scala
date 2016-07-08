@@ -104,7 +104,7 @@ object NewSchema {
   "fields": [
     {
       "name": "field",
-      "type": "type"
+      "type": "java.net.URL"
     }
   ]
 }"""

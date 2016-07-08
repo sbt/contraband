@@ -155,7 +155,7 @@ class SchemaSpec extends Specification {
         namespace must_== None
         doc must_== Some("Example of simple record")
         fields must haveSize(1)
-        fields(0) must_== Field("field", Nil, TpeRef("type", false, false), Field.emptyVersion, None)
+        fields(0) must_== Field("field", Nil, TpeRef("java.net.URL", false, false), Field.emptyVersion, None)
     }
   }
 

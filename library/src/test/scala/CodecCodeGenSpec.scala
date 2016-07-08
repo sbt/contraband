@@ -166,13 +166,13 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait simpleRecordExampleFormats { self: _root_.typeFormats with sjsonnew.BasicJsonProtocol =>
+        |trait simpleRecordExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleRecordExampleFormat: JsonFormat[simpleRecordExample] = new JsonFormat[simpleRecordExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleRecordExample = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
-        |          val field = unbuilder.readField[type]("field")
+        |          val field = unbuilder.readField[java.net.URL]("field")
         |          unbuilder.endObject()
         |          new simpleRecordExample(field)
         |        case None =>
@@ -186,8 +186,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |    }
         |  }
         |}
-        |trait Codec { self: _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol with _root_.typeFormats => }
-        |object Codec extends Codec with _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol with _root_.typeFormats""".stripMargin.unindent)
+        |trait Codec { self: _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol => }
+        |object Codec extends Codec with _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
