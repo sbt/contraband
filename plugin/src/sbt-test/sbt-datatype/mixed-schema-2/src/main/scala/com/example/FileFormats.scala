@@ -4,7 +4,7 @@ import java.io.File
 
 import sjsonnew.{ Builder, deserializationError, JsonFormat, Unbuilder }
 
-trait FileFormat {
+trait FileFormats {
   implicit val fileFormat: JsonFormat[File] = new JsonFormat[File] {
     override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): File = {
       jsOpt match {
