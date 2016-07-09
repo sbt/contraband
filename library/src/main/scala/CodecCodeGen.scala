@@ -142,8 +142,8 @@ class CodecCodeGen(genFile: Definition => File,
     val codecs = s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapValues (_.indented)
     protocolName match {
       case Some(x) =>
-        val fullCodec = generateFullCodec(s, x)
-        codecs merge fullCodec
+        val fullProtocol = generateFullProtocol(s, x)
+        codecs merge fullProtocol
       case None =>
         codecs
     }
@@ -255,17 +255,13 @@ class CodecCodeGen(genFile: Definition => File,
     case other     => other
   }
 
-  private def generateFullCodec(s: Schema, name: String): Map[File, String] = {
+  private def generateFullProtocol(s: Schema, name: String): Map[File, String] = {
     val allFormats = getAllRequiredFormats(s).distinct
-    val selfType = allFormats match {
-      case Nil  => ""
-      case fmts => fmts.mkString("self: ", " with ", " =>")
-    }
-    val parents = name :: allFormats mkString ("extends ", " with ", "")
+    val parents = allFormats.mkString("extends ", " with ", "")
     val code =
       s"""${codecNamespace map (p => s"package $p") getOrElse ""}
-         |trait $name { $selfType }
-         |object $name $parents""".stripMargin
+         |trait $name $parents
+         |object $name extends $name""".stripMargin
 
     val syntheticDefinition = Interface(name, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
 

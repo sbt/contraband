@@ -788,8 +788,8 @@ object NewSchema {
       |  }
       |}
       |}
-      |trait CustomProtcol { self: com.example.GreetingsFormats with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.util.DateFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol => }
-      |object CustomProtcol extends CustomProtcol with com.example.GreetingsFormats with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.util.DateFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol""".stripMargin
+      |trait CustomProtcol extends com.example.GreetingsFormats with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.util.DateFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
+      |object CustomProtcol extends CustomProtcol""".stripMargin
 
 
   val growableAddOneFieldExample = """{
