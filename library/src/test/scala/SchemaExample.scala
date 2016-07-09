@@ -687,7 +687,7 @@ object NewSchema {
   val completeExampleCodeCodec =
     """package com.example
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingsFormats { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with com.example.GreetingWithAttachmentsFormats =>
+      |trait GreetingsFormats { self: com.example.GreetingHeaderFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
       |implicit lazy val GreetingsFormat: JsonFormat[Greetings] = unionFormat2[Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
@@ -788,8 +788,8 @@ object NewSchema {
       |  }
       |}
       |}
-      |trait Codec { self: com.example.GreetingsFormats with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with com.example.GreetingWithAttachmentsFormats with java.util.DateFormats => }
-      |object Codec extends Codec with com.example.GreetingsFormats with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with com.example.GreetingWithAttachmentsFormats with java.util.DateFormats""".stripMargin
+      |trait CustomProtcol extends com.example.GreetingsFormats with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.util.DateFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
+      |object CustomProtcol extends CustomProtcol""".stripMargin
 
 
   val growableAddOneFieldExample = """{

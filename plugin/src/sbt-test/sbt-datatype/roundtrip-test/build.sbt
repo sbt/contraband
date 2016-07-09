@@ -15,3 +15,5 @@ datatypeFormatsForType in generateDatatypes in Compile := { tpe =>
 libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.0"
 
 enablePlugins(DatatypePlugin)
+
+scalacOptions += "-Xlog-implicits"
