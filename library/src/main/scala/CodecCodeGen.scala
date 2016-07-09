@@ -38,7 +38,7 @@ class CodecCodeGen(genFile: Definition => File,
     val code =
       s"""${genPackage(e)}
          |$sjsonImports
-         |trait ${e.name}Formats { $selfType
+         |trait ${e.name.capitalize}Formats { $selfType
          |  implicit lazy val ${e.name}Format: JsonFormat[${e.name}] = new JsonFormat[${e.name}] {
          |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${e.name} = {
          |      jsOpt match {
@@ -77,7 +77,7 @@ class CodecCodeGen(genFile: Definition => File,
     val code =
       s"""${genPackage(r)}
          |$sjsonImports
-         |trait ${r.name}Formats { $selfType
+         |trait ${r.name.capitalize}Formats { $selfType
          |  implicit lazy val ${r.name}Format: JsonFormat[${r.name}] = new JsonFormat[${r.name}] {
          |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${r.name} = {
          |      jsOpt match {
@@ -109,7 +109,7 @@ class CodecCodeGen(genFile: Definition => File,
         case Nil =>
           s"""${genPackage(i)}
              |$sjsonImports
-             |trait ${name}Formats {
+             |trait ${name.capitalize}Formats {
              |  implicit lazy val ${name}Format: JsonFormat[${name}] = new JsonFormat[${name}] {
              |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): ${i.name} = {
              |      deserializationError("No known implementation of ${i.name}.")
@@ -129,7 +129,7 @@ class CodecCodeGen(genFile: Definition => File,
           }
           s"""${genPackage(i)}
              |$sjsonImports
-             |trait ${name}Formats { $selfType
+             |trait ${name.capitalize}Formats { $selfType
              |  implicit lazy val ${name}Format: JsonFormat[${name}] = $unionFormat
              |}""".stripMargin
 
@@ -173,16 +173,36 @@ class CodecCodeGen(genFile: Definition => File,
     typeFormats ++ unionFormat ++ codecParents
   }
 
-  private def getAllRequiredFormats(s: Schema): List[String] = {
-    val topFormats =
-      s.definitions flatMap { d =>
-        val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false)
-        formatsForType(tpe)
+  private def fullFormatsName(d: Definition): String =
+    s"""${d.namespace getOrElse "_root_"}.${d.name.capitalize}Formats"""
+
+  private def getAllRequiredFormats(s: Schema): List[String] = getAllRequiredFormats(s, s.definitions, Nil)
+
+  /**
+   * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `ds`,
+   * knowing that it inherits fields `superFields` in the context of schema `s`.
+   *
+   * The results are sorted topologically.
+   */
+  private def getAllRequiredFormats(s: Schema, ds: List[Definition], superFields: List[Field]): List[String] = {
+    val seedFormats = ds map { fullFormatsName }
+    def getAllDefinitions(d: Definition): List[Definition] =
+      d match {
+        case i: Interface => i :: (i.children flatMap {getAllDefinitions})
+        case _            => d :: Nil
       }
-
-    val childrenFormats = s.definitions flatMap (getAllRequiredFormats(s, _, Nil))
-
-    topFormats ++ childrenFormats
+    val allDefinitions = ds flatMap getAllDefinitions
+    val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
+      val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false)
+      fullFormatsName(d) -> (d match {
+        case i: Interface =>
+          i.children.map(fullFormatsName) :::
+          "sjsonnew.BasicJsonProtocol" :: getRequiredFormats(s, d, superFields)
+        case _            => "sjsonnew.BasicJsonProtocol" :: getRequiredFormats(s, d, superFields)
+      })
+    }: _*)
+    val xs = sbt.Dag.topologicalSort[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
+    xs.reverse
   }
 
   /**
@@ -193,9 +213,8 @@ class CodecCodeGen(genFile: Definition => File,
    */
   private def getAllRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = d match {
     case i: Interface =>
-      getRequiredFormats(s, i, superFields) ++
-        i.children.flatMap(c => getAllRequiredFormats(s, c, i.fields ++ superFields)) ++
-        i.children.map(c => s"""${c.namespace getOrElse "_root_"}.${c.name}Formats""")
+      val fmt = fullFormatsName(d)
+      getAllRequiredFormats(s, i :: Nil, superFields) filter { _ != fmt }
     case r: Record =>
       getRequiredFormats(s, r, superFields)
     case e: Enumeration =>
@@ -292,8 +311,15 @@ object CodecCodeGen {
   val formatsForType: TpeRef => List[String] =
     extensibleFormatsForType {
       removeTypeParameters(_) match {
-        case TpeRef(name, _, _) if name contains "." => s"${name}Formats" :: Nil
-        case TpeRef(name, _, _)                      => s"_root_.${name}Formats" :: Nil
+        case TpeRef(name, _, _) if name contains "." =>
+          val tokens: List[String] = name.split("""\.""").toList.reverse
+          val cap = tokens match {
+            case x :: xs => (x.capitalize :: xs).reverse.mkString(".")
+            case x => x.mkString(".")
+          }
+          val xs = s"${cap}Formats" :: Nil
+          xs
+        case TpeRef(name, _, _) => s"_root_.${name.capitalize}Formats" :: Nil
       }
     }
 
