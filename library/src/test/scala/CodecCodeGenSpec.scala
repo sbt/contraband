@@ -18,7 +18,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
 
   val outputFile = new File("output.scala")
-  val codecName = "Codec"
+  val protocolName = None
   val codecNamespace = None
   val codecParents = Nil
   val genFileName = (_: Definition) => outputFile
@@ -26,7 +26,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   val formatsForType = CodecCodeGen.formatsForType
 
   override def enumerationGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -54,13 +54,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.writeString(str)
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.simpleEnumerationExampleFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.simpleEnumerationExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def protocolGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val protocol = Interface parse simpleProtocolExample
     val code = gen generate protocol
 
@@ -75,13 +73,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of simpleProtocolExample.")
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.simpleProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.typeFormats => }
-        |object Codec extends Codec with _root_.simpleProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.typeFormats""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val protocol = Interface parse oneChildProtocolExample
     val code = gen generate protocol
 
@@ -108,13 +104,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.oneChildProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.childRecordFormats => }
-        |object Codec extends Codec with _root_.oneChildProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.childRecordFormats""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def protocolGenerateNested = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val protocol = Interface parse nestedProtocolExample
     val code = gen generate protocol
 
@@ -133,13 +127,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of nestedProtocol.")
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.nestedProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.nestedProtocolFormats => }
-        |object Codec extends Codec with _root_.nestedProtocolExampleFormats with sjsonnew.BasicJsonProtocol with _root_.nestedProtocolFormats""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   def protocolGenerateAbstractMethods = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse generateArgDocExample
     val code = gen generate schema
 
@@ -154,13 +146,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of generateArgDocExample.")
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.generateArgDocExampleFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.generateArgDocExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def recordGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
@@ -185,13 +175,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.simpleRecordExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
@@ -216,13 +204,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.growableAddOneFieldFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.growableAddOneFieldFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse primitiveTypesExample
     val code = gen generate schema
 
@@ -254,13 +240,11 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.primitiveTypesExampleFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.primitiveTypesExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = gen generate schema
 
@@ -287,13 +271,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.primitiveTypesNoLazyExampleFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.primitiveTypesNoLazyExampleFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val protocolName = Some("CustomProtcol")
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
@@ -301,7 +284,8 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val protocolName = Some("CustomProtcol")
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
@@ -309,7 +293,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   def fullCodecCheck = {
-    val gen = new CodecCodeGen(genFileName, codecName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse s"""{
                                  |  "types": [
                                  |    {
@@ -332,9 +316,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of Greeting.")
         |    }
         |  }
-        |}
-        |trait Codec { self: _root_.GreetingFormats with sjsonnew.BasicJsonProtocol => }
-        |object Codec extends Codec with _root_.GreetingFormats with sjsonnew.BasicJsonProtocol""".stripMargin.unindent)
+        |}""".stripMargin.unindent)
   }
 
 }

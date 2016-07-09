@@ -6,14 +6,15 @@ import java.io.File
  * Code generator to produce a codec for a given type.
  *
  * @param genFile             A function that maps a `Definition` to the `File` in which we should write it.
- * @param codecName           The name of the full codec object to generate.
+ * @param protocolName        The name of the full codec object to generate.
  * @param codecNamespace      The package to which the full codec object should belong.
  * @param codecParents        The parents that appear in the self type of all codecs, and the full codec inherits from.
  * @param instantiateJavaLazy How to transform an expression to its lazy equivalent in Java.
  * @param formatsForType      Given a `TpeRef` t, returns the list of codecs needed to encode t.
  */
 class CodecCodeGen(genFile: Definition => File,
-  codecName: String, codecNamespace: Option[String],
+  protocolName: Option[String],
+  codecNamespace: Option[String],
   codecParents: List[String],
   instantiateJavaLazy: String => String,
   formatsForType: TpeRef => List[String]) extends CodeGenerator {
@@ -139,9 +140,13 @@ class CodecCodeGen(genFile: Definition => File,
 
   override def generate(s: Schema): Map[File, String] = {
     val codecs = s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapValues (_.indented)
-    val fullCodec = generateFullCodec(s)
-
-    codecs merge fullCodec
+    protocolName match {
+      case Some(x) =>
+        val fullCodec = generateFullCodec(s, x)
+        codecs merge fullCodec
+      case None =>
+        codecs
+    }
   }
 
   /**
@@ -231,19 +236,19 @@ class CodecCodeGen(genFile: Definition => File,
     case other     => other
   }
 
-  private def generateFullCodec(s: Schema): Map[File, String] = {
+  private def generateFullCodec(s: Schema, name: String): Map[File, String] = {
     val allFormats = getAllRequiredFormats(s).distinct
     val selfType = allFormats match {
       case Nil  => ""
       case fmts => fmts.mkString("self: ", " with ", " =>")
     }
-    val parents = codecName :: allFormats mkString ("extends ", " with ", "")
+    val parents = name :: allFormats mkString ("extends ", " with ", "")
     val code =
       s"""${codecNamespace map (p => s"package $p") getOrElse ""}
-         |trait $codecName { $selfType }
-         |object $codecName $parents""".stripMargin
+         |trait $name { $selfType }
+         |object $name $parents""".stripMargin
 
-    val syntheticDefinition = Interface(codecName, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
+    val syntheticDefinition = Interface(name, "Scala", codecNamespace, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
 
     Map(genFile(syntheticDefinition) -> code)
   }
