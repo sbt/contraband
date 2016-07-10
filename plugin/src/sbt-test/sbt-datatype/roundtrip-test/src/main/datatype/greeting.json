@@ -1,4 +1,5 @@
 {
+	"codecNamespace": "generated",
 	"types": [
 		{
 			"name": "Greeting",

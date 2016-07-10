@@ -1,4 +1,4 @@
-package com.example
+package com.foo
 
 import java.io.File
 

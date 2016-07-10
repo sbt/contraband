@@ -1,14 +1,15 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 import java.io.File
+import scala.collection.immutable.ListMap
 
 /**
  * The base for code generators.
  */
 abstract class CodeGenerator {
 
-  implicit class MergeableMap[T](m: Map[T, String]) {
-    def merge(o: Map[T, String]): Map[T, String] =
+  implicit class ListMapOp[T](m: ListMap[T, String]) {
+    def merge(o: ListMap[T, String]): ListMap[T, String] =
       (o foldLeft m) { case (acc, (k, v)) =>
         val existing = acc get k getOrElse ""
 
@@ -22,6 +23,11 @@ abstract class CodeGenerator {
             acc + (k -> (existing + EOL + EOL + content))
         }
       }
+
+    def mapV(f: String => String): ListMap[T, String] =
+      ListMap(m.toList map { case (k, v) =>
+        (k, f(v))
+      }: _*)
   }
 
   implicit protected class IndentationAwareString(code: String) {
@@ -45,10 +51,10 @@ abstract class CodeGenerator {
   }
 
   /** Generate the code corresponding to all definitions in `s`. */
-  def generate(s: Schema): Map[File, String]
+  def generate(s: Schema): ListMap[File, String]
 
   /** Generate the code corresponding to `d`. */
-  protected final def generate(s: Schema, d: Definition, parent: Option[Interface], superFields: List[Field]): Map[File, String] =
+  protected final def generate(s: Schema, d: Definition, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] =
     d match {
       case i: Interface   => generate(s, i, parent, superFields)
       case r: Record      => generate(s, r, parent, superFields)
@@ -56,13 +62,13 @@ abstract class CodeGenerator {
     }
 
   /** Generate the code corresponding to the interface `i`. */
-  protected def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String]
+  protected def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
 
   /** Generate the code corresponding to the record `r`. */
-  protected def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String]
+  protected def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
 
   /** Generate the code corresponding to the enumeration `e`. */
-  protected def generate(s: Schema, e: Enumeration): Map[File, String]
+  protected def generate(s: Schema, e: Enumeration): ListMap[File, String]
 
 }
 

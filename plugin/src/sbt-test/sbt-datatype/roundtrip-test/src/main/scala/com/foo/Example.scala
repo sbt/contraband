@@ -1,11 +1,12 @@
-package com.example
+package com.foo
 
 import sjsonnew.JsonFormat
 import sjsonnew.support.scalajson.unsafe.Converter
-import interfaces.Greeting
+import com.example.interfaces.Greeting
+import com.example._
 
 object Example extends App {
-  import CustomProtocol._
+  import generated.CustomProtocol._
   val g0: Greeting = new SimpleGreeting("Hello")
   val g1: Greeting = new SimpleGreeting("Hello", 0)
   val g21: Greeting = new GreetingWithAttachments(Array.empty, "Hello")

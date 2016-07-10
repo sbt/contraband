@@ -87,12 +87,18 @@ object Definition extends Parser[Definition] {
  * Represents a complete schema definition.
  * Syntax:
  *   Schema := { "types": [ Definition* ] }
+ *             (, "codecNamespace": string constant)?
+ *             (, "fullCodec": string constant)? }
  */
-case class Schema(definitions: List[Definition])
+case class Schema(definitions: List[Definition],
+  codecNamespace: Option[String],
+  fullCodec: Option[String])
 
 object Schema extends Parser[Schema] {
   override def parse(json: JValue): Schema =
-    Schema(json ->* "types" map Definition.parse)
+    Schema(json ->* "types" map Definition.parse,
+      json ->? "codecNamespace",
+      json ->? "fullCodec")
 }
 
 /**

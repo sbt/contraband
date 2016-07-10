@@ -1,6 +1,7 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 import java.io.File
+import scala.collection.immutable.ListMap
 
 /**
  * Code generator for Scala.
@@ -19,10 +20,10 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
   }
 
 
-  override def generate(s: Schema): Map[File, String] =
-    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapValues (_.indented)
+  override def generate(s: Schema): ListMap[File, String] =
+    s.definitions.toList map (generate (s, _, None, Nil)) reduce (_ merge _) mapV (_.indented)
 
-  override def generate(s: Schema, e: Enumeration): Map[File, String] = {
+  override def generate(s: Schema, e: Enumeration): ListMap[File, String] = {
     val values =
       e.values map { case (EnumerationValue(name, doc)) =>
         s"""${genDoc(doc)}
@@ -37,10 +38,10 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  $values
          |}""".stripMargin
 
-    Map(genFile(e) -> code)
+    ListMap(genFile(e) -> code)
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = r.fields ++ superFields
 
     val alternativeCtors =
@@ -93,10 +94,10 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  $applyOverloads
          |}""".stripMargin
 
-    Map(genFile(r) -> code)
+    ListMap(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = i.fields ++ superFields
 
     val alternativeCtors =
@@ -132,7 +133,7 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
          |  ${genToString(i, superFields)}
          |}""".stripMargin
 
-    Map(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
+    ListMap(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: List[String]) = doc match {

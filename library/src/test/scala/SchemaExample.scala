@@ -197,6 +197,7 @@ object NewSchema {
 }"""
 
   val generateArgDocExample = """{
+  "codecNamespace": "generated",
   "types": [
     {
       "name": "generateArgDocExample",
@@ -239,6 +240,8 @@ object NewSchema {
 }"""
 
   val completeExample = """{
+  "codecNamespace": "generated",
+  "fullCodec": "CustomProtcol",
   "types": [
     {
       "name": "Greetings",
@@ -685,27 +688,28 @@ object NewSchema {
           |}""".stripMargin)
 
   val completeExampleCodeCodec =
-    """package com.example
+    """package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingsFormats { self: com.example.GreetingHeaderFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
-      |implicit lazy val GreetingsFormat: JsonFormat[Greetings] = unionFormat2[Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
+      |trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.GreetingWithAttachmentsFormats with java.io.FileFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
+      |implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat2[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
+      |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait SimpleGreetingFormats { self: sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormats =>
-      |implicit lazy val SimpleGreetingFormat: JsonFormat[SimpleGreeting] = new JsonFormat[SimpleGreeting] {
-      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): SimpleGreeting = {
+      |trait SimpleGreetingFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+      |implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] = new JsonFormat[com.example.SimpleGreeting] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.SimpleGreeting = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
       |      val message = unbuilder.readField[String]("message")
       |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
       |      unbuilder.endObject()
-      |      new SimpleGreeting(message, header)
+      |      new com.example.SimpleGreeting(message, header)
       |      case None =>
       |      deserializationError("Expected JsObject but found None")
       |    }
       |  }
-      |  override def write[J](obj: SimpleGreeting, builder: Builder[J]): Unit = {
+      |  override def write[J](obj: com.example.SimpleGreeting, builder: Builder[J]): Unit = {
       |    builder.beginObject()
       |    builder.addField("message", obj.message)
       |    builder.addField("header", obj.header)
@@ -713,10 +717,11 @@ object NewSchema {
       |  }
       |}
       |}
+      |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingWithAttachmentsFormats { self: java.io.FileFormats with sjsonnew.BasicJsonProtocol with com.example.GreetingHeaderFormats =>
-      |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[GreetingWithAttachments] = new JsonFormat[GreetingWithAttachments] {
-      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingWithAttachments = {
+      |trait GreetingWithAttachmentsFormats { self: java.io.FileFormats with sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+      |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
@@ -724,12 +729,12 @@ object NewSchema {
       |      val message = unbuilder.readField[String]("message")
       |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
       |      unbuilder.endObject()
-      |      new GreetingWithAttachments(attachments, message, header)
+      |      new com.example.GreetingWithAttachments(attachments, message, header)
       |      case None =>
       |      deserializationError("Expected JsObject but found None")
       |    }
       |  }
-      |  override def write[J](obj: GreetingWithAttachments, builder: Builder[J]): Unit = {
+      |  override def write[J](obj: com.example.GreetingWithAttachments, builder: Builder[J]): Unit = {
       |    builder.beginObject()
       |    builder.addField("attachments", obj.attachments)
       |    builder.addField("message", obj.message)
@@ -738,10 +743,11 @@ object NewSchema {
       |  }
       |}
       |}
+      |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingHeaderFormats { self: java.util.DateFormats with sjsonnew.BasicJsonProtocol with com.example.PriorityLevelFormats =>
-      |implicit lazy val GreetingHeaderFormat: JsonFormat[GreetingHeader] = new JsonFormat[GreetingHeader] {
-      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): GreetingHeader = {
+      |trait GreetingHeaderFormats { self: java.util.DateFormats with sjsonnew.BasicJsonProtocol with generated.PriorityLevelFormats =>
+      |implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] = new JsonFormat[com.example.GreetingHeader] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingHeader = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
@@ -749,12 +755,12 @@ object NewSchema {
       |      val priority = unbuilder.readField[com.example.PriorityLevel]("priority")
       |      val author = unbuilder.readField[String]("author")
       |      unbuilder.endObject()
-      |      new GreetingHeader(created, priority, author)
+      |      new com.example.GreetingHeader(created, priority, author)
       |      case None =>
       |      deserializationError("Expected JsObject but found None")
       |    }
       |  }
-      |  override def write[J](obj: GreetingHeader, builder: Builder[J]): Unit = {
+      |  override def write[J](obj: com.example.GreetingHeader, builder: Builder[J]): Unit = {
       |    builder.beginObject()
       |    builder.addField("created", obj.created)
       |    builder.addField("priority", obj.priority)
@@ -763,32 +769,34 @@ object NewSchema {
       |  }
       |}
       |}
+      |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
       |trait PriorityLevelFormats { self: sjsonnew.BasicJsonProtocol =>
-      |implicit lazy val PriorityLevelFormat: JsonFormat[PriorityLevel] = new JsonFormat[PriorityLevel] {
-      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): PriorityLevel = {
+      |implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = new JsonFormat[com.example.PriorityLevel] {
+      |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.PriorityLevel = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.readString(js) match {
-      |        case "Low" => PriorityLevel.Low
-      |        case "Medium" => PriorityLevel.Medium
-      |        case "High" => PriorityLevel.High
+      |        case "Low" => com.example.PriorityLevel.Low
+      |        case "Medium" => com.example.PriorityLevel.Medium
+      |        case "High" => com.example.PriorityLevel.High
       |      }
       |      case None =>
       |      deserializationError("Expected JsString but found None")
       |    }
       |  }
-      |  override def write[J](obj: PriorityLevel, builder: Builder[J]): Unit = {
+      |  override def write[J](obj: com.example.PriorityLevel, builder: Builder[J]): Unit = {
       |    val str = obj match {
-      |      case PriorityLevel.Low => "Low"
-      |      case PriorityLevel.Medium => "Medium"
-      |      case PriorityLevel.High => "High"
+      |      case com.example.PriorityLevel.Low => "Low"
+      |      case com.example.PriorityLevel.Medium => "Medium"
+      |      case com.example.PriorityLevel.High => "High"
       |    }
       |    builder.writeString(str)
       |  }
       |}
       |}
-      |trait CustomProtcol extends com.example.GreetingsFormats with com.example.GreetingHeaderFormats with com.example.PriorityLevelFormats with java.util.DateFormats with com.example.GreetingWithAttachmentsFormats with java.io.FileFormats with com.example.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
+      |package generated
+      |trait CustomProtcol extends generated.GreetingsFormats with generated.GreetingHeaderFormats with generated.PriorityLevelFormats with java.util.DateFormats with generated.GreetingWithAttachmentsFormats with java.io.FileFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
       |object CustomProtcol extends CustomProtcol""".stripMargin
 
 
