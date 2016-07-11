@@ -12,7 +12,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		MyLazy<Integer> lazy = new MyLazy<Integer>() { public Integer get() { return 1 / 0; } };
-		B b = new B(0, 1, lazy);
+		B b = new B(0, lazy, 1);
 		assert(b.normalField() == 0);
 		assert(b.dummyField() == 1);
 
