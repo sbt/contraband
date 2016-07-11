@@ -20,10 +20,10 @@ abstract class GCodeGenSpec(language: String) extends Specification {
       generate a simple enumeration              $enumerationGenerateSimple
 
     generate(Interface) should
-      generate a simple interface                $protocolGenerateSimple
-      generate a simple interface with one child $protocolGenerateOneChild
-      generate nested interfaces                 $protocolGenerateNested
-      generate abstract methods                  $protocolGenerateAbstractMethods
+      generate a simple interface                $interfaceGenerateSimple
+      generate a simple interface with one child $interfaceGenerateOneChild
+      generate nested interfaces                 $interfaceGenerateNested
+      generate abstract methods                  $interfaceGenerateAbstractMethods
 
     generate(Record) should
       generate a simple record                   $recordGenerateSimple
@@ -38,10 +38,10 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   """
 
   def enumerationGenerateSimple: MatchResult[_]
-  def protocolGenerateSimple: MatchResult[_]
-  def protocolGenerateOneChild: MatchResult[_]
-  def protocolGenerateNested: MatchResult[_]
-  def protocolGenerateAbstractMethods: MatchResult[_]
+  def interfaceGenerateSimple: MatchResult[_]
+  def interfaceGenerateOneChild: MatchResult[_]
+  def interfaceGenerateNested: MatchResult[_]
+  def interfaceGenerateAbstractMethods: MatchResult[_]
   def recordGenerateSimple: MatchResult[_]
   def schemaGenerateComplete: MatchResult[_]
   def schemaGenerateCompletePlusIndent: MatchResult[_]

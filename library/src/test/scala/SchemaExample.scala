@@ -55,10 +55,10 @@ object NewSchema {
   "name": "hello"
 }"""
 
-  val simpleProtocolExample = """{
+  val simpleInterfaceExample = """{
   "type": "interface",
   "doc": "example of simple interface",
-  "name": "simpleProtocolExample",
+  "name": "simpleInterfaceExample",
   "target": "Scala",
   "fields": [
     {
@@ -68,8 +68,8 @@ object NewSchema {
   ]
 }"""
 
-  val oneChildProtocolExample = """{
-  "name": "oneChildProtocolExample",
+  val oneChildInterfaceExample = """{
+  "name": "oneChildInterfaceExample",
   "type": "interface",
   "target": "Scala",
   "doc": "example of interface",
@@ -82,7 +82,7 @@ object NewSchema {
   ]
 }"""
 
-  val nestedProtocolExample = """{
+  val nestedInterfaceExample = """{
   "name": "nestedProtocolExample",
   "target": "Scala",
   "type": "interface",

@@ -55,36 +55,36 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateSimple = {
+  override def interfaceGenerateSimple = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse simpleProtocolExample
+    val intf = Interface parse simpleInterfaceExample
     val code = gen generate intf
 
     code.head._2.unindent must containTheSameElementsAs(
       """package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait SimpleProtocolExampleFormats {
-        |  implicit lazy val simpleProtocolExampleFormat: JsonFormat[_root_.simpleProtocolExample] = new JsonFormat[_root_.simpleProtocolExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleProtocolExample = {
-        |      deserializationError("No known implementation of simpleProtocolExample.")
+        |trait SimpleInterfaceExampleFormats {
+        |  implicit lazy val simpleInterfaceExampleFormat: JsonFormat[_root_.simpleInterfaceExample] = new JsonFormat[_root_.simpleInterfaceExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleInterfaceExample = {
+        |      deserializationError("No known implementation of simpleInterfaceExample.")
         |    }
-        |    override def write[J](obj: _root_.simpleProtocolExample, builder: Builder[J]): Unit = {
-        |      serializationError("No known implementation of simpleProtocolExample.")
+        |    override def write[J](obj: _root_.simpleInterfaceExample, builder: Builder[J]): Unit = {
+        |      serializationError("No known implementation of simpleInterfaceExample.")
         |    }
         |  }
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateOneChild = {
+  override def interfaceGenerateOneChild = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse oneChildProtocolExample
+    val intf = Interface parse oneChildInterfaceExample
     val code = gen generate intf
 
-    (code(new File("generated", "oneChildProtocolExampleFormats.scala")).unindent must containTheSameElementsAs(
+    (code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent must containTheSameElementsAs(
       """package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait OneChildProtocolExampleFormats { self: generated.ChildRecordFormats with sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val oneChildProtocolExampleFormat: JsonFormat[_root_.oneChildProtocolExample] = unionFormat1[_root_.oneChildProtocolExample, _root_.childRecord]
+        |trait OneChildInterfaceExampleFormats { self: generated.ChildRecordFormats with sjsonnew.BasicJsonProtocol =>
+        |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = unionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]
         |}""".stripMargin.unindent)) and
     (code(new File("generated", "childRecordFormats.scala")).unindent must containTheSameElementsAs(
       """package generated
@@ -109,9 +109,9 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent))
   }
 
-  override def protocolGenerateNested = {
+  override def interfaceGenerateNested = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse nestedProtocolExample
+    val intf = Interface parse nestedInterfaceExample
     val code = gen generate intf
 
     (code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent must containTheSameElementsAs(
@@ -135,7 +135,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent))
   }
 
-  def protocolGenerateAbstractMethods = {
+  def interfaceGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema

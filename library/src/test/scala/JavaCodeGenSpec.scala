@@ -20,15 +20,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateSimple = {
-    val protocol = Interface parse simpleProtocolExample
+  override def interfaceGenerateSimple = {
+    val protocol = Interface parse simpleInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple interface */
-        |public abstract class simpleProtocolExample implements java.io.Serializable {
+        |public abstract class simpleInterfaceExample implements java.io.Serializable {
         |    private type field;
-        |    public simpleProtocolExample(type _field) {
+        |    public simpleInterfaceExample(type _field) {
         |        super();
         |        field = _field;
         |    }
@@ -38,10 +38,10 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
-        |        } else if (!(obj instanceof simpleProtocolExample)) {
+        |        } else if (!(obj instanceof simpleInterfaceExample)) {
         |            return false;
         |        } else {
-        |            simpleProtocolExample o = (simpleProtocolExample)obj;
+        |            simpleInterfaceExample o = (simpleInterfaceExample)obj;
         |            return field().equals(o.field());
         |        }
         |    }
@@ -49,30 +49,30 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
-        |        return "simpleProtocolExample("  + "field: " + field() + ")";
+        |        return "simpleInterfaceExample("  + "field: " + field() + ")";
         |    }
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateOneChild = {
-    val protocol = Interface parse oneChildProtocolExample
+  override def interfaceGenerateOneChild = {
+    val protocol = Interface parse oneChildInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
-        new File("oneChildProtocolExample.java") ->
+        new File("oneChildInterfaceExample.java") ->
           """/** example of interface */
-            |public abstract class oneChildProtocolExample implements java.io.Serializable {
-            |    public oneChildProtocolExample() {
+            |public abstract class oneChildInterfaceExample implements java.io.Serializable {
+            |    public oneChildInterfaceExample() {
             |        super();
             |    }
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |        return true;
-            |        } else if (!(obj instanceof oneChildProtocolExample)) {
+            |        } else if (!(obj instanceof oneChildInterfaceExample)) {
             |            return false;
             |        } else {
-            |            oneChildProtocolExample o = (oneChildProtocolExample)obj;
+            |            oneChildInterfaceExample o = (oneChildInterfaceExample)obj;
             |            return true;
             |        }
             |    }
@@ -80,12 +80,12 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return 17;
             |    }
             |    public String toString() {
-            |        return "oneChildProtocolExample("  + ")";
+            |        return "oneChildInterfaceExample("  + ")";
             |    }
             |}""".stripMargin.unindent,
 
         new File("childRecord.java") ->
-          """public final class childRecord extends oneChildProtocolExample {
+          """public final class childRecord extends oneChildInterfaceExample {
             |    public childRecord() {
             |        super();
             |    }
@@ -110,8 +110,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     )
   }
 
-  override def protocolGenerateNested = {
-    val protocol = Interface parse nestedProtocolExample
+  override def interfaceGenerateNested = {
+    val protocol = Interface parse nestedInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
@@ -166,7 +166,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     )
   }
 
-  override def protocolGenerateAbstractMethods = {
+  override def interfaceGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 

@@ -22,9 +22,9 @@ class SchemaSpec extends Specification {
       throw an error on invalid definition kind  $definitionParseInvalidDefinitionKind
 
     Interface.parse should
-      parse simple interface                     $protocolParseSimple
-      parse interface with one child             $protocolParseOneChild
-      parse nested interfaces                    $protocolParseNested
+      parse simple interface                     $interfaceParseSimple
+      parse interface with one child             $interfaceParseOneChild
+      parse nested interfaces                    $interfaceParseNested
 
     Record.parse should
       parse simple record                        $recordParseSimple
@@ -107,10 +107,10 @@ class SchemaSpec extends Specification {
   def definitionParseInvalidDefinitionKind =
     Definition parse invalidDefinitionKindExample must throwA[RuntimeException]
 
-  def protocolParseSimple = {
-    Interface parse simpleProtocolExample match {
+  def interfaceParseSimple = {
+    Interface parse simpleInterfaceExample match {
       case Interface(name, target, namespace, since, doc, fields, abstractMethods, children) =>
-        (name must_== "simpleProtocolExample") and
+        (name must_== "simpleInterfaceExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List("example of simple interface")) and
@@ -121,10 +121,10 @@ class SchemaSpec extends Specification {
     }
   }
 
-  def protocolParseOneChild = {
-    Interface parse oneChildProtocolExample match {
+  def interfaceParseOneChild = {
+    Interface parse oneChildInterfaceExample match {
       case Interface(name, target, namespace, since, doc, fields, abstractMethods, children) =>
-        (name must_== "oneChildProtocolExample") and
+        (name must_== "oneChildInterfaceExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List("example of interface")) and
@@ -135,8 +135,8 @@ class SchemaSpec extends Specification {
     }
   }
 
-  def protocolParseNested = {
-    Interface parse nestedProtocolExample match {
+  def interfaceParseNested = {
+    Interface parse nestedInterfaceExample match {
       case Interface(name, target, namespace, since, doc, fields, abstractMethods, children) =>
         (name must_== "nestedProtocolExample") and
         (target must_== "Scala") and
