@@ -16,9 +16,7 @@ object DatatypePlugin extends AutoPlugin {
     val datatypeJavaLazy = settingKey[String]("Interface to use to provide laziness in Java.")
     val datatypeSource = settingKey[File]("Datatype source directory.")
     val datatypeScalaFileNames = settingKey[Definition => File]("Mapping from `Definition` to file for Scala generator.")
-    val datatypeScalaSealProtocols = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
-    val datatypeProtocolName = settingKey[Option[String]]("Name of the full protocol object.")
-    val datatypeCodecNamespace = settingKey[Option[String]]("Package that holds the full codec object.")
+    val datatypeScalaSealInterface = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
     val datatypeCodecParents = settingKey[List[String]]("Parents to add all o of the codec object.")
     val datatypeInstantiateJavaLazy = settingKey[String => String]("Function that instantiate a lazy expression from an expression in Java.")
     val datatypeFormatsForType = settingKey[TpeRef => List[String]]("Function that maps types to the list of required codecs for them.")
@@ -39,9 +37,7 @@ object DatatypePlugin extends AutoPlugin {
       datatypeScalaFileNames in generateDatatypes := scalaDef2File,
       // We cannot enable this by default, because the default function for naming Scala files that we provide
       // will create a separate file for every `Definition`.
-      datatypeScalaSealProtocols in generateDatatypes := false,
-      datatypeProtocolName in generateDatatypes := Some("CustomProtocol"),
-      datatypeCodecNamespace in generateDatatypes := None,
+      datatypeScalaSealInterface in generateDatatypes := false,
       datatypeCodecParents in generateDatatypes := Nil,
       datatypeInstantiateJavaLazy in generateDatatypes := { (e: String) => s"xsbti.SafeLazy($e)" },
       datatypeFormatsForType in generateDatatypes := CodecCodeGen.formatsForType,
@@ -52,9 +48,7 @@ object DatatypePlugin extends AutoPlugin {
           (sourceManaged in generateDatatypes).value,
           (datatypeJavaLazy in generateDatatypes).value,
           (datatypeScalaFileNames in generateDatatypes).value,
-          (datatypeScalaSealProtocols in generateDatatypes).value,
-          (datatypeProtocolName in generateDatatypes).value,
-          (datatypeCodecNamespace in generateDatatypes).value,
+          (datatypeScalaSealInterface in generateDatatypes).value,
           (datatypeCodecParents in generateDatatypes).value,
           (datatypeInstantiateJavaLazy in generateDatatypes).value,
           (datatypeFormatsForType in generateDatatypes).value,
@@ -89,57 +83,49 @@ object DatatypePlugin extends AutoPlugin {
 }
 
 object Generate {
-
-  private def codecFileName(genScalaFileName: Definition => File): Definition => File = d => {
-    val original = genScalaFileName(d)
-    val parent = original.getParentFile
-    parent / "serialization" / original.getName
-  }
-
-
   private def generate(createDatatypes: Boolean,
     createCodecs: Boolean,
     definitions: Array[File],
     target: File,
     javaLazy: String,
     scalaFileNames: Definition => File,
-    scalaSealProtocols: Boolean,
-    protocolName: Option[String],
-    codecNamespace: Option[String],
+    scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
     formatsForType: TpeRef => List[String],
     log: Logger): Seq[File] = {
-    val input = definitions flatMap (f => Schema.parse(IO read f).definitions)
-    val fullSchema = Schema(input.toList)
-
-    val generator = new MixedCodeGen(javaLazy, scalaFileNames, scalaSealProtocols)
-    val jsonFormatsGenerator = new CodecCodeGen(codecFileName(scalaFileNames), protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val input = definitions.toList map (f => Schema.parse(IO read f))
+    val generator = new MixedCodeGen(javaLazy, scalaFileNames, scalaSealInterface)
+    val jsonFormatsGenerator = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, input)
 
     val datatypes =
       if (createDatatypes) {
-        generator.generate(fullSchema).map {
-          case (file, code) =>
-            val outputFile = new File(target, "/" + file.toString)
-            IO.write(outputFile, code)
-            log.info(s"sbt-datatype created $outputFile")
+        input flatMap { s =>
+          generator.generate(s).map {
+            case (file, code) =>
+              val outputFile = new File(target, "/" + file.toString)
+              IO.write(outputFile, code)
+              log.info(s"sbt-datatype created $outputFile")
 
-            outputFile
-        }.toList
+              outputFile
+          }.toList
+        }
       } else {
         List.empty
       }
 
     val formats =
       if (createCodecs) {
-        jsonFormatsGenerator.generate(fullSchema).map {
-          case (file, code) =>
-            val outputFile = new File(target, "/" + file.toString)
-            IO.write(outputFile, code)
-            log.info(s"sbt-datatype created $outputFile")
+        input flatMap { s =>
+          jsonFormatsGenerator.generate(s).map {
+            case (file, code) =>
+              val outputFile = new File(target, "/" + file.toString)
+              IO.write(outputFile, code)
+              log.info(s"sbt-datatype created $outputFile")
 
-            outputFile
-        }.toList
+              outputFile
+          }.toList
+        }
       } else {
         List.empty
       }
@@ -153,15 +139,13 @@ object Generate {
     target: File,
     javaLazy: String,
     scalaFileNames: Definition => File,
-    scalaSealProtocols: Boolean,
-    protocolName: Option[String],
-    codecNamespace: Option[String],
+    scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
     formatsForType: TpeRef => List[String],
     s: TaskStreams): Seq[File] = {
     val definitions = IO listFiles base
-    def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, scalaFileNames, scalaSealProtocols, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType, s.log)
+    def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, scalaFileNames, scalaSealInterface, codecParents, instantiateJavaLazy, formatsForType, s.log)
     val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }

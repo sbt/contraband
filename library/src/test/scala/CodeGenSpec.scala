@@ -11,7 +11,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   }
 
   implicit def definition2Schema(d: Definition): Schema =
-    Schema(List(d))
+    Schema(List(d), Some("generated"), None)
 
   def is = s2"""
     This is a specification for the generation of $language code.
@@ -20,9 +20,9 @@ abstract class GCodeGenSpec(language: String) extends Specification {
       generate a simple enumeration              $enumerationGenerateSimple
 
     generate(Interface) should
-      generate a simple protocol                 $protocolGenerateSimple
-      generate a simple protocol with one child  $protocolGenerateOneChild
-      generate nested protocols                  $protocolGenerateNested
+      generate a simple interface                $protocolGenerateSimple
+      generate a simple interface with one child $protocolGenerateOneChild
+      generate nested interfaces                 $protocolGenerateNested
       generate abstract methods                  $protocolGenerateAbstractMethods
 
     generate(Record) should

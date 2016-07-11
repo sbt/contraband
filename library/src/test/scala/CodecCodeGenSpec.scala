@@ -16,40 +16,36 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def is = super.is append codecCodeGenSpec
 
-
-  val outputFile = new File("output.scala")
-  val protocolName = None
-  val codecNamespace = None
   val codecParents = Nil
-  val genFileName = (_: Definition) => outputFile
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
   val formatsForType: TpeRef => List[String] = CodecCodeGen.formatsForType
 
   override def enumerationGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleEnumerationExampleFormats { self: sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[simpleEnumerationExample] = new JsonFormat[simpleEnumerationExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleEnumerationExample = {
+        |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[_root_.simpleEnumerationExample] = new JsonFormat[_root_.simpleEnumerationExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleEnumerationExample = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.readString(js) match {
-        |            case "first" => simpleEnumerationExample.first
-        |            case "second" => simpleEnumerationExample.second
+        |            case "first" => _root_.simpleEnumerationExample.first
+        |            case "second" => _root_.simpleEnumerationExample.second
         |          }
         |        case None =>
         |          deserializationError("Expected JsString but found None")
         |      }
         |    }
         |
-        |    override def write[J](obj: simpleEnumerationExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.simpleEnumerationExample, builder: Builder[J]): Unit = {
         |      val str = obj match {
-        |        case simpleEnumerationExample.first => "first"
-        |        case simpleEnumerationExample.second => "second"
+        |        case _root_.simpleEnumerationExample.first => "first"
+        |        case _root_.simpleEnumerationExample.second => "second"
         |      }
         |      builder.writeString(str)
         |    }
@@ -58,18 +54,19 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Interface parse simpleProtocolExample
-    val code = gen generate protocol
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val intf = Interface parse simpleProtocolExample
+    val code = gen generate intf
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleProtocolExampleFormats {
-        |  implicit lazy val simpleProtocolExampleFormat: JsonFormat[simpleProtocolExample] = new JsonFormat[simpleProtocolExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleProtocolExample = {
+        |  implicit lazy val simpleProtocolExampleFormat: JsonFormat[_root_.simpleProtocolExample] = new JsonFormat[_root_.simpleProtocolExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleProtocolExample = {
         |      deserializationError("No known implementation of simpleProtocolExample.")
         |    }
-        |    override def write[J](obj: simpleProtocolExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.simpleProtocolExample, builder: Builder[J]): Unit = {
         |      serializationError("No known implementation of simpleProtocolExample.")
         |    }
         |  }
@@ -77,72 +74,79 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Interface parse oneChildProtocolExample
-    val code = gen generate protocol
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val intf = Interface parse oneChildProtocolExample
+    val code = gen generate intf
 
-    code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait OneChildProtocolExampleFormats { self: _root_.ChildRecordFormats with sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val oneChildProtocolExampleFormat: JsonFormat[oneChildProtocolExample] = unionFormat1[oneChildProtocolExample, _root_.childRecord]
-        |}
+    (code(new File("generated", "oneChildProtocolExampleFormats.scala")).unindent must containTheSameElementsAs(
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |trait OneChildProtocolExampleFormats { self: generated.ChildRecordFormats with sjsonnew.BasicJsonProtocol =>
+        |  implicit lazy val oneChildProtocolExampleFormat: JsonFormat[_root_.oneChildProtocolExample] = unionFormat1[_root_.oneChildProtocolExample, _root_.childRecord]
+        |}""".stripMargin.unindent)) and
+    (code(new File("generated", "childRecordFormats.scala")).unindent must containTheSameElementsAs(
+      """package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait ChildRecordFormats {
-        |  implicit lazy val childRecordFormat: JsonFormat[childRecord] = new JsonFormat[childRecord] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): childRecord = {
+        |  implicit lazy val childRecordFormat: JsonFormat[_root_.childRecord] = new JsonFormat[_root_.childRecord] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.childRecord = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
         |          unbuilder.endObject()
-        |          new childRecord()
+        |          new _root_.childRecord()
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
-        |    override def write[J](obj: childRecord, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.childRecord, builder: Builder[J]): Unit = {
         |      builder.beginObject()
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.unindent))
   }
 
   override def protocolGenerateNested = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
-    val protocol = Interface parse nestedProtocolExample
-    val code = gen generate protocol
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val intf = Interface parse nestedProtocolExample
+    val code = gen generate intf
 
-    code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait NestedProtocolExampleFormats { self: _root_.NestedProtocolFormats with sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[nestedProtocolExample] = unionFormat1[nestedProtocolExample, _root_.nestedProtocol]
-        |}
+    (code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent must containTheSameElementsAs(
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |trait NestedProtocolExampleFormats { self: generated.NestedProtocolFormats with sjsonnew.BasicJsonProtocol =>
+        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = unionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]
+        |}""".stripMargin.unindent)) and
+    (code(new File("generated", "nestedProtocolFormats.scala")).unindent must containTheSameElementsAs(
+      """package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait NestedProtocolFormats {
-        |  implicit lazy val nestedProtocolFormat: JsonFormat[nestedProtocol] = new JsonFormat[nestedProtocol] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): nestedProtocol = {
+        |  implicit lazy val nestedProtocolFormat: JsonFormat[_root_.nestedProtocol] = new JsonFormat[_root_.nestedProtocol] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.nestedProtocol = {
         |      deserializationError("No known implementation of nestedProtocol.")
         |    }
-        |    override def write[J](obj: nestedProtocol, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.nestedProtocol, builder: Builder[J]): Unit = {
         |      serializationError("No known implementation of nestedProtocol.")
         |    }
         |  }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.unindent))
   }
 
   def protocolGenerateAbstractMethods = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse generateArgDocExample
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GenerateArgDocExampleFormats {
-        |  implicit lazy val generateArgDocExampleFormat: JsonFormat[generateArgDocExample] = new JsonFormat[generateArgDocExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): generateArgDocExample = {
+        |  implicit lazy val generateArgDocExampleFormat: JsonFormat[_root_.generateArgDocExample] = new JsonFormat[_root_.generateArgDocExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.generateArgDocExample = {
         |      deserializationError("No known implementation of generateArgDocExample.")
         |    }
-        |    override def write[J](obj: generateArgDocExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.generateArgDocExample, builder: Builder[J]): Unit = {
         |      serializationError("No known implementation of generateArgDocExample.")
         |    }
         |  }
@@ -150,26 +154,27 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleRecordExampleFormats { self: sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val simpleRecordExampleFormat: JsonFormat[simpleRecordExample] = new JsonFormat[simpleRecordExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): simpleRecordExample = {
+        |  implicit lazy val simpleRecordExampleFormat: JsonFormat[_root_.simpleRecordExample] = new JsonFormat[_root_.simpleRecordExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleRecordExample = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
         |          val field = unbuilder.readField[java.net.URL]("field")
         |          unbuilder.endObject()
-        |          new simpleRecordExample(field)
+        |          new _root_.simpleRecordExample(field)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
-        |    override def write[J](obj: simpleRecordExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.simpleRecordExample, builder: Builder[J]): Unit = {
         |      builder.beginObject()
         |      builder.addField("field", obj.field)
         |      builder.endObject()
@@ -179,26 +184,27 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GrowableAddOneFieldFormats { self: sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val growableAddOneFieldFormat: JsonFormat[growableAddOneField] = new JsonFormat[growableAddOneField] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): growableAddOneField = {
+        |  implicit lazy val growableAddOneFieldFormat: JsonFormat[_root_.growableAddOneField] = new JsonFormat[_root_.growableAddOneField] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.growableAddOneField = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
         |          val field = unbuilder.readField[Int]("field")
         |          unbuilder.endObject()
-        |          new growableAddOneField(field)
+        |          new _root_.growableAddOneField(field)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
-        |    override def write[J](obj: growableAddOneField, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.growableAddOneField, builder: Builder[J]): Unit = {
         |      builder.beginObject()
         |      builder.addField("field", obj.field)
         |      builder.endObject()
@@ -208,15 +214,15 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse primitiveTypesExample
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait PrimitiveTypesExampleFormats { self: sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[primitiveTypesExample] = new JsonFormat[primitiveTypesExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesExample = {
+        |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[_root_.primitiveTypesExample] = new JsonFormat[_root_.primitiveTypesExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
@@ -225,13 +231,13 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          val arrayInteger = unbuilder.readField[Array[Int]]("arrayInteger")
         |          val lazyArrayInteger = unbuilder.readField[Array[Int]]("lazyArrayInteger")
         |          unbuilder.endObject()
-        |          new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
+        |          new _root_.primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
         |
-        |    override def write[J](obj: primitiveTypesExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.primitiveTypesExample, builder: Builder[J]): Unit = {
         |      builder.beginObject()
         |      builder.addField("simpleInteger", obj.simpleInteger)
         |      builder.addField("lazyInteger", obj.lazyInteger)
@@ -244,27 +250,27 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse primitiveTypesNoLazyExample
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait PrimitiveTypesNoLazyExampleFormats { self: sjsonnew.BasicJsonProtocol =>
-        |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[primitiveTypesNoLazyExample] = new JsonFormat[primitiveTypesNoLazyExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): primitiveTypesNoLazyExample = {
+        |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[_root_.primitiveTypesNoLazyExample] = new JsonFormat[_root_.primitiveTypesNoLazyExample] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesNoLazyExample = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
         |          val arrayInteger = unbuilder.readField[Array[Int]]("arrayInteger")
         |          unbuilder.endObject()
-        |          new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
+        |          new _root_.primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
-        |    override def write[J](obj: primitiveTypesNoLazyExample, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.primitiveTypesNoLazyExample, builder: Builder[J]): Unit = {
         |      builder.beginObject()
         |      builder.addField("simpleInteger", obj.simpleInteger)
         |      builder.addField("arrayInteger", obj.arrayInteger)
@@ -275,25 +281,22 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateComplete = {
-    val protocolName = Some("CustomProtcol")
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse completeExample
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
+    code.values.mkString.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val protocolName = Some("CustomProtcol")
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse completeExample
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeCodec.withoutEmptyLines)
+    code.values.mkString.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeCodec.withoutEmptyLines)
   }
 
   def fullCodecCheck = {
-    val gen = new CodecCodeGen(genFileName, protocolName, codecNamespace, codecParents, instantiateJavaLazy, formatsForType)
     val schema = Schema parse s"""{
                                  |  "types": [
                                  |    {
@@ -303,16 +306,17 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
                                  |    }
                                  |  ]
                                  |}""".stripMargin
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
       """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GreetingFormats {
-        |  implicit lazy val GreetingFormat: JsonFormat[Greeting] = new JsonFormat[Greeting] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): Greeting = {
+        |  implicit lazy val GreetingFormat: JsonFormat[_root_.Greeting] = new JsonFormat[_root_.Greeting] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Greeting = {
         |      deserializationError("No known implementation of Greeting.")
         |    }
-        |    override def write[J](obj: Greeting, builder: Builder[J]): Unit = {
+        |    override def write[J](obj: _root_.Greeting, builder: Builder[J]): Unit = {
         |      serializationError("No known implementation of Greeting.")
         |    }
         |  }

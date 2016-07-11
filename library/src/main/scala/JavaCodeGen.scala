@@ -1,6 +1,7 @@
 package sbt.datatype
 import scala.compat.Platform.EOL
 import java.io.File
+import scala.collection.immutable.ListMap
 
 /**
  * Code generator for Java.
@@ -16,10 +17,10 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
-  override def generate(s: Schema): Map[File, String] =
-    s.definitions flatMap (generate(s, _, None, Nil) mapValues (_.indented)) toMap
+  override def generate(s: Schema): ListMap[File, String] =
+    ListMap(s.definitions.toList flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
-  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val Interface(name, _, namespace, _, doc, fields, abstractMethods, children) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -36,10 +37,10 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
          |    ${genToString(i, superFields)}
          |}""".stripMargin
 
-    Map(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), fields ++ superFields)))
+    ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), fields ++ superFields)))
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): Map[File, String] = {
+  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val Record(name, _, namespace, _, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -56,10 +57,10 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
          |    ${genToString(r, superFields)}
          |}""".stripMargin
 
-    Map(genFile(r) -> code)
+    ListMap(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, e: Enumeration): Map[File, String] = {
+  override def generate(s: Schema, e: Enumeration): ListMap[File, String] = {
     val Enumeration(name, _, namespace, _, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>
@@ -74,7 +75,7 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
          |    $valuesCode
          |}""".stripMargin
 
-    Map(genFile(e) -> code)
+    ListMap(genFile(e) -> code)
   }
 
   private def genDoc(doc: List[String]) = doc match {
