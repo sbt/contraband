@@ -27,71 +27,80 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateSimple = {
+  override def interfaceGenerateSimple = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
-    val protocol = Interface parse simpleProtocolExample
+    val protocol = Interface parse simpleInterfaceExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple interface */
-        |sealed abstract class simpleProtocolExample(
+        |sealed abstract class simpleInterfaceExample(
         |  val field: type) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: simpleProtocolExample => (this.field == x.field)
+        |    case x: simpleInterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
         |    37 * (17 + field.##)
         |  }
         |  override def toString: String = {
-        |    "simpleProtocolExample(" + field + ")"
+        |    "simpleInterfaceExample(" + field + ")"
         |  }
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateOneChild = {
+  override def interfaceGenerateOneChild = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
-    val protocol = Interface parse oneChildProtocolExample
+    val protocol = Interface parse oneChildInterfaceExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of interface */
-        |sealed abstract class oneChildProtocolExample() extends Serializable {
+        |sealed abstract class oneChildInterfaceExample(
+        |    val field: Int) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: oneChildProtocolExample => true
+        |    case x: oneChildInterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (17 + field.##)
         |  }
         |  override def toString: String = {
-        |    "oneChildProtocolExample(" +  + ")"
+        |    "oneChildInterfaceExample(" + field + ")"
         |  }
         |}
-        |final class childRecord() extends oneChildProtocolExample() {
+        |final class childRecord(
+        |  field: Int,
+        |  val x: Int) extends oneChildInterfaceExample(field) {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: childRecord => true
+        |    case x: childRecord => (this.field == x.field) && (this.x == x.x)
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (37 * (17 + field.##) + x.##)
         |  }
         |  override def toString: String = {
-        |    "childRecord(" +  + ")"
+        |    "childRecord(" + field + ", " + x + ")"
         |  }
-        |  private[this] def copy(): childRecord = {
-        |    new childRecord()
+        |  private[this] def copy(field: Int = field, x: Int = x): childRecord = {
+        |    new childRecord(field, x)
+        |  }
+        |  def withField(field: Int): childRecord = {
+        |    copy(field = field)
+        |  }
+        |  def withX(x: Int): childRecord = {
+        |    copy(x = x)
         |  }
         |}
         |
         |object childRecord {
-        |  def apply(): childRecord = new childRecord()
+        |  def apply(field: Int, x: Int): childRecord = new childRecord(field, x)
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateNested = {
+  override def interfaceGenerateNested = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
-    val protocol = Interface parse nestedProtocolExample
+    val protocol = Interface parse nestedInterfaceExample
     val code = gen generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -122,7 +131,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
-  override def protocolGenerateAbstractMethods = {
+  override def interfaceGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
     val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
 
@@ -313,7 +322,6 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
-
     code.head._2.unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
   }
 

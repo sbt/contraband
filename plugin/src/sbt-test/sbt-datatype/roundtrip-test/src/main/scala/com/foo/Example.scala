@@ -9,8 +9,8 @@ object Example extends App {
   import generated.CustomProtocol._
   val g0: Greeting = new SimpleGreeting("Hello")
   val g1: Greeting = new SimpleGreeting("Hello", 0)
-  val g21: Greeting = new GreetingWithAttachments(Array.empty, "Hello")
-  val g3: Greeting = GreetingWithOption(Some("foo"), "Hello")
+  val g21: Greeting = new GreetingWithAttachments("Hello", Array.empty)
+  val g3: Greeting = GreetingWithOption("Hello", Some("foo"))
 
   println(Converter.toJson(g0).get)
 

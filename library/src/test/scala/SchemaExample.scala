@@ -55,10 +55,10 @@ object NewSchema {
   "name": "hello"
 }"""
 
-  val simpleProtocolExample = """{
+  val simpleInterfaceExample = """{
   "type": "interface",
   "doc": "example of simple interface",
-  "name": "simpleProtocolExample",
+  "name": "simpleInterfaceExample",
   "target": "Scala",
   "fields": [
     {
@@ -68,21 +68,33 @@ object NewSchema {
   ]
 }"""
 
-  val oneChildProtocolExample = """{
-  "name": "oneChildProtocolExample",
+  val oneChildInterfaceExample = """{
+  "name": "oneChildInterfaceExample",
   "type": "interface",
   "target": "Scala",
   "doc": "example of interface",
+  "fields": [
+    {
+      "name": "field",
+      "type": "int"
+    }
+  ],
   "types": [
     {
       "name": "childRecord",
       "type": "record",
-      "target": "Scala"
+      "target": "Scala",
+      "fields": [
+        {
+          "name": "x",
+          "type": "int"
+        }
+      ]
     }
   ]
 }"""
 
-  val nestedProtocolExample = """{
+  val nestedInterfaceExample = """{
   "name": "nestedProtocolExample",
   "target": "Scala",
   "type": "interface",
@@ -409,11 +421,11 @@ object NewSchema {
       |
       |/** A Greeting with attachments */
       |final class GreetingWithAttachments(
-      |  /** The files attached to the greeting */
-      |  val attachments: Vector[java.io.File],
       |  message: => String,
-      |  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) {
-      |  def this(attachments: Vector[java.io.File], message: => String) = this(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+      |  header: com.example.GreetingHeader,
+      |  /** The files attached to the greeting */
+      |  val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) {
+      |  def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
       |
       |  override def equals(o: Any): Boolean = o match {
       |    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -425,11 +437,8 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
-      |  private[this] def copy(attachments: Vector[java.io.File] = attachments, message: => String = message, header: com.example.GreetingHeader = header): GreetingWithAttachments = {
-      |    new GreetingWithAttachments(attachments, message, header)
-      |  }
-      |  def withAttachments(attachments: Vector[java.io.File]): GreetingWithAttachments = {
-      |    copy(attachments = attachments)
+      |  private[this] def copy(message: => String = message, header: com.example.GreetingHeader = header, attachments: Vector[java.io.File] = attachments): GreetingWithAttachments = {
+      |    new GreetingWithAttachments(message, header, attachments)
       |  }
       |  def withMessage(message: => String): GreetingWithAttachments = {
       |    copy(message = message)
@@ -437,11 +446,14 @@ object NewSchema {
       |  def withHeader(header: com.example.GreetingHeader): GreetingWithAttachments = {
       |    copy(header = header)
       |  }
+      |  def withAttachments(attachments: Vector[java.io.File]): GreetingWithAttachments = {
+      |    copy(attachments = attachments)
+      |  }
       |}
       |
       |object GreetingWithAttachments {
-      |  def apply(attachments: Vector[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
-      |  def apply(attachments: Vector[java.io.File], message: => String, header: com.example.GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
+      |  def apply(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+      |  def apply(message: => String, header: com.example.GreetingHeader, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
       |}
       |
       |/** Meta information of a Greeting */
@@ -574,44 +586,34 @@ object NewSchema {
         """package com.example;
           |/** A Greeting with attachments */
           |public final class GreetingWithAttachments extends com.example.Greetings {
-          |
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
-          |
-          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message) {
+          |    public GreetingWithAttachments(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
           |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
-          |
-          |    public GreetingWithAttachments(java.io.File[] _attachments, com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
+          |    public GreetingWithAttachments(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, java.io.File[] _attachments) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
-          |
           |    public java.io.File[] attachments() {
           |        return this.attachments;
           |    }
-          |
-          |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
-          |        return new GreetingWithAttachments(attachments, new com.example.MyLazy<String>() { public String get() { return message(); } }, header());
-          |    }
-          |
           |    public GreetingWithAttachments withMessage(com.example.MyLazy<String> message) {
-          |        return new GreetingWithAttachments(attachments, message, header());
+          |        return new GreetingWithAttachments(message, header(), attachments);
           |    }
-          |
           |    public GreetingWithAttachments withHeader(com.example.GreetingHeader header) {
-          |        return new GreetingWithAttachments(attachments, new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
+          |        return new GreetingWithAttachments(new com.example.MyLazy<String>() { public String get() { return message(); } }, header, attachments);
           |    }
-          |
+          |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
+          |        return new GreetingWithAttachments(new com.example.MyLazy<String>() { public String get() { return message(); } }, header(), attachments);
+          |    }
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
-          |
           |    public int hashCode() {
           |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
-          |
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
@@ -729,26 +731,26 @@ object NewSchema {
       |}
       |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingWithAttachmentsFormats { self: java.io.FileFormats with sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+      |trait GreetingWithAttachmentsFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats with java.io.FileFormats =>
       |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
-      |      val attachments = unbuilder.readField[Vector[java.io.File]]("attachments")
       |      val message = unbuilder.readField[String]("message")
       |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
+      |      val attachments = unbuilder.readField[Vector[java.io.File]]("attachments")
       |      unbuilder.endObject()
-      |      new com.example.GreetingWithAttachments(attachments, message, header)
+      |      new com.example.GreetingWithAttachments(message, header, attachments)
       |      case None =>
       |      deserializationError("Expected JsObject but found None")
       |    }
       |  }
       |  override def write[J](obj: com.example.GreetingWithAttachments, builder: Builder[J]): Unit = {
       |    builder.beginObject()
-      |    builder.addField("attachments", obj.attachments)
       |    builder.addField("message", obj.message)
       |    builder.addField("header", obj.header)
+      |    builder.addField("attachments", obj.attachments)
       |    builder.endObject()
       |  }
       |}

@@ -69,7 +69,7 @@ class CodecCodeGen(codecParents: List[String],
       else f.name
     }
     val fqn = fullyQualifiedName(r)
-    val allFields = r.fields ++ superFields
+    val allFields = superFields ++ r.fields
     val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe, r.targetLang)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${f.name})""") mkString EOL
@@ -137,7 +137,7 @@ class CodecCodeGen(codecParents: List[String],
 
       }
 
-    ListMap(genFile(s, i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
+    ListMap(genFile(s, i) -> code) :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields))) reduce (_ merge _)
   }
 
   override def generate(s: Schema): ListMap[File, String] = {
@@ -169,11 +169,11 @@ class CodecCodeGen(codecParents: List[String],
     val typeFormats =
       d match {
         case Interface(name, _, namespace, _, _, fields, _, _) =>
-          val allFields = fields ++ superFields
+          val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
 
         case Record(_, _, _, _, _, fields) =>
-          val allFields = fields ++ superFields
+          val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
 
         case _: Enumeration =>
@@ -299,7 +299,7 @@ class CodecCodeGen(codecParents: List[String],
     case _: Interface => true
     case r: Record =>
       val defsMap = definitionsMap(s)
-      val allFields = r.fields ++ superFields
+      val allFields = superFields ++ r.fields
       allFields exists { f => defsMap get f.tpe.name exists { case _: Interface => true ; case _ => false } }
     case _: Enumeration => false
   }

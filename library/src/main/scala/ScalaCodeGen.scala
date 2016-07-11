@@ -42,7 +42,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
   override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val allFields = r.fields ++ superFields
+    val allFields = superFields ++ r.fields
 
     val alternativeCtors =
       genAlternativeConstructors(r.since, allFields) mkString EOL
@@ -98,8 +98,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
   override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val allFields = i.fields ++ superFields
-
+    val allFields = superFields ++ i.fields
     val alternativeCtors =
       genAlternativeConstructors(i.since, allFields) mkString EOL
 
@@ -133,7 +132,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genToString(i, superFields)}
          |}""".stripMargin
 
-    ListMap(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), i.fields ++ superFields))) reduce (_ merge _)
+    ListMap(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields))) reduce (_ merge _)
   }
 
   private def genDoc(doc: List[String]) = doc match {
@@ -171,7 +170,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
     val comparisonCode =
       if (allFields exists (_.tpe.lzy)) {
         "super.equals(o) // We have lazy members, so use object identity to avoid circularity."
@@ -188,7 +187,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
     val computationCode =
       if (allFields exists (_.tpe.lzy)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
@@ -202,7 +201,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
 
     if (allFields exists (_.tpe.lzy)) {
       s"""override def toString: String = {
@@ -280,7 +279,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     d.namespace map (ns => s"package $ns") getOrElse ""
 
   private def genCopy(r: Record, superFields: List[Field]) = {
-    val allFields = r.fields ++ superFields
+    val allFields = superFields ++ r.fields
     val params = allFields map (f => s"${f.name}: ${genRealTpe(f.tpe, isParam = true)} = ${f.name}") mkString ", "
     val constructorCall = allFields map (_.name) mkString ", "
     s"""private[this] def copy($params): ${r.name} = {
@@ -290,7 +289,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
   private def genWith(r: Record, superFields: List[Field]) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
-    val allFields = r.fields ++ superFields
+    val allFields = superFields ++ r.fields
 
     allFields map { f =>
       s"""def with${capitalize(f.name)}(${f.name}: ${genRealTpe(f.tpe, isParam = true)}): ${r.name} = {
