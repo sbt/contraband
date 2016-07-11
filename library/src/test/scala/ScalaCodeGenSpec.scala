@@ -56,36 +56,45 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of interface */
-        |sealed abstract class oneChildInterfaceExample() extends Serializable {
+        |sealed abstract class oneChildInterfaceExample(
+        |    val field: Int) extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: oneChildInterfaceExample => true
+        |    case x: oneChildInterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (17 + field.##)
         |  }
         |  override def toString: String = {
-        |    "oneChildInterfaceExample(" +  + ")"
+        |    "oneChildInterfaceExample(" + field + ")"
         |  }
         |}
-        |final class childRecord() extends oneChildInterfaceExample() {
+        |final class childRecord(
+        |  field: Int,
+        |  val x: Int) extends oneChildInterfaceExample(field) {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: childRecord => true
+        |    case x: childRecord => (this.field == x.field) && (this.x == x.x)
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (37 * (17 + field.##) + x.##)
         |  }
         |  override def toString: String = {
-        |    "childRecord(" +  + ")"
+        |    "childRecord(" + field + ", " + x + ")"
         |  }
-        |  private[this] def copy(): childRecord = {
-        |    new childRecord()
+        |  private[this] def copy(field: Int = field, x: Int = x): childRecord = {
+        |    new childRecord(field, x)
+        |  }
+        |  def withField(field: Int): childRecord = {
+        |    copy(field = field)
+        |  }
+        |  def withX(x: Int): childRecord = {
+        |    copy(x = x)
         |  }
         |}
         |
         |object childRecord {
-        |  def apply(): childRecord = new childRecord()
+        |  def apply(field: Int, x: Int): childRecord = new childRecord(field, x)
         |}""".stripMargin.unindent)
   }
 
@@ -313,7 +322,6 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
-
     code.head._2.unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
   }
 

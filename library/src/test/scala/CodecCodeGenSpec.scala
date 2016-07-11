@@ -89,20 +89,24 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     (code(new File("generated", "childRecordFormats.scala")).unindent must containTheSameElementsAs(
       """package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait ChildRecordFormats {
+        |trait ChildRecordFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val childRecordFormat: JsonFormat[_root_.childRecord] = new JsonFormat[_root_.childRecord] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.childRecord = {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
+        |          val field = unbuilder.readField[Int]("field")
+        |          val x = unbuilder.readField[Int]("x")
         |          unbuilder.endObject()
-        |          new _root_.childRecord()
+        |          new _root_.childRecord(field, x)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
         |    }
         |    override def write[J](obj: _root_.childRecord, builder: Builder[J]): Unit = {
         |      builder.beginObject()
+        |      builder.addField("field", obj.field)
+        |      builder.addField("x", obj.x)
         |      builder.endObject()
         |    }
         |  }
@@ -290,7 +294,6 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val schema = Schema parse completeExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
-
     code.values.mkString.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
   }
 

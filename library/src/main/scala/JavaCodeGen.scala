@@ -37,7 +37,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genToString(i, superFields)}
          |}""".stripMargin
 
-    ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), fields ++ superFields)))
+    ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), superFields ++ fields)))
   }
 
   override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
@@ -154,7 +154,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   private def genConstructors(cl: ClassLike, parent: Option[Interface], superFields: List[Field]) =
-    perVersionNumber(cl.since, cl.fields ++ superFields) { (provided, byDefault) =>
+    perVersionNumber(cl.since, superFields ++ cl.fields) { (provided, byDefault) =>
       val ctorParameters = provided map (f => s"${genRealTpe(f.tpe)} _${f.name}") mkString ", "
       val superFieldsValues = superFields map {
         case f if provided contains f  => s"_${f.name}"
@@ -174,7 +174,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
 
   private def genWith(r: Record, superFields: List[Field]) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
-    val allFields = (r.fields ++ superFields).zipWithIndex
+    val allFields = (superFields ++ r.fields).zipWithIndex
     def nonParam(f: (Field, Int)): String = {
       val field = f._1
       if (r.fields contains field) field.name
@@ -196,7 +196,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   private def genEquals(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return this == obj; // We have lazy members, so use object identity to avoid circularity."
@@ -231,7 +231,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     else s"${f.name}().hashCode()"
 
   private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
@@ -246,7 +246,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = cl.fields ++ superFields
+    val allFields = superFields ++ cl.fields
     val body =
       if (allFields exists (_.tpe.lzy)) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."

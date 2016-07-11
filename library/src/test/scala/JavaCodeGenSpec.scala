@@ -57,57 +57,72 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def interfaceGenerateOneChild = {
     val protocol = Interface parse oneChildInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
-
-    code mapValues (_.unindent) must containTheSameElementsAs(
-      Map(
-        new File("oneChildInterfaceExample.java") ->
-          """/** example of interface */
-            |public abstract class oneChildInterfaceExample implements java.io.Serializable {
-            |    public oneChildInterfaceExample() {
-            |        super();
-            |    }
-            |    public boolean equals(Object obj) {
-            |        if (this == obj) {
-            |        return true;
-            |        } else if (!(obj instanceof oneChildInterfaceExample)) {
-            |            return false;
-            |        } else {
-            |            oneChildInterfaceExample o = (oneChildInterfaceExample)obj;
-            |            return true;
-            |        }
-            |    }
-            |    public int hashCode() {
-            |        return 17;
-            |    }
-            |    public String toString() {
-            |        return "oneChildInterfaceExample("  + ")";
-            |    }
-            |}""".stripMargin.unindent,
-
-        new File("childRecord.java") ->
-          """public final class childRecord extends oneChildInterfaceExample {
-            |    public childRecord() {
-            |        super();
-            |    }
-            |    public boolean equals(Object obj) {
-            |        if (this == obj) {
-            |            return true;
-            |        } else if (!(obj instanceof childRecord)) {
-            |            return false;
-            |        } else {
-            |            childRecord o = (childRecord)obj;
-            |            return true;
-            |        }
-            |    }
-            |    public int hashCode() {
-            |        return 17;
-            |    }
-            |    public String toString() {
-            |        return "childRecord("  + ")";
-            |    }
-            |}""".stripMargin.unindent
-      ).toList
-    )
+    val code1 = code.toList(0)._2.unindent
+    val code2 = code.toList(1)._2.unindent
+    (code1 must containTheSameElementsAs (
+      """/** example of interface */
+        |public abstract class oneChildInterfaceExample implements java.io.Serializable {
+        |
+        |    private int field;
+        |    public oneChildInterfaceExample(int _field) {
+        |        super();
+        |        field = _field;
+        |    }
+        |    public int field() {
+        |        return this.field;
+        |    }
+        |    public boolean equals(Object obj) {
+        |        if (this == obj) {
+        |            return true;
+        |        } else if (!(obj instanceof oneChildInterfaceExample)) {
+        |            return false;
+        |        } else {
+        |            oneChildInterfaceExample o = (oneChildInterfaceExample)obj;
+        |            return (field() == o.field());
+        |        }
+        |    }
+        |    public int hashCode() {
+        |        return 37 * (17 + (new Integer(field())).hashCode());
+        |    }
+        |    public String toString() {
+        |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
+        |    }
+        |}""".stripMargin.unindent
+    )) and
+    (code2 must containTheSameElementsAs (
+      """public final class childRecord extends oneChildInterfaceExample {
+        |    private int x;
+        |    public childRecord(int _field, int _x) {
+        |        super(_field);
+        |         x = _x;
+        |    }
+        |    public int x() {
+        |        return this.x;
+        |    }
+        |    public childRecord withX(int x) {
+        |        return new childRecord(field(), x);
+        |    }
+        |    public childRecord withField(int field) {
+        |        return new childRecord(field, x);
+        |    }
+        |    public boolean equals(Object obj) {
+        |        if (this == obj) {
+        |            return true;
+        |        } else if (!(obj instanceof childRecord)) {
+        |            return false;
+        |        } else {
+        |            childRecord o = (childRecord)obj;
+        |            return (field() == o.field()) && (x() == o.x());
+        |        }
+        |    }
+        |    public int hashCode() {
+        |        return 37 * (37 * (17 + (new Integer(field())).hashCode()) + (new Integer(x())).hashCode());
+        |    }
+        |    public String toString() {
+        |        return "childRecord("  + "field: " + field() + ", " + "x: " + x() + ")";
+        |    }
+        |}""".stripMargin.unindent
+    ))
   }
 
   override def interfaceGenerateNested = {
@@ -422,7 +437,6 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
-
     code mapValues (_.unindent) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.unindent) toList)
   }
 

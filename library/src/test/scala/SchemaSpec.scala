@@ -128,10 +128,12 @@ class SchemaSpec extends Specification {
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List("example of interface")) and
-        (fields must haveSize(0)) and
+        (fields must haveSize(1)) and
+        (fields(0) must_== Field("field", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None)) and
         (abstractMethods must haveSize(0)) and
         (children must haveSize(1)) and
-        (children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil, Nil))
+        (children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
+          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil))
     }
   }
 
