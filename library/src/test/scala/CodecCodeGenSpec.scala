@@ -16,13 +16,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def is = super.is append codecCodeGenSpec
 
-  val protocolName = None
   val codecParents = Nil
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
   val formatsForType: TpeRef => List[String] = CodecCodeGen.formatsForType
 
   override def enumerationGenerateSimple = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -55,7 +54,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val intf = Interface parse simpleProtocolExample
     val code = gen generate intf
 
@@ -75,7 +74,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val intf = Interface parse oneChildProtocolExample
     val code = gen generate intf
 
@@ -109,7 +108,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateNested = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val intf = Interface parse nestedProtocolExample
     val code = gen generate intf
 
@@ -136,7 +135,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   def protocolGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -155,7 +154,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
@@ -185,7 +184,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
@@ -216,7 +215,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -252,7 +251,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = Schema parse primitiveTypesNoLazyExample
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -282,18 +281,16 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateComplete = {
-    val protocolName = Some("CustomProtcol")
     val schema = Schema parse completeExample
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.values.mkString.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val protocolName = Some("CustomProtcol")
     val schema = Schema parse completeExample
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.values.mkString.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeCodec.withoutEmptyLines)
@@ -309,7 +306,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
                                  |    }
                                  |  ]
                                  |}""".stripMargin
-    val gen = new CodecCodeGen(protocolName, codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(

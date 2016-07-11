@@ -1,5 +1,6 @@
 {
 	"codecNamespace": "generated",
+	"fullCodec": "CustomProtocol",
 	"types": [
 		{
 			"name": "Greeting",

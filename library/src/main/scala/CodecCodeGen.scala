@@ -6,14 +6,12 @@ import scala.collection.immutable.ListMap
 /**
  * Code generator to produce a codec for a given type.
  *
- * @param protocolName        The name of the full codec object to generate.
  * @param codecParents        The parents that appear in the self type of all codecs, and the full codec inherits from.
  * @param instantiateJavaLazy How to transform an expression to its lazy equivalent in Java.
  * @param formatsForType      Given a `TpeRef` t, returns the list of codecs needed to encode t.
  * @param includedSchemas     List of schemas that could be refereced.
  */
-class CodecCodeGen(protocolName: Option[String],
-  codecParents: List[String],
+class CodecCodeGen(codecParents: List[String],
   instantiateJavaLazy: String => String,
   formatsForType: TpeRef => List[String],
   includedSchemas: List[Schema]) extends CodeGenerator {
@@ -143,10 +141,10 @@ class CodecCodeGen(protocolName: Option[String],
   override def generate(s: Schema): ListMap[File, String] = {
     val codecs: ListMap[File, String] = ((s.definitions.toList map { d =>
       ListMap(generate(s, d, None, Nil).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
-    protocolName match {
+    s.fullCodec match {
       case Some(x) =>
-        val fullProtocol = generateFullProtocol(s, x)
-        codecs merge fullProtocol
+        val full = generateFullCodec(s, x)
+        codecs merge full
       case None =>
         codecs
     }
@@ -267,7 +265,7 @@ class CodecCodeGen(protocolName: Option[String],
     case other     => other
   }
 
-  private def generateFullProtocol(s: Schema, name: String): ListMap[File, String] = {
+  private def generateFullCodec(s: Schema, name: String): ListMap[File, String] = {
     val allFormats = getAllRequiredFormats(s).distinct
     val parents = allFormats.mkString("extends ", " with ", "")
     val code =
