@@ -37,6 +37,18 @@
 							"type": "java.io.File*"
 						}
 					]
+				},
+				{
+					"name": "GreetingWithOption",
+					"namespace": "com.example",
+					"target": "Scala",
+					"type": "record",
+					"fields": [
+						{
+							"name": "opt",
+							"type": "String?"
+						}
+					]
 				}
 			]
 		}

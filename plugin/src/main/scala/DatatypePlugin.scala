@@ -9,9 +9,9 @@ object DatatypePlugin extends AutoPlugin {
     d.namespace map (ns => new File(ns.replace(".", "/"))) map (new File(_, d.name + ".scala")) getOrElse new File(d.name + ".scala")
 
   object autoImport {
+    val skipGeneration = settingKey[Boolean]("skip")
     val generateDatatypes = taskKey[Seq[File]]("Generate datatypes.")
-    val createDatatypes = settingKey[Boolean]("Whether to generate the datatypes or not.")
-    val createCodecs = settingKey[Boolean]("Whether to generate the JsonFormats for the datatypes or not.")
+    val generateJsonCodecs = taskKey[Seq[File]]("Dummy task for generating JSON codecs.")
     val datatypeCodecsDependencies = settingKey[Seq[ModuleID]]("ModuleIDs of the default codecs.")
     val datatypeJavaLazy = settingKey[String]("Interface to use to provide laziness in Java.")
     val datatypeJavaOption = settingKey[String]("Interface to use to provide options in Java.")
@@ -30,9 +30,9 @@ object DatatypePlugin extends AutoPlugin {
     }
 
     lazy val baseDatatypeSettings: Seq[Def.Setting[_]] = Seq(
-      createDatatypes in generateDatatypes := true,
+      skipGeneration in generateDatatypes := false,
+      skipGeneration in generateJsonCodecs := true,
       datatypeCodecsDependencies in generateDatatypes := Seq("com.eed3si9n" %% "sjson-new-core" % "0.4.0"),
-      createCodecs in generateDatatypes := true,
       datatypeJavaLazy in generateDatatypes := "xsbti.api.Lazy",
       datatypeJavaOption in generateDatatypes := "xsbti.Maybe",
       datatypeScalaArray in generateDatatypes := "Vector",
@@ -47,8 +47,8 @@ object DatatypePlugin extends AutoPlugin {
       datatypeFormatsForType in generateDatatypes := CodecCodeGen.formatsForType,
       generateDatatypes := {
         Generate((datatypeSource in generateDatatypes).value,
-          (createDatatypes in generateDatatypes).value,
-          (createCodecs in generateDatatypes).value,
+          !(skipGeneration in generateDatatypes).value,
+          !(skipGeneration in generateJsonCodecs).value,
           (sourceManaged in generateDatatypes).value,
           (datatypeJavaLazy in generateDatatypes).value,
           (datatypeJavaOption in generateDatatypes).value,
@@ -72,8 +72,8 @@ object DatatypePlugin extends AutoPlugin {
   override lazy val projectSettings =
     inConfig(Compile)(baseDatatypeSettings) ++ inConfig(Test)(baseDatatypeSettings) ++ Seq(
       libraryDependencies ++= {
-        val addInCompile = (createCodecs in generateDatatypes in Compile).value
-        val addInTest = !addInCompile && (createCodecs in generateDatatypes in Test).value
+        val addInCompile = !(skipGeneration in (Compile, generateJsonCodecs)).value
+        val addInTest = !addInCompile && !(skipGeneration in (Test, generateJsonCodecs)).value
 
         val inCompile =
           if (addInCompile) (datatypeCodecsDependencies in generateDatatypes in Compile).value
