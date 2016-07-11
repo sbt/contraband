@@ -1,7 +1,7 @@
 import sbt.datatype._
 
 lazy val root = (project in file(".")).
-  enablePlugins(DatatypePlugin).
+  enablePlugins(DatatypePlugin, JsonCodecPlugin).
   settings(
     name := "example",
     datatypeFormatsForType in generateDatatypes in Compile := { tpe =>

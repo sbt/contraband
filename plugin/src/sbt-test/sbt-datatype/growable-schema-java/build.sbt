@@ -1,3 +1,3 @@
 name := "example"
 
-enablePlugins(sbt.datatype.DatatypePlugin)
+enablePlugins(DatatypePlugin, JsonCodecPlugin)

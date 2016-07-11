@@ -10,10 +10,12 @@ object Example extends App {
   val g0: Greeting = new SimpleGreeting("Hello")
   val g1: Greeting = new SimpleGreeting("Hello", 0)
   val g21: Greeting = new GreetingWithAttachments(Array.empty, "Hello")
+  val g3: Greeting = GreetingWithOption(Some("foo"), "Hello")
 
   println(Converter.toJson(g0).get)
 
   assert(Converter.fromJson[Greeting](Converter.toJson(g0).get).get == g0)
   assert(Converter.fromJson[Greeting](Converter.toJson(g1).get).get == g1)
   assert(Converter.fromJson[Greeting](Converter.toJson(g21).get).get == g21)
+  assert(Converter.fromJson[Greeting](Converter.toJson(g3).get).get == g3)
 }
