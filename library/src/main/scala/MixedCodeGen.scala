@@ -6,9 +6,9 @@ import scala.collection.immutable.ListMap
 /**
  * Generator that produces both Scala and Java code.
  */
-class MixedCodeGen(javaLazy: String, genScalaFileName: Definition => File, scalaSealprotocols: Boolean) extends CodeGenerator {
-  val javaGen  = new JavaCodeGen(javaLazy)
-  val scalaGen = new ScalaCodeGen(genScalaFileName, scalaSealprotocols)
+class MixedCodeGen(javaLazy: String, javaOptional: String, scalaArray: String, genScalaFileName: Definition => File, scalaSealprotocols: Boolean) extends CodeGenerator {
+  val javaGen  = new JavaCodeGen(javaLazy, javaOptional)
+  val scalaGen = new ScalaCodeGen(scalaArray, genScalaFileName, scalaSealprotocols)
 
   def generate(s: Schema): ListMap[File, String] =
     s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _)

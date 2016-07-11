@@ -146,7 +146,9 @@ object NewSchema {
   val simpleTpeRefExample = "simpleTpeRefExample"
   val lazyTpeRefExample = "lazy lazyTpeRefExample"
   val arrayTpeRefExample = "arrayTpeRefExample*"
+  val optionTpeRefExample = "optionTpeRefExample?"
   val lazyArrayTpeRefExample = "lazy lazyArrayTpeRefExample*"
+  val lazyOptionTpeRefExample = "lazy lazyOptionTpeRefExample?"
 
   val primitiveTypesExample = """{
   "types": [
@@ -168,8 +170,16 @@ object NewSchema {
           "type": "int*"
         },
         {
+          "name": "optionInteger",
+          "type": "int?"
+        },
+        {
           "name": "lazyArrayInteger",
           "type": "lazy int*"
+        },
+        {
+          "name": "lazyOptionInteger",
+          "type": "lazy int?"
         }
       ]
     }
@@ -400,10 +410,10 @@ object NewSchema {
       |/** A Greeting with attachments */
       |final class GreetingWithAttachments(
       |  /** The files attached to the greeting */
-      |  val attachments: Array[java.io.File],
+      |  val attachments: Vector[java.io.File],
       |  message: => String,
       |  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) {
-      |  def this(attachments: Array[java.io.File], message: => String) = this(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def this(attachments: Vector[java.io.File], message: => String) = this(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
       |
       |  override def equals(o: Any): Boolean = o match {
       |    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -415,10 +425,10 @@ object NewSchema {
       |  override def toString: String = {
       |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
       |  }
-      |  private[this] def copy(attachments: Array[java.io.File] = attachments, message: => String = message, header: com.example.GreetingHeader = header): GreetingWithAttachments = {
+      |  private[this] def copy(attachments: Vector[java.io.File] = attachments, message: => String = message, header: com.example.GreetingHeader = header): GreetingWithAttachments = {
       |    new GreetingWithAttachments(attachments, message, header)
       |  }
-      |  def withAttachments(attachments: Array[java.io.File]): GreetingWithAttachments = {
+      |  def withAttachments(attachments: Vector[java.io.File]): GreetingWithAttachments = {
       |    copy(attachments = attachments)
       |  }
       |  def withMessage(message: => String): GreetingWithAttachments = {
@@ -430,8 +440,8 @@ object NewSchema {
       |}
       |
       |object GreetingWithAttachments {
-      |  def apply(attachments: Array[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
-      |  def apply(attachments: Array[java.io.File], message: => String, header: com.example.GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
+      |  def apply(attachments: Vector[java.io.File], message: => String): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+      |  def apply(attachments: Vector[java.io.File], message: => String, header: com.example.GreetingHeader): GreetingWithAttachments = new GreetingWithAttachments(attachments, message, header)
       |}
       |
       |/** Meta information of a Greeting */
@@ -725,7 +735,7 @@ object NewSchema {
       |    jsOpt match {
       |      case Some(js) =>
       |      unbuilder.beginObject(js)
-      |      val attachments = unbuilder.readField[Array[java.io.File]]("attachments")
+      |      val attachments = unbuilder.readField[Vector[java.io.File]]("attachments")
       |      val message = unbuilder.readField[String]("message")
       |      val header = unbuilder.readField[com.example.GreetingHeader]("header")
       |      unbuilder.endObject()

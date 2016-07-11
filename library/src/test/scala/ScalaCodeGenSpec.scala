@@ -8,10 +8,11 @@ import NewSchema._
 class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   val outputFile = new File("output.scala")
+  val scalaArray = "Vector"
   val genFileName = (_: Definition) => outputFile
 
   override def enumerationGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -27,7 +28,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = Interface parse simpleProtocolExample
     val code = gen generate protocol
 
@@ -49,7 +50,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = Interface parse oneChildProtocolExample
     val code = gen generate protocol
 
@@ -89,7 +90,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def protocolGenerateNested = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = Interface parse nestedProtocolExample
     val code = gen generate protocol
 
@@ -123,7 +124,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   override def protocolGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
-    val code = new ScalaCodeGen(genFileName, sealProtocols = false) generate schema
+    val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
 
     code.head._2.withoutEmptyLines must containTheSameElementsAs(
       """abstract class generateArgDocExample(
@@ -136,7 +137,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |                 Make sure it is awesome.
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
-        |  def methodExample(arg0: => Array[Int], arg1: Boolean): Array[Int]
+        |  def methodExample(arg0: => Vector[Int], arg1: Boolean): Vector[Int]
         |  override def equals(o: Any): Boolean = o match {
         |    case x: generateArgDocExample => (this.field == x.field)
         |    case _ => false
@@ -152,7 +153,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
@@ -183,7 +184,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
@@ -215,23 +216,22 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesExample
     val code = gen generate schema
-
     code.head._2.unindent must containTheSameElementsAs(
       """final class primitiveTypesExample(
-        |
         |  val simpleInteger: Int,
         |  _lazyInteger: => Int,
-        |
-        |  val arrayInteger: Array[Int],
-        |  _lazyArrayInteger: => Array[Int]) extends Serializable {
+        |  val arrayInteger: Vector[Int],
+        |  val optionInteger: Option[Int],
+        |  _lazyArrayInteger: => Vector[Int],
+        |  _lazyOptionInteger: => Option[Int]) extends Serializable {
         |
         |
         |  lazy val lazyInteger: Int = _lazyInteger
-        |
-        |  lazy val lazyArrayInteger: Array[Int] = _lazyArrayInteger
+        |  lazy val lazyArrayInteger: Vector[Int] = _lazyArrayInteger
+        |  lazy val lazyOptionInteger: Option[Int] = _lazyOptionInteger
         |  override def equals(o: Any): Boolean = o match {
         |    case x: primitiveTypesExample => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
         |    case _ => false
@@ -242,8 +242,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
         |  }
-        |  private[this] def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Array[Int] = arrayInteger, lazyArrayInteger: => Array[Int] = lazyArrayInteger): primitiveTypesExample = {
-        |    new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
+        |  private[this] def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Vector[Int] = arrayInteger, optionInteger: Option[Int] = optionInteger, lazyArrayInteger: => Vector[Int] = lazyArrayInteger, lazyOptionInteger: => Option[Int] = lazyOptionInteger): primitiveTypesExample = {
+        |    new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesExample = {
         |    copy(simpleInteger = simpleInteger)
@@ -251,21 +251,27 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def withLazyInteger(lazyInteger: => Int): primitiveTypesExample = {
         |    copy(lazyInteger = lazyInteger)
         |  }
-        |  def withArrayInteger(arrayInteger: Array[Int]): primitiveTypesExample = {
+        |  def withArrayInteger(arrayInteger: Vector[Int]): primitiveTypesExample = {
         |    copy(arrayInteger = arrayInteger)
         |  }
-        |  def withLazyArrayInteger(lazyArrayInteger: => Array[Int]): primitiveTypesExample = {
+        |  def withOptionInteger(optionInteger: Option[Int]): primitiveTypesExample = {
+        |    copy(optionInteger = optionInteger)
+        |  }
+        |  def withLazyArrayInteger(lazyArrayInteger: => Vector[Int]): primitiveTypesExample = {
         |    copy(lazyArrayInteger = lazyArrayInteger)
+        |  }
+        |  def withLazyOptionInteger(lazyOptionInteger: => Option[Int]): primitiveTypesExample = {
+        |    copy(lazyOptionInteger = lazyOptionInteger)
         |  }
         |}
         |
         |object primitiveTypesExample {
-        |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Array[Int], lazyArrayInteger: => Array[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
+        |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Vector[Int], optionInteger: Option[Int], lazyArrayInteger: => Vector[Int], lazyOptionInteger: => Option[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = gen generate schema
 
@@ -274,7 +280,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |  val simpleInteger: Int,
         |
-        |  val arrayInteger: Array[Int]) extends Serializable {
+        |  val arrayInteger: Vector[Int]) extends Serializable {
         |
         |
         |  override def equals(o: Any): Boolean = o match {
@@ -287,24 +293,24 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "primitiveTypesNoLazyExample(" + simpleInteger + ", " + arrayInteger + ")"
         |  }
-        |  private[this] def copy(simpleInteger: Int = simpleInteger, arrayInteger: Array[Int] = arrayInteger): primitiveTypesNoLazyExample = {
+        |  private[this] def copy(simpleInteger: Int = simpleInteger, arrayInteger: Vector[Int] = arrayInteger): primitiveTypesNoLazyExample = {
         |    new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesNoLazyExample = {
         |    copy(simpleInteger = simpleInteger)
         |  }
-        |  def withArrayInteger(arrayInteger: Array[Int]): primitiveTypesNoLazyExample = {
+        |  def withArrayInteger(arrayInteger: Vector[Int]): primitiveTypesNoLazyExample = {
         |    copy(arrayInteger = arrayInteger)
         |  }
         |}
         |
         |object primitiveTypesNoLazyExample {
-        |  def apply(simpleInteger: Int, arrayInteger: Array[Int]): primitiveTypesNoLazyExample = new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
+        |  def apply(simpleInteger: Int, arrayInteger: Vector[Int]): primitiveTypesNoLazyExample = new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
 
@@ -312,7 +318,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val gen = new ScalaCodeGen(genFileName, sealProtocols = true)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
 

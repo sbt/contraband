@@ -6,7 +6,7 @@ import scala.collection.immutable.ListMap
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends CodeGenerator {
+class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocols: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -162,7 +162,11 @@ class ScalaCodeGen(genFile: Definition => File, sealProtocols: Boolean) extends 
 
   private def genRealTpe(tpe: TpeRef, isParam: Boolean) = {
     val scalaTpe = lookupTpe(tpe.name)
-    val base = if (tpe.repeated) s"Array[$scalaTpe]" else scalaTpe
+    val base = tpe match {
+      case x if x.repeated => s"$scalaArray[$scalaTpe]"
+      case x if x.optional => s"Option[$scalaTpe]"
+      case _               => scalaTpe
+    }
     if (tpe.lzy && isParam) s"=> $base" else base
   }
 

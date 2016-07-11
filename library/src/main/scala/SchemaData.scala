@@ -266,19 +266,23 @@ object Arg extends Parser[Arg] {
       TpeRef(json -> "type"))
 }
 
-case class TpeRef(name: String, lzy: Boolean, repeated: Boolean)
+case class TpeRef(name: String, lzy: Boolean, repeated: Boolean, optional: Boolean)
 
 object TpeRef {
   import scala.util.matching.Regex
   private val LazyRepeated = """^lazy (.+?)\*$""".r
+  private val LazyOptional = """^lazy (.+?)\?$""".r
   private val Lazy = """^lazy (.+?)$""".r
-  private val Repeated = """^(.+?)\*""".r
+  private val Repeated = """^(.+?)\*$""".r
+  private val Optional = """^(.+?)\?$""".r
 
   def apply(str: String): TpeRef = str match {
-    case LazyRepeated(tpe) => TpeRef(tpe, true, true)
-    case Lazy(tpe)         => TpeRef(tpe, true, false)
-    case Repeated(tpe)     => TpeRef(tpe, false, true)
-    case tpe               => TpeRef(tpe, false, false)
+    case LazyRepeated(tpe) => TpeRef(tpe, true, true, false)
+    case LazyOptional(tpe) => TpeRef(tpe, true, false, true)
+    case Lazy(tpe)         => TpeRef(tpe, true, false, false)
+    case Repeated(tpe)     => TpeRef(tpe, false, true, false)
+    case Optional(tpe)     => TpeRef(tpe, false, false, true)
+    case tpe               => TpeRef(tpe, false, false, false)
   }
 }
 

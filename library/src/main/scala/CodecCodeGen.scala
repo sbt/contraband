@@ -13,6 +13,8 @@ import scala.collection.immutable.ListMap
  */
 class CodecCodeGen(codecParents: List[String],
   instantiateJavaLazy: String => String,
+  javaOption: String,
+  scalaArray: String,
   formatsForType: TpeRef => List[String],
   includedSchemas: List[Schema]) extends CodeGenerator {
   import CodecCodeGen._
@@ -68,7 +70,7 @@ class CodecCodeGen(codecParents: List[String],
     }
     val fqn = fullyQualifiedName(r)
     val allFields = r.fields ++ superFields
-    val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe)}]("${f.name}")""") mkString EOL
+    val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe, r.targetLang)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${f.name})""") mkString EOL
     val selfType = makeSelfType(s, r, superFields)
@@ -203,7 +205,7 @@ class CodecCodeGen(codecParents: List[String],
       }
     val allDefinitions = ds flatMap getAllDefinitions
     val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
-      val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false)
+      val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false, false)
       fullFormatsName(s, d) -> (d match {
         case i: Interface =>
           i.children.map( c => fullFormatsName(s, c)) :::
@@ -248,9 +250,15 @@ class CodecCodeGen(codecParents: List[String],
 
   private def scalaifyType(t: String) = t.replace("<", "[").replace(">", "]")
 
-  private def genRealTpe(tpe: TpeRef) = {
+  private def genRealTpe(tpe: TpeRef, targetLang: String) = {
     val scalaTpe = lookupTpe(scalaifyType(tpe.name))
-    if (tpe.repeated) s"Array[$scalaTpe]" else scalaTpe
+    tpe match {
+      case x if x.repeated && targetLang == "Java" => s"Array[$scalaTpe]"
+      case x if x.repeated => s"$scalaArray[$scalaTpe]"
+      case x if x.optional && targetLang == "Java" => s"$javaOption[$scalaTpe]"
+      case x if x.optional => s"Option[$scalaTpe]"
+      case _               => scalaTpe
+    }
   }
 
   private def lookupTpe(tpe: String): String = scalaifyType(tpe) match {

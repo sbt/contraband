@@ -18,10 +18,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   val codecParents = Nil
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
+  val javaOption = "com.example.Option"
+  val scalaArray = "Vector"
   val formatsForType: TpeRef => List[String] = CodecCodeGen.formatsForType
 
   override def enumerationGenerateSimple = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
@@ -54,7 +56,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateSimple = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val intf = Interface parse simpleProtocolExample
     val code = gen generate intf
 
@@ -74,7 +76,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateOneChild = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val intf = Interface parse oneChildProtocolExample
     val code = gen generate intf
 
@@ -108,7 +110,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def protocolGenerateNested = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val intf = Interface parse nestedProtocolExample
     val code = gen generate intf
 
@@ -135,7 +137,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   def protocolGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -154,7 +156,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
@@ -184,7 +186,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
@@ -215,7 +217,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -228,10 +230,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          unbuilder.beginObject(js)
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
         |          val lazyInteger = unbuilder.readField[Int]("lazyInteger")
-        |          val arrayInteger = unbuilder.readField[Array[Int]]("arrayInteger")
-        |          val lazyArrayInteger = unbuilder.readField[Array[Int]]("lazyArrayInteger")
+        |          val arrayInteger = unbuilder.readField[Vector[Int]]("arrayInteger")
+        |          val optionInteger = unbuilder.readField[Option[Int]]("optionInteger")
+        |          val lazyArrayInteger = unbuilder.readField[Vector[Int]]("lazyArrayInteger")
+        |          val lazyOptionInteger = unbuilder.readField[Option[Int]]("lazyOptionInteger")
         |          unbuilder.endObject()
-        |          new _root_.primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger)
+        |          new _root_.primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -242,7 +246,9 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.addField("simpleInteger", obj.simpleInteger)
         |      builder.addField("lazyInteger", obj.lazyInteger)
         |      builder.addField("arrayInteger", obj.arrayInteger)
+        |      builder.addField("optionInteger", obj.optionInteger)
         |      builder.addField("lazyArrayInteger", obj.lazyArrayInteger)
+        |      builder.addField("lazyOptionInteger", obj.lazyOptionInteger)
         |      builder.endObject()
         |    }
         |  }
@@ -251,7 +257,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = Schema parse primitiveTypesNoLazyExample
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
@@ -263,7 +269,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
-        |          val arrayInteger = unbuilder.readField[Array[Int]]("arrayInteger")
+        |          val arrayInteger = unbuilder.readField[Vector[Int]]("arrayInteger")
         |          unbuilder.endObject()
         |          new _root_.primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |        case None =>
@@ -282,7 +288,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.values.mkString.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
@@ -290,7 +296,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = Schema parse completeExample
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.values.mkString.withoutEmptyLines must containTheSameElementsAs(completeExampleCodeCodec.withoutEmptyLines)
@@ -306,7 +312,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
                                  |    }
                                  |  ]
                                  |}""".stripMargin
-    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, schema :: Nil)
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
