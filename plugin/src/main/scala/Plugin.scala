@@ -14,6 +14,8 @@ object DatatypePlugin extends AutoPlugin {
     val createCodecs = settingKey[Boolean]("Whether to generate the JsonFormats for the datatypes or not.")
     val datatypeCodecsDependencies = settingKey[Seq[ModuleID]]("ModuleIDs of the default codecs.")
     val datatypeJavaLazy = settingKey[String]("Interface to use to provide laziness in Java.")
+    val datatypeJavaOption = settingKey[String]("Interface to use to provide options in Java.")
+    val datatypeScalaArray = settingKey[String]("Repeated type in Scala.")
     val datatypeSource = settingKey[File]("Datatype source directory.")
     val datatypeScalaFileNames = settingKey[Definition => File]("Mapping from `Definition` to file for Scala generator.")
     val datatypeScalaSealInterface = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
@@ -32,6 +34,8 @@ object DatatypePlugin extends AutoPlugin {
       datatypeCodecsDependencies in generateDatatypes := Seq("com.eed3si9n" %% "sjson-new-core" % "0.4.0"),
       createCodecs in generateDatatypes := true,
       datatypeJavaLazy in generateDatatypes := "xsbti.api.Lazy",
+      datatypeJavaOption in generateDatatypes := "xsbti.Maybe",
+      datatypeScalaArray in generateDatatypes := "Vector",
       datatypeSource in generateDatatypes := Defaults.configSrcSub(sourceDirectory).value / "datatype",
       sourceManaged in generateDatatypes := sourceManaged.value,
       datatypeScalaFileNames in generateDatatypes := scalaDef2File,
@@ -47,6 +51,8 @@ object DatatypePlugin extends AutoPlugin {
           (createCodecs in generateDatatypes).value,
           (sourceManaged in generateDatatypes).value,
           (datatypeJavaLazy in generateDatatypes).value,
+          (datatypeJavaOption in generateDatatypes).value,
+          (datatypeScalaArray in generateDatatypes).value,
           (datatypeScalaFileNames in generateDatatypes).value,
           (datatypeScalaSealInterface in generateDatatypes).value,
           (datatypeCodecParents in generateDatatypes).value,
@@ -88,6 +94,8 @@ object Generate {
     definitions: Array[File],
     target: File,
     javaLazy: String,
+    javaOption: String,
+    scalaArray: String,
     scalaFileNames: Definition => File,
     scalaSealInterface: Boolean,
     codecParents: List[String],
@@ -95,8 +103,8 @@ object Generate {
     formatsForType: TpeRef => List[String],
     log: Logger): Seq[File] = {
     val input = definitions.toList map (f => Schema.parse(IO read f))
-    val generator = new MixedCodeGen(javaLazy, scalaFileNames, scalaSealInterface)
-    val jsonFormatsGenerator = new CodecCodeGen(codecParents, instantiateJavaLazy, formatsForType, input)
+    val generator = new MixedCodeGen(javaLazy, javaOption, scalaArray, scalaFileNames, scalaSealInterface)
+    val jsonFormatsGenerator = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, input)
 
     val datatypes =
       if (createDatatypes) {
@@ -138,6 +146,8 @@ object Generate {
     createCodecs: Boolean,
     target: File,
     javaLazy: String,
+    javaOption: String,
+    scalaArray: String,
     scalaFileNames: Definition => File,
     scalaSealInterface: Boolean,
     codecParents: List[String],
@@ -145,7 +155,8 @@ object Generate {
     formatsForType: TpeRef => List[String],
     s: TaskStreams): Seq[File] = {
     val definitions = IO listFiles base
-    def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, scalaFileNames, scalaSealInterface, codecParents, instantiateJavaLazy, formatsForType, s.log)
+    def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,
+      scalaFileNames, scalaSealInterface, codecParents, instantiateJavaLazy, formatsForType, s.log)
     val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }

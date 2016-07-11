@@ -6,7 +6,7 @@ import scala.collection.immutable.ListMap
 /**
  * Code generator for Java.
  */
-class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
+class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -114,10 +114,12 @@ class JavaCodeGen(lazyInterface: String) extends CodeGenerator {
   }
 
   private def genRealTpe(tpe: TpeRef): String = tpe match {
-    case TpeRef(name, true, true)   => s"$lazyInterface<$name[]>"
-    case TpeRef(name, true, false)  => s"$lazyInterface<${boxedType(name)}>"
-    case TpeRef(name, false, true)  => s"$name[]"
-    case TpeRef(name, false, false) => name
+    case TpeRef(name, true, true, _)       => s"$lazyInterface<$name[]>"
+    case TpeRef(name, true, false, true)   => s"$lazyInterface<$optionalInterface<${boxedType(name)}>>"
+    case TpeRef(name, true, false, false)  => s"$lazyInterface<${boxedType(name)}>"
+    case TpeRef(name, false, true, _)      => s"$name[]"
+    case TpeRef(name, false, false, true)  => s"$optionalInterface<${boxedType(name)}>"
+    case TpeRef(name, false, false, false) => name
   }
 
   private def genAccessors(fields: List[Field]) = fields map genAccessor mkString EOL

@@ -9,7 +9,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def enumerationGenerateSimple = {
     val enumeration = Enumeration parse simpleEnumerationExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate enumeration
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate enumeration
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
@@ -22,7 +22,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateSimple = {
     val protocol = Interface parse simpleProtocolExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple interface */
@@ -56,7 +56,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateOneChild = {
     val protocol = Interface parse oneChildProtocolExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -112,7 +112,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateNested = {
     val protocol = Interface parse nestedProtocolExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate protocol
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -168,7 +168,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def protocolGenerateAbstractMethods = {
     val schema = Schema parse generateArgDocExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
     code mapValues (_.withoutEmptyLines) must containTheSameElementsAs(
       Map(
@@ -214,7 +214,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGenerateSimple = {
     val record = Record parse simpleRecordExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate record
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -256,7 +256,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGrowZeroToOneField = {
     val record = Record parse growableAddOneFieldExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate record
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -300,67 +300,78 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
-    code mapValues (_.unindent) must containTheSameElementsAs(
-      Map(
-        new File("primitiveTypesExample.java") ->
-          """public final class primitiveTypesExample implements java.io.Serializable {
-            |    private int simpleInteger;
-            |
-            |    private com.example.MyLazy<Integer> lazyInteger;
-            |
-            |    private int[] arrayInteger;
-            |
-            |    private com.example.MyLazy<int[]> lazyArrayInteger;
-            |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, com.example.MyLazy<int[]> _lazyArrayInteger) {
-            |        super();
-            |        simpleInteger = _simpleInteger;
-            |        lazyInteger = _lazyInteger;
-            |        arrayInteger = _arrayInteger;
-            |        lazyArrayInteger = _lazyArrayInteger;
-            |    }
-            |    public int simpleInteger() {
-            |        return this.simpleInteger;
-            |    }
-            |    public int lazyInteger() {
-            |        return this.lazyInteger.get();
-            |    }
-            |    public int[] arrayInteger() {
-            |        return this.arrayInteger;
-            |    }
-            |    public int[] lazyArrayInteger() {
-            |        return this.lazyArrayInteger.get();
-            |    }
-            |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
-            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
-            |    }
-            |    public primitiveTypesExample withLazyInteger(com.example.MyLazy<Integer> lazyInteger) {
-            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
-            |    }
-            |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
-            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
-            |    }
-            |    public primitiveTypesExample withLazyArrayInteger(com.example.MyLazy<int[]> lazyArrayInteger) {
-            |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, lazyArrayInteger);
-            |    }
-            |    public boolean equals(Object obj) {
-            |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
-            |    }
-            |    public int hashCode() {
-            |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
-            |    }
-            |    public String toString() {
-            |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
-            |    }
-            |}""".stripMargin.unindent
-      ).toList
+    code.head._2.unindent must containTheSameElementsAs(
+      """public final class primitiveTypesExample implements java.io.Serializable {
+        |
+        |    private int simpleInteger;
+        |    private com.example.MyLazy<Integer> lazyInteger;
+        |    private int[] arrayInteger;
+        |    private com.example.MyOption<Integer> optionInteger;
+        |    private com.example.MyLazy<int[]> lazyArrayInteger;
+        |    private com.example.MyLazy<com.example.MyOption<Integer>> lazyOptionInteger;
+        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, com.example.MyOption<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<com.example.MyOption<Integer>> _lazyOptionInteger) {
+        |        super();
+        |        simpleInteger = _simpleInteger;
+        |        lazyInteger = _lazyInteger;
+        |        arrayInteger = _arrayInteger;
+        |        optionInteger = _optionInteger;
+        |        lazyArrayInteger = _lazyArrayInteger;
+        |        lazyOptionInteger = _lazyOptionInteger;
+        |    }
+        |    public int simpleInteger() {
+        |        return this.simpleInteger;
+        |    }
+        |    public int lazyInteger() {
+        |        return this.lazyInteger.get();
+        |    }
+        |    public int[] arrayInteger() {
+        |        return this.arrayInteger;
+        |    }
+        |    public int optionInteger() {
+        |        return this.optionInteger;
+        |    }
+        |    public int[] lazyArrayInteger() {
+        |        return this.lazyArrayInteger.get();
+        |    }
+        |    public int lazyOptionInteger() {
+        |        return this.lazyOptionInteger.get();
+        |    }
+        |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withLazyInteger(com.example.MyLazy<Integer> lazyInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withOptionInteger(com.example.MyOption<Integer> optionInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withLazyArrayInteger(com.example.MyLazy<int[]> lazyArrayInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<com.example.MyOption<Integer>> lazyOptionInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public boolean equals(Object obj) {
+        |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
+        |    }
+        |    public int hashCode() {
+        |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
+        |    }
+        |    public String toString() {
+        |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
+        |    }
+        |}""".stripMargin.unindent
     )
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = Schema parse primitiveTypesNoLazyExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
     code mapValues (_.unindent) must containTheSameElementsAs(
       Map(
@@ -410,14 +421,14 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
     code mapValues (_.unindent) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.unindent) toList)
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = Schema parse completeExample
-    val code = new JavaCodeGen("com.example.MyLazy") generate schema
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
     code mapValues (_.withoutEmptyLines) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.withoutEmptyLines) toList)
   }
