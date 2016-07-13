@@ -17,7 +17,7 @@ trait Parser[T] {
     }
 
     /** Retrieves the string field `key` from `jValue`. */
-    def ->(key: String): String = this ->? key getOrElse sys.error(s"Undefined $key: $jValue")
+    def ->(key: String): String = this ->? key getOrElse sys.error(s"""Undefined key "$key": $jValue""")
 
     /** Optionally retrieves the array field `key` from `jValue`. */
     def ->*?(key: String): Option[List[JValue]] = (jValue \ key).toOption map {
@@ -36,7 +36,7 @@ trait Parser[T] {
     }
 
     /** Retrieves an array and concatenates its string values in multiple lines, or retrieves a string. */
-    def multiLine(key: String): List[String] = multiLineOpt(key) getOrElse sys.error(s"Undefined $key or wrong type: $jValue")
+    def multiLine(key: String): List[String] = multiLineOpt(key) getOrElse sys.error(s"""Undefined "$key" or wrong type: $jValue""")
   }
 
   /** Parse an instance of `T` from `input`. */
@@ -109,7 +109,7 @@ object Schema extends Parser[Schema] {
  *                (, "namespace": string constant)?
  *                (, "doc": string constant)?
  *                (, "fields": [ Field* ])?
- *                (, "methods": [ AbstractMethod* ])?
+ *                (, "messages": [ Message* ])?
  *                (, "types": [ Definition* ])? }
  */
 case class Interface(name: String,
@@ -118,7 +118,7 @@ case class Interface(name: String,
   since: VersionNumber,
   doc: List[String],
   fields: List[Field],
-  abstractMethods: List[AbstractMethod],
+  messages: List[Message],
   children: List[Definition]) extends ClassLike
 
 object Interface extends Parser[Interface] {
@@ -129,7 +129,7 @@ object Interface extends Parser[Interface] {
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json multiLineOpt "doc" getOrElse Nil,
       json ->* "fields" map Field.parse,
-      json ->* "methods" map AbstractMethod.parse,
+      json ->* "messages" map Message.parse,
       json ->* "types" map Definition.parse)
 }
 
@@ -230,38 +230,38 @@ object Field extends Parser[Field] {
 /**
  * An abstract method defined in an interface.
  * Syntax:
- *   AbstractMethod := {   "name": ID,
- *                         "type": ID
- *                      (, "args": [ Arg* ])?
- *                      (, "doc": string constant)? }
+ *   Message := {   "name": ID,
+ *                  "response": ID
+ *               (, "request": [ Request* ])?
+ *               (, "doc": string constant)? }
  */
-case class AbstractMethod(name: String,
+case class Message(name: String,
   doc: List[String],
-  retTpe: TpeRef,
-  args: List[Arg]) extends SchemaElement
+  responseTpe: TpeRef,
+  request: List[Request]) extends SchemaElement
 
-object AbstractMethod extends Parser[AbstractMethod] {
-  override def parse(json: JValue): AbstractMethod =
-    AbstractMethod(json -> "name",
+object Message extends Parser[Message] {
+  override def parse(json: JValue): Message =
+    Message(json -> "name",
       json multiLineOpt "doc" getOrElse Nil,
-      TpeRef(json -> "type"),
-      json ->* "args" map Arg.parse)
+      TpeRef(json -> "response"),
+      json ->* "request" map Request.parse)
 }
 
 /**
  * An argument of a method.
  * Syntax:
- *   Arg := {   "name": ID,
- *              "type": ID
- *            (, "doc": string constant)? }
+ *   Request := {   "name": ID,
+ *                  "type": ID
+ *               (, "doc": string constant)? }
  */
-case class Arg(name: String,
+case class Request(name: String,
   doc: List[String],
   tpe: TpeRef) extends SchemaElement
 
-object Arg extends Parser[Arg] {
-  override def parse(json: JValue): Arg =
-    Arg(json -> "name",
+object Request extends Parser[Request] {
+  override def parse(json: JValue): Request =
+    Request(json -> "name",
       json multiLineOpt "doc" getOrElse Nil,
       TpeRef(json -> "type"))
 }

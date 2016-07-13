@@ -6,9 +6,9 @@
 
 ### enhancements
 
-- An interface now supports `methods` list. [#14][14] by [@Duhemm][@Duhemm]
 - Optional type support. See below.
 - JSON codec generation. See below.
+- An interface now supports `messages` list, which generates abstract methods. [#14][14] by [@Duhemm][@Duhemm]
 
 ### optional
 
@@ -26,6 +26,8 @@ sbt-datatype 0.2.1 adds support for optional types. Adding `?` at the end of a t
       }]
     }
 
+[#22][22] by [@eed3si9n][@eed3si9n]
+
 ### JsonCodecPlugin
 
 sbt-datatype 0.2.1 adds a new auto plugin `JsonCodecPlugin`, which generates JSON codec traits for [sjson-new][1].
@@ -39,8 +41,12 @@ Using the codecs, you can define a JSON protocol stack and convert the generated
 
 This will generate `JsonFormat` traits under `com.example.codec` package.
 
+[#15][15] etc by [@Duhemm][@Duhemm]/[@eed3si9n][@eed3si9n]
+
   [14]: https://github.com/sbt/sbt-datatype/pull/14
+  [15]: https://github.com/sbt/sbt-datatype/pull/15
   [19]: https://github.com/sbt/sbt-datatype/pull/19
+  [22]: https://github.com/sbt/sbt-datatype/pull/22
   [@eed3si9n]: https://github.com/eed3si9n
   [@jsuereth]: https://github.com/jsuereth
   [@dwijnand]: http://github.com/dwijnand

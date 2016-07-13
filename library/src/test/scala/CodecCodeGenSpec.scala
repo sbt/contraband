@@ -139,7 +139,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent))
   }
 
-  def interfaceGenerateAbstractMethods = {
+  def interfaceGenerateMessages = {
     val schema = Schema parse generateArgDocExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema

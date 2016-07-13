@@ -181,7 +181,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     )
   }
 
-  override def interfaceGenerateAbstractMethods = {
+  override def interfaceGenerateMessages = {
     val schema = Schema parse generateArgDocExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
@@ -199,13 +199,13 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return this.field;
             |    }
             |    /**
-            |     * A very simple example of abstract method.
-            |     * Abstract methods can only appear in interface definitions.
-            |     * @param arg0 The first argument of the method.
+            |     * A very simple example of a message.
+            |     * Messages can only appear in interface definitions.
+            |     * @param arg0 The first argument of the message.
             |                   Make sure it is awesome.
             |     * @param arg1 This argument is not important, so it gets single line doc.
             |     */
-            |    public abstract int[] methodExample(com.example.MyLazy<int[]> arg0,boolean arg1);
+            |    public abstract int[] messageExample(com.example.MyLazy<int[]> arg0,boolean arg1);
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;

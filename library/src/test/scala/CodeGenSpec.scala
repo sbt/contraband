@@ -23,7 +23,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
       generate a simple interface                $interfaceGenerateSimple
       generate a simple interface with one child $interfaceGenerateOneChild
       generate nested interfaces                 $interfaceGenerateNested
-      generate abstract methods                  $interfaceGenerateAbstractMethods
+      generate messages                          $interfaceGenerateMessages
 
     generate(Record) should
       generate a simple record                   $recordGenerateSimple
@@ -41,7 +41,7 @@ abstract class GCodeGenSpec(language: String) extends Specification {
   def interfaceGenerateSimple: MatchResult[_]
   def interfaceGenerateOneChild: MatchResult[_]
   def interfaceGenerateNested: MatchResult[_]
-  def interfaceGenerateAbstractMethods: MatchResult[_]
+  def interfaceGenerateMessages: MatchResult[_]
   def recordGenerateSimple: MatchResult[_]
   def schemaGenerateComplete: MatchResult[_]
   def schemaGenerateCompletePlusIndent: MatchResult[_]

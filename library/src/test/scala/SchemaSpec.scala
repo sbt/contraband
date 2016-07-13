@@ -32,6 +32,9 @@ class SchemaSpec extends Specification {
     Enumeration.parse should
       parse simple enumeration                   $enumerationParseSimple
 
+    Message.parse should
+      parse                                      $messageParse
+
     Field.parse should
       parse                                      $fieldParse
       parse multiline doc comments               $multiLineDoc
@@ -188,13 +191,13 @@ class SchemaSpec extends Specification {
 
   }
 
-  def abstractMethodParse = {
-    AbstractMethod parse abstractMethodExample match {
-      case AbstractMethod(name, doc, retTpe, args) =>
-        (name must_== "abstractMethodExample") and
-        (doc must_== List("Example of abstract method")) and
-        (retTpe must_== TpeRef("type", false, false, false)) and
-        (args must_== List(Arg("arg0", Nil, TpeRef("type2", false, false, false))))
+  def messageParse = {
+    Message parse messageExample match {
+      case Message(name, doc, retTpe, request) =>
+        (name must_== "messageExample") and
+        (doc must_== List("Example of a message")) and
+        (retTpe must_== TpeRef("int", false, false, false)) and
+        (request must_== List(Request("arg0", Nil, TpeRef("type2", false, false, false))))
     }
   }
 

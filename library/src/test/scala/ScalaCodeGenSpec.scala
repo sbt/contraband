@@ -131,7 +131,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent)
   }
 
-  override def interfaceGenerateAbstractMethods = {
+  override def interfaceGenerateMessages = {
     val schema = Schema parse generateArgDocExample
     val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
 
@@ -140,13 +140,13 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  /** I'm a field. */
         |  val field: Int) extends Serializable {
         |  /**
-        |   * A very simple example of abstract method.
-        |   * Abstract methods can only appear in interface definitions.
-        |   * @param arg0 The first argument of the method.
+        |   * A very simple example of a message.
+        |   * Messages can only appear in interface definitions.
+        |   * @param arg0 The first argument of the message.
         |                 Make sure it is awesome.
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
-        |  def methodExample(arg0: => Vector[Int], arg1: Boolean): Vector[Int]
+        |  def messageExample(arg0: => Vector[Int], arg1: Boolean): Vector[Int]
         |  override def equals(o: Any): Boolean = o match {
         |    case x: generateArgDocExample => (this.field == x.field)
         |    case _ => false

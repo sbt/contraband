@@ -143,11 +143,11 @@ object NewSchema {
   "default": "2 + 2"
 }"""
 
-  val abstractMethodExample = """{
-  "name": "abstractMethodExample",
-  "doc": "Example of abstract method",
-  "type": "type",
-  "args": [
+  val messageExample = """{
+  "name": "messageExample",
+  "doc": "Example of a message",
+  "response": "int",
+  "request": [
     {
       "name": "arg0",
       "type": "type2"
@@ -232,20 +232,20 @@ object NewSchema {
           "doc": "I'm a field."
         }
       ],
-      "methods": [
+      "messages": [
         {
-          "name": "methodExample",
+          "name": "messageExample",
           "doc": [
-            "A very simple example of abstract method.",
-            "Abstract methods can only appear in interface definitions."
+            "A very simple example of a message.",
+            "Messages can only appear in interface definitions."
           ],
-          "type": "int*",
-          "args": [
+          "response": "int*",
+          "request": [
             {
               "name": "arg0",
               "type": "lazy int*",
               "doc": [
-                "The first argument of the method.",
+                "The first argument of the message.",
                 "Make sure it is awesome."
               ]
             },
