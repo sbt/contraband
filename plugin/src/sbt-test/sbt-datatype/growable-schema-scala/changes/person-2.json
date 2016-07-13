@@ -28,8 +28,8 @@
 			"name": "Gender",
 			"namespace": "com.example",
 			"target": "Scala",
-			"type": "enumeration",
-			"types": [
+			"type": "enum",
+			"symbols": [
 				"Unknown",
 				"Male",
 				"Female"

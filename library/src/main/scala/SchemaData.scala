@@ -75,9 +75,9 @@ sealed trait ClassLike extends Definition {
 object Definition extends Parser[Definition] {
   override def parse(json: JValue): Definition = {
     json -> "type" match {
-      case "interface"   => Interface.parse(json)
-      case "record"      => Record.parse(json)
-      case "enumeration" => Enumeration.parse(json)
+      case "interface"            => Interface.parse(json)
+      case "record"               => Record.parse(json)
+      case "enum" | "enumeration" => Enumeration.parse(json)
       case other         => sys.error(s"Invalid type: $other")
     }
   }
@@ -166,7 +166,7 @@ object Record extends Parser[Record] {
  *                      "target": ("Scala" | "Java" | "Mixed")
  *                   (, "namespace": string constant)?
  *                   (, "doc": string constant)?
- *                   (, "types": [ EnumerationValue* ])? }
+ *                   (, "symbols": [ EnumerationValue* ])? }
  */
 case class Enumeration(name: String,
   targetLang: String,
@@ -182,7 +182,7 @@ object Enumeration extends Parser[Enumeration] {
       json ->? "namespace",
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json multiLineOpt "doc" getOrElse Nil,
-      json ->* "types" map EnumerationValue.parse)
+      json ->* "symbols" map EnumerationValue.parse)
 }
 
 /**
