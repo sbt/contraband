@@ -124,12 +124,12 @@ object NewSchema {
   val simpleEnumerationExample = """{
   "name": "simpleEnumerationExample",
   "target": "Scala",
-  "type": "enumeration",
+  "type": "enum",
   "doc": "Example of simple enumeration",
-  "types": [
+  "symbols": [
     {
       "name": "first",
-      "doc": "First type"
+      "doc": "First symbol"
     },
     "second"
   ]
@@ -349,7 +349,7 @@ object NewSchema {
       "type": "enumeration",
       "doc": "Priority levels",
 
-      "types": [
+      "symbols": [
         "Low",
         {
           "name": "Medium",

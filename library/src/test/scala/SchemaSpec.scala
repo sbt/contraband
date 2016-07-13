@@ -171,7 +171,7 @@ class SchemaSpec extends Specification {
         (namespace must_== None) and
         (doc must_== List("Example of simple enumeration")) and
         (values must haveSize(2)) and
-        (values(0) must_== EnumerationValue("first", List("First type"))) and
+        (values(0) must_== EnumerationValue("first", List("First symbol"))) and
         (values(1) must_== EnumerationValue("second", Nil))
     }
   }

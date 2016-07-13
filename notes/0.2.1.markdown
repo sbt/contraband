@@ -1,12 +1,18 @@
 
-### interface
+### breaking changes
 
-In sbt-datatype 0.2.1 the `protocol` type, which generates abstract class, is renamed to `interface`.
-It supports `methods` list as well as `fields`. [#14][14] by [@Duhemm][@Duhemm]/[#19][19] by [@eed3si9n][@eed3si9n]
+- The `protocol` type, which used to generate abstract classes, is renamed to `interface` [#19][19] by [@eed3si9n][@eed3si9n]
+- The `enumeration` type is renamed to `enum`, and the list of values are now called `symbols` (instead of `types`).
+
+### enhancements
+
+- An interface now supports `methods` list. [#14][14] by [@Duhemm][@Duhemm]
+- Optional type support. See below.
+- JSON codec generation. See below.
 
 ### optional
 
-Type can now be optional by adding `?` at the end:
+sbt-datatype 0.2.1 adds support for optional types. Adding `?` at the end of a type name:
 
     {
       "types": [{
@@ -24,6 +30,14 @@ Type can now be optional by adding `?` at the end:
 
 sbt-datatype 0.2.1 adds a new auto plugin `JsonCodecPlugin`, which generates JSON codec traits for [sjson-new][1].
 Using the codecs, you can define a JSON protocol stack and convert the generated datatypes into JSON.
+
+    {
+      "codecNamespace": "com.example.codec",
+      "fullCodec": "CustomProtocol",
+      "types": [....]
+    }
+
+This will generate `JsonFormat` traits under `com.example.codec` package.
 
   [14]: https://github.com/sbt/sbt-datatype/pull/14
   [19]: https://github.com/sbt/sbt-datatype/pull/19

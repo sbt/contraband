@@ -20,7 +20,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** Example of simple enumeration */
         |sealed abstract class simpleEnumerationExample extends Serializable
         |object simpleEnumerationExample {
-        |  /** First type */
+        |  /** First symbol */
         |  case object first extends simpleEnumerationExample
         |
         |  case object second extends simpleEnumerationExample
