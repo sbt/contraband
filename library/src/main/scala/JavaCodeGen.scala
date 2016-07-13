@@ -21,7 +21,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(s.definitions.toList flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Interface(name, _, namespace, _, doc, fields, abstractMethods, children) = i
+    val Interface(name, _, namespace, _, doc, fields, messages, children) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -31,7 +31,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genFields(fields)}
          |    ${genConstructors(i, parent, superFields)}
          |    ${genAccessors(fields)}
-         |    ${genAbstractMethods(abstractMethods)}
+         |    ${genMessages(messages)}
          |    ${genEquals(i, superFields)}
          |    ${genHashCode(i, superFields)}
          |    ${genToString(i, superFields)}
@@ -139,18 +139,18 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
        |}""".stripMargin
   }
 
-  private def genAbstractMethods(abstractMethods: List[AbstractMethod]) = abstractMethods map genAbstractMethod mkString EOL
-  private def genAbstractMethod(abstractMethod: AbstractMethod) = {
-    val args = abstractMethod.args map { case Arg(name, _, tpe) => s"${genRealTpe(tpe)} $name" }
-    val argsDoc = abstractMethod.args flatMap {
-      case Arg(name, Nil, _)        => Nil
-      case Arg(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
-      case Arg(name, doc, _)        =>
+  private def genMessages(messages: List[Message]) = messages map genMessage mkString EOL
+  private def genMessage(message: Message) = {
+    val requests = message.request map { case Request(name, _, tpe) => s"${genRealTpe(tpe)} $name" }
+    val requestsDoc = message.request flatMap {
+      case Request(name, Nil, _)        => Nil
+      case Request(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
+      case Request(name, doc, _)        =>
         val prefix = s"@param $name "
         doc.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
     }
-    s"""${genDoc(abstractMethod.doc ++ argsDoc)}
-       |public abstract ${genRealTpe(abstractMethod.retTpe)} ${abstractMethod.name}(${args mkString ","});"""
+    s"""${genDoc(message.doc ++ requestsDoc)}
+       |public abstract ${genRealTpe(message.responseTpe)} ${message.name}(${requests mkString ","});"""
   }
 
   private def genConstructors(cl: ClassLike, parent: Option[Interface], superFields: List[Field]) =
