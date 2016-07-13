@@ -4,7 +4,7 @@
 - The `protocol` type, which used to generate abstract classes, is renamed to `interface` [#19][19] by [@eed3si9n][@eed3si9n]
 - The `enumeration` type is renamed to `enum`, and the list of values are now called `symbols` (instead of `types`).
 
-### enhacements
+### enhancements
 
 - An interface now supports `methods` list. [#14][14] by [@Duhemm][@Duhemm]
 - Optional type support. See below.

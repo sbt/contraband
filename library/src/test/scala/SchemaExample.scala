@@ -129,7 +129,7 @@ object NewSchema {
   "symbols": [
     {
       "name": "first",
-      "doc": "First type"
+      "doc": "First symbol"
     },
     "second"
   ]
