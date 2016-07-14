@@ -11,7 +11,7 @@ lazy val commonSettings = Seq(
   )
 
 lazy val pluginSettings = commonSettings ++ Seq(
-  version := "0.2.0-SNAPSHOT",
+  version := "0.2.1",
   sbtPlugin := true
 )
 
