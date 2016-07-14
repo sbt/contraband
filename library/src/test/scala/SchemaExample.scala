@@ -702,7 +702,7 @@ object NewSchema {
   val completeExampleCodeCodec =
     """package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.GreetingWithAttachmentsFormats with java.io.FileFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
+      |trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.GreetingWithAttachmentsFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
       |implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat2[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingWithAttachments]
       |}
       |package generated
@@ -731,7 +731,7 @@ object NewSchema {
       |}
       |package generated
       |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-      |trait GreetingWithAttachmentsFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats with java.io.FileFormats =>
+      |trait GreetingWithAttachmentsFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
       |implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
       |  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
       |    jsOpt match {
@@ -808,7 +808,7 @@ object NewSchema {
       |}
       |}
       |package generated
-      |trait CustomProtcol extends generated.GreetingsFormats with generated.GreetingHeaderFormats with generated.PriorityLevelFormats with java.util.DateFormats with generated.GreetingWithAttachmentsFormats with java.io.FileFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
+      |trait CustomProtcol extends generated.GreetingsFormats with generated.GreetingHeaderFormats with generated.PriorityLevelFormats with java.util.DateFormats with generated.GreetingWithAttachmentsFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
       |object CustomProtcol extends CustomProtcol""".stripMargin
 
 
