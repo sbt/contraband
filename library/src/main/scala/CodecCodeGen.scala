@@ -358,7 +358,8 @@ object CodecCodeGen {
     val basicJsonProtcol = "sjsonnew.BasicJsonProtocol"
     removeTypeParameters(tpe).name match {
       case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => basicJsonProtcol :: Nil
-      case "java.util.UUID" | "java.net.URI" | "java.net.URL" => basicJsonProtcol :: Nil
+      case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger"
+        | "java.math.BigDecimal" | "java.io.File" => basicJsonProtcol :: Nil
       case _ => forOthers(tpe) ++ (basicJsonProtcol :: Nil)
     }
   }
