@@ -39,7 +39,7 @@ Using the codecs, you can define a JSON protocol stack and convert the generated
       "types": [....]
     }
 
-This will generate `JsonFormat` traits under `com.example.codec` package.
+This will generate `JsonFormat` traits under `com.example.codec` package. See [JSON codec generation](http://www.scala-sbt.org/0.13/docs/Datatype.html#JSON+codec+generation) for more details.
 
 [#15][15] etc by [@Duhemm][@Duhemm]/[@eed3si9n][@eed3si9n]
 
