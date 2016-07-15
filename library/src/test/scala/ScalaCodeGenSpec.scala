@@ -322,6 +322,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
+    // println(code.toString)
     code.head._2.unindent must containTheSameElementsAs(completeExampleCodeScala.unindent)
   }
 

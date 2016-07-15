@@ -23,7 +23,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   override def generate(s: Schema): ListMap[File, String] =
     s.definitions.toList map (generate (s, _, None, Nil)) reduce (_ merge _) mapV (_.indented)
 
-  override def generate(s: Schema, e: Enumeration): ListMap[File, String] = {
+  override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val values =
       e.values map { case (EnumerationValue(name, doc)) =>
         s"""${genDoc(doc)}
@@ -41,7 +41,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     ListMap(genFile(e) -> code)
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = superFields ++ r.fields
 
     val alternativeCtors =
@@ -97,7 +97,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     ListMap(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = superFields ++ i.fields
     val alternativeCtors =
       genAlternativeConstructors(i.since, allFields) mkString EOL
