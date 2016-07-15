@@ -56,19 +56,19 @@ abstract class CodeGenerator {
   /** Generate the code corresponding to `d`. */
   protected final def generate(s: Schema, d: Definition, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] =
     d match {
-      case i: Interface   => generate(s, i, parent, superFields)
-      case r: Record      => generate(s, r, parent, superFields)
-      case e: Enumeration => generate(s, e)
+      case i: Interface   => generateInterface(s, i, parent, superFields)
+      case r: Record      => generateRecord(s, r, parent, superFields)
+      case e: Enumeration => generateEnum(s, e)
     }
 
   /** Generate the code corresponding to the interface `i`. */
-  protected def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
+  protected def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
 
   /** Generate the code corresponding to the record `r`. */
-  protected def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
+  protected def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String]
 
   /** Generate the code corresponding to the enumeration `e`. */
-  protected def generate(s: Schema, e: Enumeration): ListMap[File, String]
+  protected def generateEnum(s: Schema, e: Enumeration): ListMap[File, String]
 
 }
 

@@ -294,6 +294,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val schema = Schema parse completeExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
+    // println(code.values.mkString)
     code.values.mkString.unindent must containTheSameElementsAs(completeExampleCodeCodec.unindent)
   }
 

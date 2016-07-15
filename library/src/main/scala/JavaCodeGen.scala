@@ -20,7 +20,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   override def generate(s: Schema): ListMap[File, String] =
     ListMap(s.definitions.toList flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
-  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val Interface(name, _, namespace, _, doc, fields, messages, children) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -40,7 +40,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), superFields ++ fields)))
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val Record(name, _, namespace, _, doc, fields) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
@@ -60,7 +60,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(genFile(r) -> code)
   }
 
-  override def generate(s: Schema, e: Enumeration): ListMap[File, String] = {
+  override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val Enumeration(name, _, namespace, _, doc, values) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>

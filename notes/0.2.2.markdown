@@ -1,0 +1,7 @@
+
+### bug fixes
+
+- Fixes parameter ordering in the generated code. [#28][28] by [@eed3si9n][@eed3si9n]
+
+  [28]: https://github.com/sbt/sbt-datatype/pull/28
+  [@eed3si9n]: https://github.com/eed3si9n

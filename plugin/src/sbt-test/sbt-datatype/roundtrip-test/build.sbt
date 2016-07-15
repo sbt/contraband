@@ -11,6 +11,6 @@ lazy val root = (project in file(".")).
         case                                                    _ => ((datatypeFormatsForType in generateDatatypes in Compile).value)(tpe)
       }
     },
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.0"
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.1"
     // scalacOptions += "-Xlog-implicits"
   )

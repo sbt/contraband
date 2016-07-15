@@ -11,7 +11,8 @@ lazy val commonSettings = Seq(
   )
 
 lazy val pluginSettings = commonSettings ++ Seq(
-  version := "0.2.1",
+  bintrayPackage := "sbt-datatype",
+  version := "0.2.2-SNAPSHOT",
   sbtPlugin := true
 )
 

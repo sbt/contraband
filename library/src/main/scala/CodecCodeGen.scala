@@ -29,7 +29,7 @@ class CodecCodeGen(codecParents: List[String],
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
-  override def generate(s: Schema, e: Enumeration): ListMap[File, String] = {
+  override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val fqn = fullyQualifiedName(e)
     val readerValues = e.values map { case EnumerationValue(v, _) => s"""case "$v" => $fqn.$v""" }
     val writerValues = e.values map { case EnumerationValue(v, _) => s"""case $fqn.$v => "$v"""" }
@@ -63,7 +63,7 @@ class CodecCodeGen(codecParents: List[String],
     ListMap(genFile(s, e) -> code)
   }
 
-  override def generate(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     def accessField(f: Field) = {
       if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else f.name
@@ -103,7 +103,7 @@ class CodecCodeGen(codecParents: List[String],
     ListMap(genFile(s, r) -> code)
   }
 
-  override def generate(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val name = i.name
     val fqn = fullyQualifiedName(i)
     val code =

@@ -437,6 +437,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
+    // println(code.toString)
     code mapValues (_.unindent) must containTheSameElementsAs(completeExampleCodeJava mapValues (_.unindent) toList)
   }
 
