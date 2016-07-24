@@ -1,0 +1,4 @@
+
+### bug fixes
+
+- Fixes code generation for `interface`'s `toString`.

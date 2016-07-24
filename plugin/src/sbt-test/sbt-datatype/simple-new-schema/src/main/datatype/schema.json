@@ -1,20 +1,26 @@
 {
-	"types": [
-		{
-			"type": "record",
-			"namespace": "com.example",
-			"target": "Scala",
-			"name": "Person",
-			"fields": [
-				{
-					"name": "name",
-					"type": "String"
-				},
-				{
-					"name": "age",
-					"type": "int"
-				}
-			]
-		}
-	]
+  "types": [
+    {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "Person",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ]
+    },
+    {
+      "type": "interface",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "emptyInterfaceExample"
+    }
+  ]
 }

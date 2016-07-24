@@ -207,6 +207,10 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       s"""override def toString: String = {
          |  super.toString // Avoid evaluating lazy members in toString to avoid circularity.
          |}""".stripMargin
+    } else if (allFields.isEmpty) {
+      s"""override def toString: String = {
+         |  "${cl.name}()"
+         |}""".stripMargin
     } else {
       val fieldsToString =
         allFields.map(_.name).mkString(" + ", """ + ", " + """, " + ")
