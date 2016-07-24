@@ -114,7 +114,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    17
         |  }
         |  override def toString: String = {
-        |    "nestedProtocolExample(" +  + ")"
+        |    "nestedProtocolExample()"
         |  }
         |}
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
@@ -126,7 +126,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    17
         |  }
         |  override def toString: String = {
-        |    "nestedProtocol(" +  + ")"
+        |    "nestedProtocol()"
         |  }
         |}""".stripMargin.unindent)
   }
