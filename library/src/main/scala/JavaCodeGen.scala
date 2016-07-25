@@ -21,13 +21,14 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(s.definitions.toList flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Interface(name, _, namespace, _, doc, fields, messages, children) = i
+    val Interface(name, _, namespace, _, doc, fields, messages, children, extra) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
       s"""${genPackage(i)}
          |${genDoc(doc)}
          |public abstract class $name $extendsCode {
+         |    ${extra mkString EOL}
          |    ${genFields(fields)}
          |    ${genConstructors(i, parent, superFields)}
          |    ${genAccessors(fields)}
@@ -41,13 +42,14 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Record(name, _, namespace, _, doc, fields) = r
+    val Record(name, _, namespace, _, doc, fields, extra) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
       s"""${genPackage(r)}
          |${genDoc(doc)}
          |public final class $name $extendsCode {
+         |    ${extra mkString EOL}
          |    ${genFields(fields)}
          |    ${genConstructors(r, parent, superFields)}
          |    ${genAccessors(fields)}
@@ -61,7 +63,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
-    val Enumeration(name, _, namespace, _, doc, values) = e
+    val Enumeration(name, _, namespace, _, doc, values, extra) = e
 
     val valuesCode = values map { case EnumerationValue(name, doc) =>
       s"""${genDoc(doc)}
@@ -72,6 +74,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
       s"""${genPackage(e)}
          |${genDoc(doc)}
          |public enum $name {
+         |    ${extra mkString EOL}
          |    $valuesCode
          |}""".stripMargin
 

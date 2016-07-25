@@ -35,6 +35,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |${genDoc(e.doc)}
          |sealed abstract class ${e.name} extends Serializable
          |object ${e.name} {
+         |  ${e.extra mkString EOL}
          |  $values
          |}""".stripMargin
 
@@ -81,6 +82,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       s"""${genPackage(r)}
          |${genDoc(r.doc)}
          |final class ${r.name}($ctorParameters) $extendsCode {
+         |  ${r.extra mkString EOL}
          |  $alternativeCtors
          |  $lazyMembers
          |  ${genEquals(r, superFields)}
@@ -124,6 +126,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       s"""${genPackage(i)}
          |${genDoc(i.doc)}
          |$classDef ${i.name}($ctorParameters) $extendsCode {
+         |  ${i.extra mkString EOL}
          |  $alternativeCtors
          |  $lazyMembers
          |  $messages
