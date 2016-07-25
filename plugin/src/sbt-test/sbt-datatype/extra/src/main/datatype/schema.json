@@ -15,7 +15,7 @@
           "type": "int"
         }
       ],
-      "append": [
+      "extra": [
         "def toUpperCase: Person =",
         "  Person(name.toUpperCase, age)"
       ]

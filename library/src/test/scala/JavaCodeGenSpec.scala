@@ -17,7 +17,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    /** First symbol */
         |    first,
         |    second
-        |    // I'm appended at the end.
+        |    // Some extra code...
         |}""".stripMargin.unindent)
   }
 
@@ -52,7 +52,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return "simpleInterfaceExample("  + "field: " + field() + ")";
         |    }
-        |    // I'm appended at the end.
+        |    // Some extra code...
         |}""".stripMargin.unindent)
   }
 
@@ -266,7 +266,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public String toString() {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
             |    }
-            |    // I'm appended at the end.
+            |    // Some extra code...
             |}""".stripMargin.unindent
       ).toList
     )

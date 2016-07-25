@@ -36,7 +36,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |sealed abstract class ${e.name} extends Serializable
          |object ${e.name} {
          |  $values
-         |  ${e.append mkString EOL}
+         |  ${e.extra mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(e) -> code)
@@ -89,7 +89,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genToString(r, superFields)}
          |  ${genCopy(r, superFields)}
          |  ${genWith(r, superFields)}
-         |  ${r.append mkString EOL}
+         |  ${r.extra mkString EOL}
          |}
          |
          |object ${r.name} {
@@ -132,7 +132,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genEquals(i, superFields)}
          |  ${genHashCode(i, superFields)}
          |  ${genToString(i, superFields)}
-         |  ${i.append mkString EOL}
+         |  ${i.extra mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields))) reduce (_ merge _)

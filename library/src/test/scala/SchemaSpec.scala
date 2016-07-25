@@ -65,7 +65,7 @@ class SchemaSpec extends Specification {
 
   def definitionParseInterface = {
     Definition parse emptyInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, append) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra) =>
         (name must_== "emptyInterfaceExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
@@ -73,7 +73,7 @@ class SchemaSpec extends Specification {
         (fields must haveSize(0)) and
         (abstractMethods must haveSize(0)) and
         (children must haveSize(0)) and
-        (append must_== List())
+        (extra must_== List())
 
       case _ =>
         true must_== false
@@ -82,13 +82,13 @@ class SchemaSpec extends Specification {
 
   def definitionParseRecord = {
     Definition parse emptyRecordExample match {
-      case Record(name, target, namespace, _, doc, fields, append) =>
+      case Record(name, target, namespace, _, doc, fields, extra) =>
         (name must_== "emptyRecordExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List()) and
         (fields must haveSize(0)) and
-        (append must_== List())
+        (extra must_== List())
 
       case _ =>
         true must_== false
@@ -97,13 +97,13 @@ class SchemaSpec extends Specification {
 
   def definitionParseEnumeration = {
     Definition parse emptyEnumerationExample match {
-      case Enumeration(name, target, namespace, _, doc, values, append) =>
+      case Enumeration(name, target, namespace, _, doc, values, extra) =>
         (name must_== "emptyEnumerationExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List()) and
         (values must haveSize(0))
-        (append must_== List())
+        (extra must_== List())
 
       case _ =>
         true must_== false
@@ -115,7 +115,7 @@ class SchemaSpec extends Specification {
 
   def interfaceParseSimple = {
     Interface parse simpleInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, append) =>
+      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra) =>
         (name must_== "simpleInterfaceExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
@@ -124,13 +124,13 @@ class SchemaSpec extends Specification {
         (fields(0) must_== Field("field", Nil, TpeRef("type", false, false, false), Field.emptyVersion, None)) and
         (abstractMethods must haveSize(0)) and
         (children must haveSize(0)) and
-        (append must_== List("// I'm appended at the end."))
+        (extra must_== List("// Some extra code..."))
     }
   }
 
   def interfaceParseOneChild = {
     Interface parse oneChildInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, append) =>
+      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra) =>
         (name must_== "oneChildInterfaceExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
@@ -141,13 +141,13 @@ class SchemaSpec extends Specification {
         (children must haveSize(1)) and
         (children(0) must_== Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
           Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil)) and
-        (append must_== List())
+        (extra must_== List())
     }
   }
 
   def interfaceParseNested = {
     Interface parse nestedInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, append) =>
+      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra) =>
         (name must_== "nestedProtocolExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
@@ -156,26 +156,26 @@ class SchemaSpec extends Specification {
         (abstractMethods must haveSize(0)) and
         (children must haveSize(1)) and
         (children(0) must_== Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil)) and
-        (append must_== List())
+        (extra must_== List())
     }
   }
 
   def recordParseSimple = {
     Record parse simpleRecordExample match {
-      case Record(name, target, namespace, since, doc, fields, append) =>
+      case Record(name, target, namespace, since, doc, fields, extra) =>
         (name must_== "simpleRecordExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
         (doc must_== List("Example of simple record")) and
         (fields must haveSize(1)) and
         (fields(0) must_== Field("field", Nil, TpeRef("java.net.URL", false, false, false), Field.emptyVersion, None)) and
-        (append must_== List("// I'm appended at the end."))
+        (extra must_== List("// Some extra code..."))
     }
   }
 
   def enumerationParseSimple = {
     Enumeration parse simpleEnumerationExample match {
-      case Enumeration(name, target, namespace, since, doc, values, append) =>
+      case Enumeration(name, target, namespace, since, doc, values, extra) =>
         (name must_== "simpleEnumerationExample") and
         (target must_== "Scala") and
         (namespace must_== None) and
@@ -183,7 +183,7 @@ class SchemaSpec extends Specification {
         (values must haveSize(2)) and
         (values(0) must_== EnumerationValue("first", List("First symbol"))) and
         (values(1) must_== EnumerationValue("second", Nil)) and
-        (append must_== List("// I'm appended at the end."))
+        (extra must_== List("// Some extra code..."))
     }
   }
 

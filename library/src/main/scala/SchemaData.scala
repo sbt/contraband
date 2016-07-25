@@ -66,7 +66,7 @@ sealed trait Definition extends SchemaElement {
   def namespace: Option[String]
   def targetLang: String
   def since: VersionNumber
-  def append: List[String]
+  def extra: List[String]
 }
 
 sealed trait ClassLike extends Definition {
@@ -112,7 +112,7 @@ object Schema extends Parser[Schema] {
  *                (, "fields": [ Field* ])?
  *                (, "messages": [ Message* ])?
  *                (, "types": [ Definition* ])?
- *                (, "append": string constant)? }
+ *                (, "extra": string constant)? }
  */
 case class Interface(name: String,
   targetLang: String,
@@ -122,7 +122,7 @@ case class Interface(name: String,
   fields: List[Field],
   messages: List[Message],
   children: List[Definition],
-  append: List[String]) extends ClassLike
+  extra: List[String]) extends ClassLike
 
 object Interface extends Parser[Interface] {
   override def parse(json: JValue): Interface =
@@ -134,7 +134,7 @@ object Interface extends Parser[Interface] {
       json ->* "fields" map Field.parse,
       json ->* "messages" map Message.parse,
       json ->* "types" map Definition.parse,
-      json multiLineOpt "append" getOrElse Nil)
+      json multiLineOpt "extra" getOrElse Nil)
 }
 
 /**
@@ -145,7 +145,7 @@ object Interface extends Parser[Interface] {
  *              (, "namespace": string constant)?
  *              (, "doc": string constant)?
  *              (, "fields": [ Field* ])?
- *              (, "append": string constant)? }
+ *              (, "extra": string constant)? }
  */
 case class Record(name: String,
   targetLang: String,
@@ -153,7 +153,7 @@ case class Record(name: String,
   since: VersionNumber,
   doc: List[String],
   fields: List[Field],
-  append: List[String]) extends ClassLike
+  extra: List[String]) extends ClassLike
 
 object Record extends Parser[Record] {
   override def parse(json: JValue): Record =
@@ -163,7 +163,7 @@ object Record extends Parser[Record] {
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json multiLineOpt "doc" getOrElse Nil,
       json ->* "fields" map Field.parse,
-      json multiLineOpt "append" getOrElse Nil)
+      json multiLineOpt "extra" getOrElse Nil)
 }
 
 /**
@@ -174,7 +174,7 @@ object Record extends Parser[Record] {
  *                   (, "namespace": string constant)?
  *                   (, "doc": string constant)?
  *                   (, "symbols": [ EnumerationValue* ])?
- *                   (, "append": string constant)? }
+ *                   (, "extra": string constant)? }
  */
 case class Enumeration(name: String,
   targetLang: String,
@@ -182,7 +182,7 @@ case class Enumeration(name: String,
   since: VersionNumber,
   doc: List[String],
   values: List[EnumerationValue],
-  append: List[String]) extends Definition
+  extra: List[String]) extends Definition
 
 object Enumeration extends Parser[Enumeration] {
   override def parse(json: JValue): Enumeration =
@@ -192,7 +192,7 @@ object Enumeration extends Parser[Enumeration] {
       json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
       json multiLineOpt "doc" getOrElse Nil,
       json ->* "symbols" map EnumerationValue.parse,
-      json multiLineOpt "append" getOrElse Nil)
+      json multiLineOpt "extra" getOrElse Nil)
 }
 
 /**

@@ -66,7 +66,7 @@ object NewSchema {
       "type": "type"
     }
   ],
-  "append": "// I'm appended at the end."
+  "extra": "// Some extra code..."
 }"""
 
   val oneChildInterfaceExample = """{
@@ -120,7 +120,7 @@ object NewSchema {
       "type": "java.net.URL"
     }
   ],
-  "append": "// I'm appended at the end."
+  "extra": "// Some extra code..."
 }"""
 
   val simpleEnumerationExample = """{
@@ -135,7 +135,7 @@ object NewSchema {
     },
     "second"
   ],
-  "append": "// I'm appended at the end."
+  "extra": "// Some extra code..."
 }"""
 
   val fieldExample = """{
