@@ -20,11 +20,11 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** Example of simple enumeration */
         |sealed abstract class simpleEnumerationExample extends Serializable
         |object simpleEnumerationExample {
+        |  // Some extra code...
         |  /** First symbol */
         |  case object first extends simpleEnumerationExample
         |
         |  case object second extends simpleEnumerationExample
-        |  // Some extra code...
         |}""".stripMargin.unindent)
   }
 
@@ -37,6 +37,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** example of simple interface */
         |sealed abstract class simpleInterfaceExample(
         |  val field: type) extends Serializable {
+        |  // Some extra code...
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleInterfaceExample => (this.field == x.field)
         |    case _ => false
@@ -47,7 +48,6 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleInterfaceExample(" + field + ")"
         |  }
-        |  // Some extra code...
         |}""".stripMargin.unindent)
   }
 
@@ -172,6 +172,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** Example of simple record */
         |final class simpleRecordExample(
         |val field: java.net.URL) extends Serializable {
+        |  // Some extra code...
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleRecordExample => (this.field == x.field)
         |    case _ => false
@@ -188,7 +189,6 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def withField(field: java.net.URL): simpleRecordExample = {
         |    copy(field = field)
         |  }
-        |  // Some extra code...
         |}
         |object simpleRecordExample {
         |  def apply(field: java.net.URL): simpleRecordExample = new simpleRecordExample(field)

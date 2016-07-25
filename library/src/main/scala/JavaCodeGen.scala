@@ -28,6 +28,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
       s"""${genPackage(i)}
          |${genDoc(doc)}
          |public abstract class $name $extendsCode {
+         |    ${extra mkString EOL}
          |    ${genFields(fields)}
          |    ${genConstructors(i, parent, superFields)}
          |    ${genAccessors(fields)}
@@ -35,7 +36,6 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genEquals(i, superFields)}
          |    ${genHashCode(i, superFields)}
          |    ${genToString(i, superFields)}
-         |    ${extra mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), superFields ++ fields)))
@@ -49,6 +49,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
       s"""${genPackage(r)}
          |${genDoc(doc)}
          |public final class $name $extendsCode {
+         |    ${extra mkString EOL}
          |    ${genFields(fields)}
          |    ${genConstructors(r, parent, superFields)}
          |    ${genAccessors(fields)}
@@ -56,7 +57,6 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genEquals(r, superFields)}
          |    ${genHashCode(r, superFields)}
          |    ${genToString(r, superFields)}
-         |    ${extra mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(r) -> code)
@@ -74,8 +74,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
       s"""${genPackage(e)}
          |${genDoc(doc)}
          |public enum $name {
-         |    $valuesCode
          |    ${extra mkString EOL}
+         |    $valuesCode
          |}""".stripMargin
 
     ListMap(genFile(e) -> code)
