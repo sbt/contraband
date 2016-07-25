@@ -24,6 +24,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  case object first extends simpleEnumerationExample
         |
         |  case object second extends simpleEnumerationExample
+        |  // I'm appended at the end.
         |}""".stripMargin.unindent)
   }
 
@@ -46,6 +47,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleInterfaceExample(" + field + ")"
         |  }
+        |  // I'm appended at the end.
         |}""".stripMargin.unindent)
   }
 
@@ -186,6 +188,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def withField(field: java.net.URL): simpleRecordExample = {
         |    copy(field = field)
         |  }
+        |  // I'm appended at the end.
         |}
         |object simpleRecordExample {
         |  def apply(field: java.net.URL): simpleRecordExample = new simpleRecordExample(field)

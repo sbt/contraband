@@ -1,0 +1,30 @@
+{
+  "types": [
+    {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "Person",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ],
+      "append": [
+        "def toUpperCase: Person =",
+        "  Person(name.toUpperCase, age)"
+      ]
+    },
+    {
+      "type": "interface",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "emptyInterfaceExample"
+    }
+  ]
+}

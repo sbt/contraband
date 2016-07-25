@@ -65,7 +65,8 @@ object NewSchema {
       "name": "field",
       "type": "type"
     }
-  ]
+  ],
+  "append": "// I'm appended at the end."
 }"""
 
   val oneChildInterfaceExample = """{
@@ -118,7 +119,8 @@ object NewSchema {
       "name": "field",
       "type": "java.net.URL"
     }
-  ]
+  ],
+  "append": "// I'm appended at the end."
 }"""
 
   val simpleEnumerationExample = """{
@@ -132,7 +134,8 @@ object NewSchema {
       "doc": "First symbol"
     },
     "second"
-  ]
+  ],
+  "append": "// I'm appended at the end."
 }"""
 
   val fieldExample = """{
