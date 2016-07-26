@@ -70,6 +70,14 @@ abstract class CodeGenerator {
   /** Generate the code corresponding to the enumeration `e`. */
   protected def generateEnum(s: Schema, e: Enumeration): ListMap[File, String]
 
+  protected def generateHeader: String =
+    """/**
+      | * This code is generated using sbt-datatype.
+      | */
+      |
+      |// DO NOT EDIT MANUALLY
+      |""".stripMargin
+
 }
 
 object CodeGen {

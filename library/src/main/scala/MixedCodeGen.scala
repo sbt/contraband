@@ -11,7 +11,8 @@ class MixedCodeGen(javaLazy: String, javaOptional: String, scalaArray: String, g
   val scalaGen = new ScalaCodeGen(scalaArray, genScalaFileName, scalaSealprotocols)
 
   def generate(s: Schema): ListMap[File, String] =
-    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _)
+    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) map { case (k, v) =>
+      (k, generateHeader + v) }
 
   def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     // We generate the code that corresponds to this protocol, but without its children, because they

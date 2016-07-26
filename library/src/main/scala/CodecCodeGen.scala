@@ -158,13 +158,14 @@ class CodecCodeGen(codecParents: List[String],
   override def generate(s: Schema): ListMap[File, String] = {
     val codecs: ListMap[File, String] = ((s.definitions.toList map { d =>
       ListMap(generate(s, d, None, Nil).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
-    s.fullCodec match {
+    val result = s.fullCodec match {
       case Some(x) =>
         val full = generateFullCodec(s, x)
         codecs merge full
       case None =>
         codecs
     }
+    result map { case (k, v) => (k, generateHeader + v) }
   }
 
   private def genFile(s: Schema, d: Definition): File =
