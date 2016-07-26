@@ -1,0 +1,63 @@
+{
+  "types": [
+    {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "Person",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String"
+        },
+        {
+          "name": "age",
+          "type": "int"
+        }
+      ],
+      "extra": [
+        "def toUpperCase: Person =",
+        "  Person(name.toUpperCase, age)"
+      ]
+    },
+    {
+      "type": "interface",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "emptyInterfaceExample"
+    },
+    {
+      "name": "ScalaEnum",
+      "namespace": "com.example",
+      "target": "Scala",
+      "type": "enum",
+      "doc": "Example of simple enumeration",
+      "symbols": [
+        {
+          "name": "first",
+          "doc": "First symbol"
+        },
+        "second"
+      ],
+      "extra": "// Some extra code..."
+    },
+    {
+      "name": "JavaEnum",
+      "namespace": "com.example",
+      "target": "Java",
+      "type": "enum",
+      "doc": "Example of simple enumeration",
+      "symbols": [
+        "MERCURY (3.303e+23, 2.4397e6)"
+      ],
+      "extra": [
+        "private final double mass;   // in kilograms",
+        "private final double radius; // in meters",
+        "JavaEnum(double mass, double radius) {",
+        "  this.mass = mass;",
+        "  this.radius = radius;",
+        "}"
+      ]
+    }
+  ]
+}

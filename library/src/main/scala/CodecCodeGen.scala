@@ -31,8 +31,23 @@ class CodecCodeGen(codecParents: List[String],
 
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val fqn = fullyQualifiedName(e)
-    val readerValues = e.values map { case EnumerationValue(v, _) => s"""case "$v" => $fqn.$v""" }
-    val writerValues = e.values map { case EnumerationValue(v, _) => s"""case $fqn.$v => "$v"""" }
+    // Java enum can have additional parameter such as MERCURY (3.303e+23, 2.4397e6)
+    val EnumPattern = """([^\(]+)(\([^\)]*\))?""".r
+    def stripParam(s: String): String =
+      s match {
+        case EnumPattern(x, _) => x.trim
+        case _                 => s
+      }
+    val readerValues =
+      e.values map { case EnumerationValue(v0, _) =>
+        val v = stripParam(v0)
+        s"""case "$v" => $fqn.$v"""
+      }
+    val writerValues =
+      e.values map { case EnumerationValue(v0, _) =>
+        val v = stripParam(v0)
+        s"""case $fqn.$v => "$v""""
+      }
     val selfType = makeSelfType(s, e, Nil)
 
     val code =
@@ -168,11 +183,11 @@ class CodecCodeGen(codecParents: List[String],
   private def getRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = {
     val typeFormats =
       d match {
-        case Interface(name, _, namespace, _, _, fields, _, _) =>
+        case Interface(name, _, namespace, _, _, fields, _, _, _) =>
           val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
 
-        case Record(_, _, _, _, _, fields) =>
+        case Record(_, _, _, _, _, fields, _) =>
           val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
 
@@ -280,7 +295,7 @@ class CodecCodeGen(codecParents: List[String],
       s"""${genPackage(s)}
          |trait $name $parents
          |object $name extends $name""".stripMargin
-    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil)
+    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil)
     ListMap(new File(genFile(s, syntheticDefinition).getParentFile, s"$name.scala") -> code)
   }
 

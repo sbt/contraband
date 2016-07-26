@@ -114,7 +114,7 @@ object Generate {
               val outputFile = new File(target, "/" + file.toString)
               IO.write(outputFile, code)
               log.info(s"sbt-datatype created $outputFile")
-
+              // println(code)
               outputFile
           }.toList
         }

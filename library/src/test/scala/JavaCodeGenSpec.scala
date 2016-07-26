@@ -16,7 +16,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |public enum simpleEnumerationExample {
         |    /** First symbol */
         |    first,
-        |    second
+        |    second;
+        |    // Some extra code...
         |}""".stripMargin.unindent)
   }
 
@@ -27,6 +28,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     code.head._2.unindent must containTheSameElementsAs(
       """/** example of simple interface */
         |public abstract class simpleInterfaceExample implements java.io.Serializable {
+        |    // Some extra code...
         |    private type field;
         |    public simpleInterfaceExample(type _field) {
         |        super();
@@ -236,6 +238,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         new File("simpleRecordExample.java") ->
           """/** Example of simple record */
             |public final class simpleRecordExample implements java.io.Serializable {
+            |    // Some extra code...
             |
             |    private java.net.URL field;
             |    public simpleRecordExample(java.net.URL _field) {

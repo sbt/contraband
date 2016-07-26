@@ -65,7 +65,8 @@ object NewSchema {
       "name": "field",
       "type": "type"
     }
-  ]
+  ],
+  "extra": "// Some extra code..."
 }"""
 
   val oneChildInterfaceExample = """{
@@ -118,7 +119,8 @@ object NewSchema {
       "name": "field",
       "type": "java.net.URL"
     }
-  ]
+  ],
+  "extra": "// Some extra code..."
 }"""
 
   val simpleEnumerationExample = """{
@@ -132,7 +134,8 @@ object NewSchema {
       "doc": "First symbol"
     },
     "second"
-  ]
+  ],
+  "extra": "// Some extra code..."
 }"""
 
   val fieldExample = """{
@@ -651,7 +654,7 @@ object PriorityLevel {
           |    Low,
           |    /** Default priority level */
           |    Medium,
-          |    High
+          |    High;
           |}""".stripMargin,
 
       new File("com/example/GreetingWithAttachments.java") ->
