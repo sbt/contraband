@@ -28,7 +28,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate enumeration
 
     code.head._2.unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleEnumerationExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[_root_.simpleEnumerationExample] = new JsonFormat[_root_.simpleEnumerationExample] {
@@ -61,7 +66,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate intf
 
     code.head._2.unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleInterfaceExampleFormats {
         |  implicit lazy val simpleInterfaceExampleFormat: JsonFormat[_root_.simpleInterfaceExample] = new JsonFormat[_root_.simpleInterfaceExample] {
@@ -81,13 +91,23 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate intf
 
     (code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait OneChildInterfaceExampleFormats { self: generated.ChildRecordFormats with sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = unionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]
         |}""".stripMargin.unindent)) and
     (code(new File("generated", "childRecordFormats.scala")).unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait ChildRecordFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val childRecordFormat: JsonFormat[_root_.childRecord] = new JsonFormat[_root_.childRecord] {
@@ -119,13 +139,23 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate intf
 
     (code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait NestedProtocolExampleFormats { self: generated.NestedProtocolFormats with sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = unionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]
         |}""".stripMargin.unindent)) and
     (code(new File("generated", "nestedProtocolFormats.scala")).unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait NestedProtocolFormats {
         |  implicit lazy val nestedProtocolFormat: JsonFormat[_root_.nestedProtocol] = new JsonFormat[_root_.nestedProtocol] {
@@ -145,7 +175,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GenerateArgDocExampleFormats {
         |  implicit lazy val generateArgDocExampleFormat: JsonFormat[_root_.generateArgDocExample] = new JsonFormat[_root_.generateArgDocExample] {
@@ -165,7 +200,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait SimpleRecordExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleRecordExampleFormat: JsonFormat[_root_.simpleRecordExample] = new JsonFormat[_root_.simpleRecordExample] {
@@ -195,7 +235,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate record
 
     code.head._2.unindent must containTheSameElementsAs(
-      """package generated
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GrowableAddOneFieldFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val growableAddOneFieldFormat: JsonFormat[_root_.growableAddOneField] = new JsonFormat[_root_.growableAddOneField] {
@@ -225,7 +270,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait PrimitiveTypesExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[_root_.primitiveTypesExample] = new JsonFormat[_root_.primitiveTypesExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample = {
@@ -265,7 +315,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait PrimitiveTypesNoLazyExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[_root_.primitiveTypesNoLazyExample] = new JsonFormat[_root_.primitiveTypesNoLazyExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesNoLazyExample = {
@@ -320,7 +375,12 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val code = gen generate schema
 
     code.head._2.unindent must containTheSameElementsAs(
-      """import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait GreetingFormats {
         |  implicit lazy val GreetingFormat: JsonFormat[_root_.Greeting] = new JsonFormat[_root_.Greeting] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Greeting = {

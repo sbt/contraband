@@ -842,11 +842,21 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |}""".stripMargin)
 
   val completeExampleCodeCodec =
-    """package generated
+    """/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
+package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingExtraFormats with generated.GreetingExtraImplFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait SimpleGreetingFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
@@ -871,11 +881,21 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
   }
 }
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingExtraFormats { self: generated.GreetingExtraImplFormats with generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = unionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingExtraImplFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
@@ -904,6 +924,11 @@ implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraI
   }
 }
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingWithAttachmentsFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
@@ -930,6 +955,11 @@ implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.Greeting
   }
 }
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingHeaderFormats { self: java.util.DateFormats with sjsonnew.BasicJsonProtocol with generated.PriorityLevelFormats =>
@@ -956,6 +986,11 @@ implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] =
   }
 }
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait PriorityLevelFormats { self: sjsonnew.BasicJsonProtocol =>
@@ -982,6 +1017,11 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
   }
 }
 }
+/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
 package generated
 trait CustomProtcol extends generated.GreetingsFormats with generated.GreetingHeaderFormats with generated.PriorityLevelFormats with java.util.DateFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingExtraFormats with generated.GreetingExtraImplFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
 object CustomProtcol extends CustomProtcol""".stripMargin
