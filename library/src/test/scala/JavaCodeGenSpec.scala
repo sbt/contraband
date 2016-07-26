@@ -14,10 +14,10 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     code.head._2.unindent must containTheSameElementsAs(
       """/** Example of simple enumeration */
         |public enum simpleEnumerationExample {
-        |    // Some extra code...
         |    /** First symbol */
         |    first,
-        |    second
+        |    second;
+        |    // Some extra code...
         |}""".stripMargin.unindent)
   }
 

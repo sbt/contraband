@@ -65,17 +65,19 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val Enumeration(name, _, namespace, _, doc, values, extra) = e
 
-    val valuesCode = values map { case EnumerationValue(name, doc) =>
-      s"""${genDoc(doc)}
-         |$name""".stripMargin
-    } mkString ("," + EOL)
+    val valuesCode =
+      if (values.isEmpty) ""
+      else (values map { case EnumerationValue(name, doc) =>
+        s"""${genDoc(doc)}
+           |$name""".stripMargin
+      }).mkString("", "," + EOL, ";")
 
     val code =
       s"""${genPackage(e)}
          |${genDoc(doc)}
          |public enum $name {
-         |    ${extra mkString EOL}
          |    $valuesCode
+         |    ${extra mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(e) -> code)

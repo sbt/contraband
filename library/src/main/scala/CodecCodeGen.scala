@@ -31,8 +31,23 @@ class CodecCodeGen(codecParents: List[String],
 
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val fqn = fullyQualifiedName(e)
-    val readerValues = e.values map { case EnumerationValue(v, _) => s"""case "$v" => $fqn.$v""" }
-    val writerValues = e.values map { case EnumerationValue(v, _) => s"""case $fqn.$v => "$v"""" }
+    // Java enum can have additional parameter such as MERCURY (3.303e+23, 2.4397e6)
+    val EnumPattern = """([^\(]+)(\([^\)]*\))?""".r
+    def stripParam(s: String): String =
+      s match {
+        case EnumPattern(x, _) => x.trim
+        case _                 => s
+      }
+    val readerValues =
+      e.values map { case EnumerationValue(v0, _) =>
+        val v = stripParam(v0)
+        s"""case "$v" => $fqn.$v"""
+      }
+    val writerValues =
+      e.values map { case EnumerationValue(v0, _) =>
+        val v = stripParam(v0)
+        s"""case $fqn.$v => "$v""""
+      }
     val selfType = makeSelfType(s, e, Nil)
 
     val code =

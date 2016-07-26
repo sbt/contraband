@@ -654,7 +654,7 @@ object PriorityLevel {
           |    Low,
           |    /** Default priority level */
           |    Medium,
-          |    High
+          |    High;
           |}""".stripMargin,
 
       new File("com/example/GreetingWithAttachments.java") ->
