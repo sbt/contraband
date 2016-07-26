@@ -1,4 +1,34 @@
+### extra
 
-### bug fixes
+sbt-datatype 0.2.3 lets you put in extra code on top of the generated code.
 
-- Fixes code generation for `interface`'s `toString`.
+    {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "Person",
+      "fields": [
+        {
+          "name": "name",
+          "type": "String"
+        }
+      ],
+      "extra": [
+        "def toUpperCase: Person =",
+        "  Person(name.toUpperCase)"
+      ]
+    }
+
+[#31][31] by [@Duhemm][@Duhemm]
+
+### bug fixes and minor enhancements
+
+- Fixes code generation for `interface`'s `toString`. [#29][29] by [@eed3si9n][@eed3si9n]
+- Generates comment on top warning that it's a generated code. [#32][32] by [@eed3si9n][@eed3si9n]
+
+  [29]: https://github.com/sbt/sbt-datatype/pull/29
+  [31]: https://github.com/sbt/sbt-datatype/pull/31
+  [32]: https://github.com/sbt/sbt-datatype/pull/32
+  [@eed3si9n]: https://github.com/eed3si9n
+  [@dwijnand]: http://github.com/dwijnand
+  [@Duhemm]: http://github.com/Duhemm
