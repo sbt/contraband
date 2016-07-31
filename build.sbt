@@ -43,6 +43,7 @@ lazy val plugin = (project in file("plugin")).
   dependsOn(library)
 
 lazy val library = project.
+  enablePlugins(KeywordPlugin).
   settings(
     pluginSettings,
     name := "datatype",
