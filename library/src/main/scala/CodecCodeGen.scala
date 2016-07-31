@@ -2,6 +2,7 @@ package sbt.datatype
 import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
+import CodeGen.bq
 
 /**
  * Code generator to produce a codec for a given type.
@@ -81,13 +82,13 @@ class CodecCodeGen(codecParents: List[String],
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     def accessField(f: Field) = {
       if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
-      else f.name
+      else bq(f.name)
     }
     val fqn = fullyQualifiedName(r)
     val allFields = superFields ++ r.fields
-    val getFields = allFields map (f => s"""val ${f.name} = unbuilder.readField[${genRealTpe(f.tpe, r.targetLang)}]("${f.name}")""") mkString EOL
+    val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.tpe, r.targetLang)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
-    val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${f.name})""") mkString EOL
+    val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${bq(f.name)})""") mkString EOL
     val selfType = makeSelfType(s, r, superFields)
 
     val code =
@@ -202,7 +203,7 @@ class CodecCodeGen(codecParents: List[String],
   }
 
   private def fullyQualifiedName(d: Definition): String =
-    s"""${d.namespace getOrElse "_root_"}.${d.name}"""
+    s"""${d.namespace getOrElse "_root_"}.${bq(d.name)}"""
 
   private def getAllRequiredFormats(s: Schema): List[String] = getAllRequiredFormats(s, s.definitions, Nil)
 

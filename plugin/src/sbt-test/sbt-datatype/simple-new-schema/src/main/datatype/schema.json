@@ -21,6 +21,22 @@
       "namespace": "com.example",
       "target": "Scala",
       "name": "emptyInterfaceExample"
+    },
+    {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "ScalaKeywordExample",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String"
+        },
+        {
+          "name": "private",
+          "type": "boolean"
+        }
+      ]
     }
   ]
 }

@@ -179,5 +179,9 @@ object $name {
       hash
     }"""
     }
+
+  def bq(id: String): String =
+    if (ScalaKeywords.values(id)) s"`$id`"
+    else id
 }
 

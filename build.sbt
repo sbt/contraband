@@ -12,7 +12,7 @@ lazy val commonSettings = Seq(
 
 lazy val pluginSettings = commonSettings ++ Seq(
   bintrayPackage := "sbt-datatype",
-  version := "0.2.3-SNAPSHOT",
+  version := "0.2.4-SNAPSHOT",
   sbtPlugin := true
 )
 
@@ -43,6 +43,7 @@ lazy val plugin = (project in file("plugin")).
   dependsOn(library)
 
 lazy val library = project.
+  enablePlugins(KeywordPlugin).
   settings(
     pluginSettings,
     name := "datatype",

@@ -2,6 +2,7 @@ package sbt.datatype
 import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
+import CodeGen.bq
 
 /**
  * Code generator for Scala.
@@ -59,7 +60,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
           val ctorCallArguments =
             allFields map {
-              case f if provided contains f  => f.name
+              case f if provided contains f  => bq(f.name)
               case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
             } mkString ", "
 
@@ -148,7 +149,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          | */""".stripMargin
   }
 
-  private def genParam(f: Field): String = s"${f.name}: ${genRealTpe(f.tpe, isParam = true)}"
+  private def genParam(f: Field): String = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)}"
 
   private def lookupTpe(tpe: String): String = tpe match {
     case "boolean" => "Boolean"
@@ -180,7 +181,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       } else if (allFields.isEmpty) {
         "true"
       } else {
-        allFields map (f => s"(this.${f.name} == x.${f.name})") mkString " && "
+        allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && "
       }
 
     s"""override def equals(o: Any): Boolean = o match {
@@ -195,7 +196,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       if (allFields exists (_.tpe.lzy)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
-        (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${f.name}.##)" }
+        (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
       }
 
     s"""override def hashCode: Int = {
@@ -216,7 +217,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |}""".stripMargin
     } else {
       val fieldsToString =
-        allFields.map(_.name).mkString(" + ", """ + ", " + """, " + ")
+        allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
       s"""override def toString: String = {
          |  "${cl.name}("$fieldsToString")"
          |}""".stripMargin
@@ -230,7 +231,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
           provided map genParam mkString ", "
         val thisCallArguments =
           allFields map {
-            case f if provided contains f  => f.name
+            case f if provided contains f  => bq(f.name)
             case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
           } mkString ", "
 
@@ -259,12 +260,12 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   private def genLazyMembers(fields: List[Field]): List[String] =
     fields filter (_.tpe.lzy) map { f =>
         s"""${genDoc(f.doc)}
-           |lazy val ${f.name}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
+           |lazy val ${bq(f.name)}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
     }
 
   private def genMessages(messages: List[Message]): List[String] =
     messages map { case Message(name, doc, responseTpe, request) =>
-      val params = request map (a => s"${a.name}: ${genRealTpe(a.tpe, isParam = true)}") mkString ", "
+      val params = request map (a => s"${bq(a.name)}: ${genRealTpe(a.tpe, isParam = true)}") mkString ", "
       val argsDoc = request flatMap {
         case Request(name, Nil, _)        => Nil
         case Request(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
@@ -287,8 +288,8 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
   private def genCopy(r: Record, superFields: List[Field]) = {
     val allFields = superFields ++ r.fields
-    val params = allFields map (f => s"${f.name}: ${genRealTpe(f.tpe, isParam = true)} = ${f.name}") mkString ", "
-    val constructorCall = allFields map (_.name) mkString ", "
+    val params = allFields map (f => s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}") mkString ", "
+    val constructorCall = allFields map (f => bq(f.name)) mkString ", "
     s"""private[this] def copy($params): ${r.name} = {
        |  new ${r.name}($constructorCall)
        |}""".stripMargin
@@ -299,8 +300,8 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     val allFields = superFields ++ r.fields
 
     allFields map { f =>
-      s"""def with${capitalize(f.name)}(${f.name}: ${genRealTpe(f.tpe, isParam = true)}): ${r.name} = {
-         |  copy(${f.name} = ${f.name})
+      s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)}): ${r.name} = {
+         |  copy(${bq(f.name)} = ${bq(f.name)})
          |}""".stripMargin
     } mkString (EOL + EOL)
   }
