@@ -1,0 +1,8 @@
+### bug fixes and minor enhancements
+
+- If a Scala keyword appears as a field name, it will now backquote the name. [#33][33] by [@eed3si9n][@eed3si9n]
+- The generated JSON codes will always include value added to `datatypeCodecParents` (default: `List("sjsonnew.BasicJsonProtocol")`). [#34][34] by [@eed3si9n][@eed3si9n]
+- Bump to using sjson-new 0.4.2.
+
+  [33]: https://github.com/sbt/sbt-datatype/pull/33
+  [34]: https://github.com/sbt/sbt-datatype/pull/34
