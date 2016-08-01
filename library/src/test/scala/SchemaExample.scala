@@ -859,7 +859,7 @@ implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionForm
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait SimpleGreetingFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+trait SimpleGreetingFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] = new JsonFormat[com.example.SimpleGreeting] {
   override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.SimpleGreeting = {
     jsOpt match {
@@ -888,7 +888,7 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingExtraFormats { self: generated.GreetingExtraImplFormats with generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
+trait GreetingExtraFormats { self: generated.GreetingExtraImplFormats with sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
 implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = unionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]
 }
 /**
@@ -898,7 +898,7 @@ implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = u
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingExtraImplFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+trait GreetingExtraImplFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraImpl] = new JsonFormat[com.example.GreetingExtraImpl] {
   override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingExtraImpl = {
     jsOpt match {
@@ -931,7 +931,7 @@ implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraI
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingWithAttachmentsFormats { self: sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+trait GreetingWithAttachmentsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
   override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
     jsOpt match {
@@ -962,7 +962,7 @@ implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.Greeting
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingHeaderFormats { self: java.util.DateFormats with sjsonnew.BasicJsonProtocol with generated.PriorityLevelFormats =>
+trait GreetingHeaderFormats { self: java.util.DateFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] = new JsonFormat[com.example.GreetingHeader] {
   override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingHeader = {
     jsOpt match {
