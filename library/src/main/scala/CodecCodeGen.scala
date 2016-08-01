@@ -188,18 +188,12 @@ class CodecCodeGen(codecParents: List[String],
         case Interface(name, _, namespace, _, _, fields, _, _, _) =>
           val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
-
         case Record(_, _, _, _, _, fields, _) =>
           val allFields = superFields ++ fields
           allFields flatMap (f => lookupFormats(f.tpe))
-
-        case _: Enumeration =>
-          "sjsonnew.BasicJsonProtocol" :: Nil
+        case _: Enumeration => Nil
       }
-
-    val unionFormat = if (requiresUnionFormats(s, d, superFields)) "sjsonnew.BasicJsonProtocol" :: Nil else Nil
-
-    typeFormats ++ unionFormat ++ codecParents
+    typeFormats ++ codecParents
   }
 
   private def fullyQualifiedName(d: Definition): String =
@@ -226,8 +220,8 @@ class CodecCodeGen(codecParents: List[String],
       fullFormatsName(s, d) -> (d match {
         case i: Interface =>
           i.children.map( c => fullFormatsName(s, c)) :::
-          "sjsonnew.BasicJsonProtocol" :: getRequiredFormats(s, d, superFields)
-        case _            => "sjsonnew.BasicJsonProtocol" :: getRequiredFormats(s, d, superFields)
+          getRequiredFormats(s, d, superFields)
+        case _            => getRequiredFormats(s, d, superFields)
       })
     }: _*)
     val xs = sbt.Dag.topologicalSort[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
@@ -372,12 +366,11 @@ object CodecCodeGen {
    * to determine mapping for non-primitive types.
    */
   def extensibleFormatsForType(forOthers: TpeRef => List[String]): TpeRef => List[String] = { tpe =>
-    val basicJsonProtcol = "sjsonnew.BasicJsonProtocol"
     removeTypeParameters(tpe).name match {
-      case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => basicJsonProtcol :: Nil
+      case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => Nil
       case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger"
-        | "java.math.BigDecimal" | "java.io.File" => basicJsonProtcol :: Nil
-      case _ => forOthers(tpe) ++ (basicJsonProtcol :: Nil)
+        | "java.math.BigDecimal" | "java.io.File" => Nil
+      case _ => forOthers(tpe)
     }
   }
 }

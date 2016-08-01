@@ -42,7 +42,7 @@ object DatatypePlugin extends AutoPlugin {
       // We cannot enable this by default, because the default function for naming Scala files that we provide
       // will create a separate file for every `Definition`.
       datatypeScalaSealInterface in generateDatatypes := false,
-      datatypeCodecParents in generateDatatypes := Nil,
+      datatypeCodecParents in generateDatatypes := List("sjsonnew.BasicJsonProtocol"),
       datatypeInstantiateJavaLazy in generateDatatypes := { (e: String) => s"xsbti.SafeLazy($e)" },
       datatypeFormatsForType in generateDatatypes := CodecCodeGen.formatsForType,
       generateDatatypes := {

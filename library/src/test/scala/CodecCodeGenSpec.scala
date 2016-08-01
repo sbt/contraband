@@ -16,7 +16,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def is = super.is append codecCodeGenSpec
 
-  val codecParents = Nil
+  val codecParents = List("sjsonnew.BasicJsonProtocol")
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
   val javaOption = "com.example.Option"
   val scalaArray = "Vector"

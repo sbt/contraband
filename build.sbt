@@ -2,8 +2,8 @@ import Dependencies._
 
 lazy val commonSettings = Seq(
     organization in ThisBuild := "org.scala-sbt",
-    crossScalaVersions := Seq("2.11.6", "2.10.5"),
-    scalaVersion := "2.10.5",
+    crossScalaVersions := Seq("2.11.8", "2.10.6"),
+    scalaVersion := "2.10.6",
     licenses += ("Apache-2.0", url("https://github.com/sbt/sbt-datatype/blob/master/LICENSE")),
     bintrayOrganization := Some("sbt"),
     bintrayRepository := "sbt-plugin-releases",

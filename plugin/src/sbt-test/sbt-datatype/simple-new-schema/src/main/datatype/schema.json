@@ -17,6 +17,18 @@
       ]
     },
     {
+      "type": "record",
+      "namespace": "com.example",
+      "target": "Scala",
+      "name": "PersonList",
+      "fields": [
+        {
+          "name": "values",
+          "type": "com.example.Person"
+        }
+      ]
+    },
+    {
       "type": "interface",
       "namespace": "com.example",
       "target": "Scala",
