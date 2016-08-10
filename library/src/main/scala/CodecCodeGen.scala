@@ -224,7 +224,7 @@ class CodecCodeGen(codecParents: List[String],
         case _            => getRequiredFormats(s, d, superFields)
       })
     }: _*)
-    val xs = sbt.Dag.topologicalSort[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
+    val xs = sbt.Dag.topologicalSortUnchecked[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
     xs.reverse
   }
 
