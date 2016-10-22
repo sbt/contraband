@@ -1,0 +1,7 @@
+
+### bug fixes
+
+- Generate codec for recursive structures. [#35][35] by [@Duhemm][@Duhemm]
+
+  [35]: https://github.com/sbt/sbt-datatype/pull/35
+  [@Duhemm]: https://github.com/Duhemm

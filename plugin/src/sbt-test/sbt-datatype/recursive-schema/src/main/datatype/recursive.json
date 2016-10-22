@@ -1,0 +1,28 @@
+{
+  "types": [
+    {
+      "name": "Term",
+      "namespace": "expr",
+      "type": "interface",
+      "target": "Scala",
+      "types": [
+        {
+          "name": "Addition",
+          "namespace": "expr",
+          "type": "record",
+          "target": "Scala",
+          "fields": [
+            {
+              "name": "lhs",
+              "type": "expr.Term"
+            },
+            {
+              "name": "rhs",
+              "type": "expr.Term"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

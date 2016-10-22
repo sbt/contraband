@@ -1,0 +1,1 @@
+enablePlugins(DatatypePlugin, JsonCodecPlugin)

@@ -849,7 +849,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingExtraFormats with generated.GreetingExtraImplFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol =>
+trait GreetingsFormats { self: sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingHeaderFormats =>
 implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]
 }
 /**
@@ -888,7 +888,7 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingExtraFormats { self: generated.GreetingExtraImplFormats with sjsonnew.BasicJsonProtocol with generated.GreetingHeaderFormats =>
+trait GreetingExtraFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.GreetingExtraImplFormats =>
 implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = unionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]
 }
 /**
@@ -1023,7 +1023,7 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 
 // DO NOT EDIT MANUALLY
 package generated
-trait CustomProtcol extends generated.GreetingsFormats with generated.GreetingHeaderFormats with generated.PriorityLevelFormats with java.util.DateFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingExtraFormats with generated.GreetingExtraImplFormats with generated.SimpleGreetingFormats with sjsonnew.BasicJsonProtocol
+trait CustomProtcol extends sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with java.util.DateFormats with generated.PriorityLevelFormats with generated.GreetingHeaderFormats with generated.GreetingsFormats
 object CustomProtcol extends CustomProtcol""".stripMargin
 
 
