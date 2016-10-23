@@ -12,7 +12,7 @@ lazy val commonSettings = Seq(
 
 lazy val pluginSettings = commonSettings ++ Seq(
   bintrayPackage := "sbt-datatype",
-  version := "0.2.5-SNAPSHOT",
+  version := "0.2.6-SNAPSHOT",
   sbtPlugin := true
 )
 
@@ -48,5 +48,5 @@ lazy val library = project.
     pluginSettings,
     name := "datatype",
     description := "Code generation library to generate growable datatypes.",
-    libraryDependencies ++= jsonDependencies ++ Seq(specs2 % Test)
+    libraryDependencies ++= jsonDependencies ++ Seq(scalaTest % Test)
   )
