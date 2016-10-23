@@ -14,8 +14,7 @@ object Dependencies {
   }
 
   val scalaCheckVersion = "1.11.5"
-  val junitInterface       = "com.novocode" % "junit-interface" % "0.11"
-  val scalaCheck           = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
-  val specs2               = "org.specs2" %% "specs2" % "2.3.11"
+  val junitInterface    = "com.novocode" % "junit-interface" % "0.11"
+  val scalaCheck        = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
+  val scalaTest         = "org.scalatest" %% "scalatest" % "3.0.0"
 }
-
