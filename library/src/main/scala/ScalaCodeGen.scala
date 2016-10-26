@@ -22,7 +22,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
 
   override def generate(s: Schema): ListMap[File, String] =
-    s.definitions.toList map (generate (s, _, None, Nil)) reduce (_ merge _) mapV (_.indented)
+    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapV (_.indented)
 
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
     val values =
@@ -46,55 +46,30 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = superFields ++ r.fields
 
-    val alternativeCtors =
-      genAlternativeConstructors(r.since, allFields) mkString EOL
-
-    // If there are no fields, we still need an `apply` method with an empty parameter list.
-    val applyOverloads =
-      if (allFields.isEmpty) {
-        s"def apply(): ${r.name} = new ${r.name}()"
-      } else {
-        perVersionNumber(r.since, allFields) { (provided, byDefault) =>
-          val applyParameters =
-            provided map genParam mkString ", "
-
-          val ctorCallArguments =
-            allFields map {
-              case f if provided contains f  => bq(f.name)
-              case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
-            } mkString ", "
-
-          s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
-        } mkString EOL
-      }
-
-    val ctorParameters =
-      genCtorParameters(r, allFields) mkString ","
-
+    val ctorParameters = genCtorParameters(r, allFields) mkString ","
     val superCtorArguments = superFields map (_.name) mkString ", "
 
-    val extendsCode =
-      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse "extends Serializable"
-
-    val lazyMembers =
-      genLazyMembers(r.fields) mkString EOL
+    val extendsCode = (parent
+      map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)")
+      getOrElse "extends Serializable"
+    )
 
     val code =
       s"""${genPackage(r)}
          |${genDoc(r.doc)}
          |final class ${r.name}($ctorParameters) $extendsCode {
          |  ${r.extra mkString EOL}
-         |  $alternativeCtors
-         |  $lazyMembers
+         |  ${genAlternativeConstructors(r.since, allFields) mkString EOL}
+         |  ${genLazyMembers(r.fields) mkString EOL}
          |  ${genEquals(r, superFields)}
          |  ${genHashCode(r, superFields)}
          |  ${genToString(r, superFields)}
-         |  ${genCopy(r, superFields)}
+         |  ${genCopy(r, allFields)}
          |  ${genWith(r, superFields)}
          |}
          |
          |object ${r.name} {
-         |  $applyOverloads
+         |  ${genApplyOverloads(r, allFields) mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(r) -> code)
@@ -102,26 +77,19 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val allFields = superFields ++ i.fields
-    val alternativeCtors =
-      genAlternativeConstructors(i.since, allFields) mkString EOL
 
-    val ctorParameters =
-      genCtorParameters(i, allFields) mkString ", "
+    val classDef = if (sealProtocols) "sealed abstract class" else "abstract class"
+    val ctorParameters = genCtorParameters(i, allFields) mkString ", "
+    val superCtorArguments = superFields map (_.name) mkString ", "
 
-    val superCtorArguments =
-      superFields map (_.name) mkString ", "
+    val extendsCode = (parent
+      map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)")
+      getOrElse "extends Serializable"
+    )
 
-    val extendsCode =
-      parent map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)") getOrElse "extends Serializable"
-
-    val lazyMembers =
-      genLazyMembers(i.fields) mkString EOL
-
-    val messages =
-      genMessages(i.messages) mkString EOL
-
-    val classDef =
-      if (sealProtocols) "sealed abstract class" else "abstract class"
+    val alternativeCtors = genAlternativeConstructors(i.since, allFields) mkString EOL
+    val lazyMembers = genLazyMembers(i.fields) mkString EOL
+    val messages = genMessages(i.messages) mkString EOL
 
     val code =
       s"""${genPackage(i)}
@@ -136,11 +104,12 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genToString(i, superFields)}
          |}""".stripMargin
 
-    ListMap(genFile(i) -> code) :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields))) reduce (_ merge _)
+    val childrenCode = i.children map (generate(s, _, Some(i), superFields ++ i.fields))
+    ListMap(genFile(i) -> code) :: childrenCode reduce (_ merge _)
   }
 
   private def genDoc(doc: List[String]) = doc match {
-    case Nil => ""
+    case Nil      => ""
     case l :: Nil => s"/** $l */"
     case lines =>
       val doc = lines map (l => s" * $l") mkString EOL
@@ -224,11 +193,27 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     }
   }
 
+  private def genApplyOverloads(r: Record, allFields: List[Field]): List[String] =
+    if (allFields.isEmpty) { // If there are no fields, we still need an `apply` method with an empty parameter list
+      List(s"def apply(): ${r.name} = new ${r.name}()")
+    } else {
+      perVersionNumber(r.since, allFields) { (provided, byDefault) =>
+        val applyParameters = provided map genParam mkString ", "
+
+        val ctorCallArguments =
+          allFields map {
+            case f if provided contains f  => bq(f.name)
+            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
+          } mkString ", "
+
+        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
+      }
+    }
+
   private def genAlternativeConstructors(since: VersionNumber, allFields: List[Field]) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
-        val ctorParameters =
-          provided map genParam mkString ", "
+        val ctorParameters = provided map genParam mkString ", "
         val thisCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
@@ -246,15 +231,13 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   // Non-lazy fields that belong to `cl` are made val parameters.
   private def genCtorParameters(cl: ClassLike, allFields: List[Field]): List[String] =
     allFields map {
-      case f if cl.fields.contains(f) && f.tpe.lzy =>
-        EOL + "_" + genParam(f)
+      case f if cl.fields.contains(f) && f.tpe.lzy => EOL + "_" + genParam(f)
 
       case f if cl.fields.contains(f) =>
         s"""$EOL${genDoc(f.doc)}
            |val ${genParam(f)}""".stripMargin
 
-      case f =>
-        EOL + genParam(f)
+      case f => EOL + genParam(f)
     }
 
   private def genLazyMembers(fields: List[Field]): List[String] =
@@ -283,12 +266,11 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     path + d.name
   }
 
-  private def genPackage(d: Definition): String =
-    d.namespace map (ns => s"package $ns") getOrElse ""
+  private def genPackage(d: Definition): String = d.namespace map (ns => s"package $ns") getOrElse ""
 
-  private def genCopy(r: Record, superFields: List[Field]) = {
-    val allFields = superFields ++ r.fields
-    val params = allFields map (f => s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}") mkString ", "
+  private def genCopy(r: Record, allFields: List[Field]) = {
+    def genParam(f: Field) = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}"
+    val params = allFields map genParam mkString ", "
     val constructorCall = allFields map (f => bq(f.name)) mkString ", "
     s"""private[this] def copy($params): ${r.name} = {
        |  new ${r.name}($constructorCall)
