@@ -64,7 +64,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genEquals(r, superFields)}
          |  ${genHashCode(r, superFields)}
          |  ${genToString(r, superFields)}
-         |  ${genCopy(r, allFields)}
+         |  ${genCopyOverloads(r, allFields) mkString EOL}
          |  ${genWith(r, superFields)}
          |}
          |
@@ -268,14 +268,26 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
   private def genPackage(d: Definition): String = d.namespace map (ns => s"package $ns") getOrElse ""
 
-  private def genCopy(r: Record, allFields: List[Field]) = {
-    def genParam(f: Field) = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}"
-    val params = allFields map genParam mkString ", "
-    val constructorCall = allFields map (f => bq(f.name)) mkString ", "
-    s"""private[this] def copy($params): ${r.name} = {
-       |  new ${r.name}($constructorCall)
-       |}""".stripMargin
-  }
+  private def genCopyOverloads(r: Record, allFields: List[Field]) =
+    if (allFields.isEmpty) { // If there are no fields, we still need an `copy` method with an empty parameter list
+      List(s"def copy(): ${r.name} = new ${r.name}()")
+    } else {
+      perVersionNumber(r.since, allFields) { (provided, byDefault) =>
+        def genParam(f: Field) = {
+          val name = bq(f.name)
+          val tpe = genRealTpe(f.tpe, isParam = true)
+          if (byDefault.isEmpty) // when all fields are provided, then given them their default value
+            s"$name: $tpe = $name"
+          else
+            s"$name: $tpe"
+        }
+        val params = provided map genParam mkString ", "
+        val constructorCall = allFields map (f => bq(f.name)) mkString ", "
+        s"""def copy($params): ${r.name} = {
+           |  new ${r.name}($constructorCall)
+           |}""".stripMargin
+      }
+    }
 
   private def genWith(r: Record, superFields: List[Field]) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
