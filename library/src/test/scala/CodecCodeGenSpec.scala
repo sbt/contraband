@@ -253,6 +253,46 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent
   }
 
+  override def recordGrowZeroToOneToTwoFields: Unit = {
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
+    val record = Record parse growableZeroToOneToTwoFieldsExample
+    val code = gen generate record
+
+    val obtained = code.head._2.unindent
+    val expected =
+      """/**
+        | * This code is generated using sbt-datatype.
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
+        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |trait FooFormats { self: sjsonnew.BasicJsonProtocol =>
+        |  implicit lazy val FooFormat: JsonFormat[_root_.Foo] = new JsonFormat[_root_.Foo] {
+        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Foo = {
+        |      jsOpt match {
+        |        case Some(js) =>
+        |          unbuilder.beginObject(js)
+        |          val x = unbuilder.readField[Int]("x")
+        |          val y = unbuilder.readField[Int]("y")
+        |          unbuilder.endObject()
+        |          new _root_.Foo(x, y)
+        |        case None =>
+        |          deserializationError("Expected JsObject but found None")
+        |      }
+        |    }
+        |    override def write[J](obj: _root_.Foo, builder: Builder[J]): Unit = {
+        |      builder.beginObject()
+        |      builder.addField("x", obj.x)
+        |      builder.addField("y", obj.y)
+        |      builder.endObject()
+        |    }
+        |  }
+        |}""".stripMargin.unindent
+    TestUtils.printUnifiedDiff(expected, obtained)
+    obtained should contain theSameElementsAs expected
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)

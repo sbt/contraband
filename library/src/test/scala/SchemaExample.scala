@@ -1041,6 +1041,26 @@ object CustomProtcol extends CustomProtcol""".stripMargin
   ]
 }""".stripMargin
 
+  val growableZeroToOneToTwoFieldsExample = """{
+  "name": "Foo",
+  "target": "Scala",
+  "type": "record",
+  "fields": [
+    {
+      "name": "x",
+      "type": "int",
+      "since": "0.1.0",
+      "default": "0"
+    },
+    {
+      "name": "y",
+      "type": "int",
+      "since": "0.2.0",
+      "default": "0"
+    }
+  ]
+}""".stripMargin
+
   val multiLineDocExample =
     """{
       |  "name": "multiLineDocField",

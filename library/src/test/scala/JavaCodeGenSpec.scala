@@ -310,6 +310,66 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
       ).toList
   }
 
+  override def recordGrowZeroToOneToTwoFields = {
+    val record = Record parse growableZeroToOneToTwoFieldsExample
+    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
+
+    val obtained = code mapValues (_.unindent)
+    val expected =
+      Map(
+        new File("Foo.java") ->
+          """public final class Foo implements java.io.Serializable {
+            |    private int x;
+            |    private int y;
+            |    public Foo() {
+            |        super();
+            |        x = 0;
+            |        y = 0;
+            |    }
+            |    public Foo(int _x) {
+            |        super();
+            |        x = _x;
+            |        y = 0;
+            |    }
+            |    public Foo(int _x, int _y) {
+            |        super();
+            |        x = _x;
+            |        y = _y;
+            |    }
+            |    public int x() {
+            |        return this.x;
+            |    }
+            |    public int y() {
+            |        return this.y;
+            |    }
+            |    public Foo withX(int x) {
+            |        return new Foo(x, y);
+            |    }
+            |    public Foo withY(int y) {
+            |        return new Foo(x, y);
+            |    }
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof Foo)) {
+            |            return false;
+            |        } else {
+            |            Foo o = (Foo)obj;
+            |            return (x() == o.x()) && (y() == o.y());
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 37 * (37 * (17 + (new Integer(x())).hashCode()) + (new Integer(y())).hashCode());
+            |    }
+            |    public String toString() {
+            |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
+            |    }
+            |}""".stripMargin.unindent
+      ).toList
+    TestUtils.printUnifiedDiff(expected.flatMap(_._2), obtained.toList.flatMap(_._2))
+    obtained should contain theSameElementsAs expected
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema

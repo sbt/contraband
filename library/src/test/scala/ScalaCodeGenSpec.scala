@@ -226,6 +226,47 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}""".stripMargin.unindent
   }
 
+  override def recordGrowZeroToOneToTwoFields = {
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
+    val record = Record parse growableZeroToOneToTwoFieldsExample
+    val code = gen generate record
+
+    val obtained = code.head._2.unindent
+    val expected =
+      """final class Foo(
+        |  val x: Int,
+        |  val y: Int) extends Serializable {
+        |  def this() = this(0, 0)
+        |  def this(x: Int) = this(x, 0)
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: Foo => (this.x == x.x) && (this.y == x.y)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + x.##) + y.##)
+        |  }
+        |  override def toString: String = {
+        |    "Foo(" + x + ", " + y + ")"
+        |  }
+        |  private[this] def copy(x: Int = x, y: Int = y): Foo = {
+        |    new Foo(x, y)
+        |  }
+        |  def withX(x: Int): Foo = {
+        |    copy(x = x)
+        |  }
+        |  def withY(y: Int): Foo = {
+        |    copy(y = y)
+        |  }
+        |}
+        |object Foo {
+        |  def apply(): Foo = new Foo(0, 0)
+        |  def apply(x: Int): Foo = new Foo(x, 0)
+        |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
+        |}""".stripMargin.unindent
+    TestUtils.printUnifiedDiff(expected, obtained)
+    obtained should contain theSameElementsAs expected
+  }
+
   override def schemaGenerateTypeReferences = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesExample
