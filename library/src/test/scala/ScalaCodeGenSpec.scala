@@ -83,7 +83,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "childRecord(" + field + ", " + x + ")"
         |  }
-        |  private[this] def copy(field: Int = field, x: Int = x): childRecord = {
+        |  def copy(field: Int = field, x: Int = x): childRecord = {
         |    new childRecord(field, x)
         |  }
         |  def withField(field: Int): childRecord = {
@@ -182,7 +182,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleRecordExample(" + field + ")"
         |  }
-        |  private[this] def copy(field: java.net.URL = field): simpleRecordExample = {
+        |  def copy(field: java.net.URL = field): simpleRecordExample = {
         |    new simpleRecordExample(field)
         |  }
         |  def withField(field: java.net.URL): simpleRecordExample = {
@@ -199,7 +199,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
-    code.head._2.unindent should contain theSameElementsAs
+    val obtained = code.head._2.unindent
+    val expected =
       """final class growableAddOneField(
         |  val field: Int) extends Serializable {
         |  def this() = this(0)
@@ -213,7 +214,10 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "growableAddOneField(" + field + ")"
         |  }
-        |  private[this] def copy(field: Int = field): growableAddOneField = {
+        |  def copy(): growableAddOneField = {
+        |    new growableAddOneField(field)
+        |  }
+        |  def copy(field: Int = field): growableAddOneField = {
         |    new growableAddOneField(field)
         |  }
         |  def withField(field: Int): growableAddOneField = {
@@ -224,6 +228,55 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def apply(): growableAddOneField = new growableAddOneField(0)
         |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
         |}""".stripMargin.unindent
+    TestUtils.printUnifiedDiff(expected, obtained)
+    obtained should contain theSameElementsAs expected
+  }
+
+  override def recordGrowZeroToOneToTwoFields = {
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
+    val record = Record parse growableZeroToOneToTwoFieldsExample
+    val code = gen generate record
+
+    val obtained = code.head._2.unindent
+    val expected =
+      """final class Foo(
+        |  val x: Int,
+        |  val y: Int) extends Serializable {
+        |  def this() = this(0, 0)
+        |  def this(x: Int) = this(x, 0)
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: Foo => (this.x == x.x) && (this.y == x.y)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + x.##) + y.##)
+        |  }
+        |  override def toString: String = {
+        |    "Foo(" + x + ", " + y + ")"
+        |  }
+        |  def copy(): Foo = {
+        |    new Foo(x, y)
+        |  }
+        |  def copy(x: Int): Foo = {
+        |    new Foo(x, y)
+        |  }
+        |  def copy(x: Int = x, y: Int = y): Foo = {
+        |    new Foo(x, y)
+        |  }
+        |  def withX(x: Int): Foo = {
+        |    copy(x = x)
+        |  }
+        |  def withY(y: Int): Foo = {
+        |    copy(y = y)
+        |  }
+        |}
+        |object Foo {
+        |  def apply(): Foo = new Foo(0, 0)
+        |  def apply(x: Int): Foo = new Foo(x, 0)
+        |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
+        |}""".stripMargin.unindent
+    TestUtils.printUnifiedDiff(expected, obtained)
+    obtained should contain theSameElementsAs expected
   }
 
   override def schemaGenerateTypeReferences = {
@@ -253,7 +306,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
         |  }
-        |  private[this] def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Vector[Int] = arrayInteger, optionInteger: Option[Int] = optionInteger, lazyArrayInteger: => Vector[Int] = lazyArrayInteger, lazyOptionInteger: => Option[Int] = lazyOptionInteger): primitiveTypesExample = {
+        |  def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Vector[Int] = arrayInteger, optionInteger: Option[Int] = optionInteger, lazyArrayInteger: => Vector[Int] = lazyArrayInteger, lazyOptionInteger: => Option[Int] = lazyOptionInteger): primitiveTypesExample = {
         |    new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesExample = {
@@ -304,7 +357,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "primitiveTypesNoLazyExample(" + simpleInteger + ", " + arrayInteger + ")"
         |  }
-        |  private[this] def copy(simpleInteger: Int = simpleInteger, arrayInteger: Vector[Int] = arrayInteger): primitiveTypesNoLazyExample = {
+        |  def copy(simpleInteger: Int = simpleInteger, arrayInteger: Vector[Int] = arrayInteger): primitiveTypesNoLazyExample = {
         |    new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesNoLazyExample = {
@@ -333,7 +386,10 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val schema = Schema parse completeExample
     val code = gen generate schema
 
-    code.head._2.withoutEmptyLines should contain theSameElementsAs completeExampleCodeScala.withoutEmptyLines
+    val obtained = code.head._2.withoutEmptyLines
+    val expected = completeExampleCodeScala.withoutEmptyLines
+    TestUtils.printUnifiedDiff(expected, obtained)
+    obtained should contain theSameElementsAs expected
   }
 
 }

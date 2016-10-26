@@ -1,0 +1,73 @@
+
+### enhancements
+
+- Adds support for public, overloaded, bincompat copy. See below. [#38][38] by [@dwijnand][@dwijnand]
+
+### copy
+
+sbt-datatype 0.2.6 adds support for public, overloaded, binary compatible copy methods (previous there was only
+one `private[this]` copy method.
+
+Defining a record as such:
+
+    {
+      "name": "Foo",
+      "target": "Scala",
+      "type": "record",
+      "fields": [
+        {
+          "name": "x",
+          "type": "int",
+          "since": "0.1.0",
+          "default": "0"
+        },
+        {
+          "name": "y",
+          "type": "int",
+          "since": "0.2.0",
+          "default": "0"
+        }
+      ]
+    }
+
+will now generate a class like this:
+
+    final class Foo(
+      val x: Int,
+      val y: Int) extends Serializable {
+      def this() = this(0, 0)
+      def this(x: Int) = this(x, 0)
+      override def equals(o: Any): Boolean = o match {
+        case x: Foo => (this.x == x.x) && (this.y == x.y)
+        case _ => false
+      }
+      override def hashCode: Int = {
+        37 * (37 * (17 + x.##) + y.##)
+      }
+      override def toString: String = {
+        "Foo(" + x + ", " + y + ")"
+      }
+      def copy(): Foo = {
+        new Foo(x, y)
+      }
+      def copy(x: Int): Foo = {
+        new Foo(x, y)
+      }
+      def copy(x: Int = x, y: Int = y): Foo = {
+        new Foo(x, y)
+      }
+      def withX(x: Int): Foo = {
+        copy(x = x)
+      }
+      def withY(y: Int): Foo = {
+        copy(y = y)
+      }
+    }
+    object Foo {
+      def apply(): Foo = new Foo(0, 0)
+      def apply(x: Int): Foo = new Foo(x, 0)
+      def apply(x: Int, y: Int): Foo = new Foo(x, y)
+    }
+
+  [38]: https://github.com/sbt/sbt-datatype/pull/38
+  [@dwijnand]: http://github.com/dwijnand
