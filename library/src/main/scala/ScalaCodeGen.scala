@@ -102,7 +102,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genEquals(i, superFields)}
          |  ${genHashCode(i, superFields)}
          |  ${genToString(i, superFields)}
-         |}""".stripMargin
+         |}
+         |
+         |object ${i.name}""".stripMargin
 
     val childrenCode = i.children map (generate(s, _, Some(i), superFields ++ i.fields))
     ListMap(genFile(i) -> code) :: childrenCode reduce (_ merge _)

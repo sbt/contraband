@@ -24,7 +24,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  case object first extends simpleEnumerationExample
         |  case object second extends simpleEnumerationExample
         |}
-        |""".stripMargin.unindent)
+        """.stripMargin.unindent)
   }
 
   override def interfaceGenerateSimple = {
@@ -48,6 +48,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "simpleInterfaceExample(" + field + ")"
         |  }
         |}
+        |
+        |object simpleInterfaceExample
         |""".stripMargin.unindent)
   }
 
@@ -71,6 +73,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "oneChildInterfaceExample(" + field + ")"
         |  }
         |}
+        |
+        |object oneChildInterfaceExample
         |final class childRecord(
         |  field: Int,
         |  val x: Int) extends oneChildInterfaceExample(field) {
@@ -97,7 +101,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object childRecord {
         |  def apply(field: Int, x: Int): childRecord = new childRecord(field, x)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def interfaceGenerateNested = {
@@ -119,6 +124,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "nestedProtocolExample()"
         |  }
         |}
+        |
+        |object nestedProtocolExample
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocol => true
@@ -130,7 +137,10 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "nestedProtocol()"
         |  }
-        |}""".stripMargin.unindent)
+        |}
+        |
+        |object nestedProtocol
+        |""".stripMargin.unindent)
   }
 
   override def interfaceGenerateMessages = {
@@ -159,7 +169,10 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "generateArgDocExample(" + field + ")"
         |  }
-        |}""".stripMargin.withoutEmptyLines
+        |}
+        |
+        |object generateArgDocExample
+        |""".stripMargin.withoutEmptyLines
 
   }
 
@@ -192,7 +205,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |object simpleRecordExample {
         |  def apply(field: java.net.URL): simpleRecordExample = new simpleRecordExample(field)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
@@ -227,7 +241,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |object growableAddOneField {
         |  def apply(): growableAddOneField = new growableAddOneField(0)
         |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneToTwoFields = {
@@ -271,7 +286,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def apply(): Foo = new Foo(0, 0)
         |  def apply(x: Int): Foo = new Foo(x, 0)
         |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
@@ -326,7 +342,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object primitiveTypesExample {
         |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Vector[Int], optionInteger: Option[Int], lazyArrayInteger: => Vector[Int], lazyOptionInteger: => Option[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
@@ -365,7 +382,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object primitiveTypesNoLazyExample {
         |  def apply(simpleInteger: Int, arrayInteger: Vector[Int]): primitiveTypesNoLazyExample = new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
-        |}""".stripMargin.unindent)
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
