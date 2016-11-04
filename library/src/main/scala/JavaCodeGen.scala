@@ -21,7 +21,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(s.definitions flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Interface(name, _, namespace, _, doc, fields, messages, children, extra) = i
+    val Interface(name, _, namespace, _, doc, fields, messages, children, extra, toString) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -35,14 +35,14 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genMessages(messages)}
          |    ${genEquals(i, superFields)}
          |    ${genHashCode(i, superFields)}
-         |    ${genToString(i, superFields)}
+         |    ${genToString(i, superFields, toString)}
          |}""".stripMargin
 
     ListMap(genFile(i) -> code) ++ (children flatMap (generate(s, _, Some(i), superFields ++ fields)))
   }
 
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Record(name, _, namespace, _, doc, fields, extra) = r
+    val Record(name, _, namespace, _, doc, fields, extra, toString) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -56,7 +56,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |    ${genWith(r, superFields)}
          |    ${genEquals(r, superFields)}
          |    ${genHashCode(r, superFields)}
-         |    ${genToString(r, superFields)}
+         |    ${genToString(r, superFields, toString)}
          |}""".stripMargin
 
     ListMap(genFile(r) -> code)
@@ -250,9 +250,9 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
        |}""".stripMargin
   }
 
-  private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
-    val body =
+  private def genToString(cl: ClassLike, superFields: List[Field], toString: Option[String]) = {
+    val body = toString getOrElse {
+      val allFields = superFields ++ cl.fields
       if (allFields exists (_.tpe.lzy)) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."
       } else {
@@ -260,6 +260,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
           s""" + "${f.name}: " + ${f.name}()"""
         }.mkString(s"""return "${cl.name}(" """, " + \", \"", " + \")\";")
       }
+    }
 
     s"""public String toString() {
        |    $body

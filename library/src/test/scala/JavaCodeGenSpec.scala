@@ -52,7 +52,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
-        |        return "simpleInterfaceExample("  + "field: " + field() + ")";
+        |        return "custom";
         |    }
         |}""".stripMargin.unindent)
   }

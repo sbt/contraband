@@ -64,6 +64,7 @@ object SchemaExample {
       "type": "type"
     }
   ],
+  "toString": "return \"custom\";",
   "extra": "// Some extra code..."
 }"""
 
@@ -310,6 +311,7 @@ object SchemaExample {
               "type": "String*"
             }
           ],
+          "toString": "return \"Welcome, extra!\";",
           "types": [
             {
               "name": "GreetingExtraImpl",
@@ -321,7 +323,8 @@ object SchemaExample {
                   "name": "x",
                   "type": "String"
                 }
-              ]
+              ],
+              "toString": "return \"Welcome, extra implosion!\";"
             }
           ]
         },
@@ -463,7 +466,7 @@ sealed abstract class GreetingExtra(
     super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
   }
   override def toString: String = {
-    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
+    return "Welcome, extra!";
   }
 }
 
@@ -483,7 +486,7 @@ final class GreetingExtraImpl(
     super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
   }
   override def toString: String = {
-    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
+    return "Welcome, extra implosion!";
   }
   def copy(message: => String, extra: Vector[String], x: String): GreetingExtraImpl = {
     new GreetingExtraImpl(message, header, extra, x)
@@ -732,7 +735,7 @@ public abstract class GreetingExtra extends com.example.Greetings {
         return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
     }
     public String toString() {
-        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
+        return "Welcome, extra!";
     }
 }""",
 
@@ -771,7 +774,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
         return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
     }
     public String toString() {
-        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
+        return "Welcome, extra implosion!";
     }
 }""",
 

@@ -2,3 +2,9 @@
 ### enhancements
 
 - Adds generating an empty companion object for abstract classes so that it can be target for enrich-my-type. [#40][40] by [@dwijnand][@dwijnand]
+- Adds support for custom toString using the key "toString". [#39][39]/[#41][41] by [@dwijnand][@dwijnand]
+
+  [39]: https://github.com/sbt/sbt-datatype/issues/39
+  [40]: https://github.com/sbt/sbt-datatype/pull/40
+  [41]: https://github.com/sbt/sbt-datatype/pull/41
+  [@dwijnand]: http://github.com/dwijnand

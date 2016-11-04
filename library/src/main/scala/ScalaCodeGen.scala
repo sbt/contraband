@@ -63,7 +63,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genLazyMembers(r.fields) mkString EOL}
          |  ${genEquals(r, superFields)}
          |  ${genHashCode(r, superFields)}
-         |  ${genToString(r, superFields)}
+         |  ${genToString(r, superFields, r.toStringImpl)}
          |  ${genCopyOverloads(r, allFields) mkString EOL}
          |  ${genWith(r, superFields)}
          |}
@@ -101,7 +101,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  $messages
          |  ${genEquals(i, superFields)}
          |  ${genHashCode(i, superFields)}
-         |  ${genToString(i, superFields)}
+         |  ${genToString(i, superFields, i.toStringBody)}
          |}
          |
          |object ${i.name}""".stripMargin
@@ -175,10 +175,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
        |}""".stripMargin
   }
 
-  private def genToString(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
-
-    val body =
+  private def genToString(cl: ClassLike, superFields: List[Field], toString: Option[String]) = {
+    val body = toString getOrElse {
+      val allFields = superFields ++ cl.fields
       if (allFields exists (_.tpe.lzy)) {
         s"super.toString // Avoid evaluating lazy members in toString to avoid circularity."
       } else if (allFields.isEmpty) {
@@ -187,6 +186,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
         val fieldsToString = allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
         s""""${cl.name}("$fieldsToString")""""
       }
+    }
 
     s"""override def toString: String = {
        |  $body

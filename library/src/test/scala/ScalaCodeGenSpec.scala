@@ -45,7 +45,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    37 * (17 + field.##)
         |  }
         |  override def toString: String = {
-        |    "simpleInterfaceExample(" + field + ")"
+        |    return "custom";
         |  }
         |}
         |
