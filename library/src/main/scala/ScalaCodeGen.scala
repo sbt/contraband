@@ -178,21 +178,19 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   private def genToString(cl: ClassLike, superFields: List[Field]) = {
     val allFields = superFields ++ cl.fields
 
-    if (allFields exists (_.tpe.lzy)) {
-      s"""override def toString: String = {
-         |  super.toString // Avoid evaluating lazy members in toString to avoid circularity.
-         |}""".stripMargin
-    } else if (allFields.isEmpty) {
-      s"""override def toString: String = {
-         |  "${cl.name}()"
-         |}""".stripMargin
-    } else {
-      val fieldsToString =
-        allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
-      s"""override def toString: String = {
-         |  "${cl.name}("$fieldsToString")"
-         |}""".stripMargin
-    }
+    val body =
+      if (allFields exists (_.tpe.lzy)) {
+        s"super.toString // Avoid evaluating lazy members in toString to avoid circularity."
+      } else if (allFields.isEmpty) {
+        s""""${cl.name}()""""
+      } else {
+        val fieldsToString = allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
+        s""""${cl.name}("$fieldsToString")""""
+      }
+
+    s"""override def toString: String = {
+       |  $body
+       |}""".stripMargin
   }
 
   private def genApplyOverloads(r: Record, allFields: List[Field]): List[String] =
