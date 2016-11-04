@@ -18,7 +18,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generate(s: Schema): ListMap[File, String] =
-    ListMap(s.definitions.toList flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
+    ListMap(s.definitions flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
     val Interface(name, _, namespace, _, doc, fields, messages, children, extra) = i
