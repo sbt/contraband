@@ -262,7 +262,7 @@ object SchemaExample {
 
   val completeExample = """{
   "codecNamespace": "generated",
-  "fullCodec": "CustomProtcol",
+  "fullCodec": "CustomProtocol",
   "types": [
     {
       "name": "Greetings",
@@ -1035,8 +1035,8 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 
 // DO NOT EDIT MANUALLY
 package generated
-trait CustomProtcol extends sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with java.util.DateFormats with generated.PriorityLevelFormats with generated.GreetingHeaderFormats with generated.GreetingsFormats
-object CustomProtcol extends CustomProtcol""".stripMargin
+trait CustomProtocol extends sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with java.util.DateFormats with generated.PriorityLevelFormats with generated.GreetingHeaderFormats with generated.GreetingsFormats
+object CustomProtocol extends CustomProtocol""".stripMargin
 
   val growableAddOneFieldExample = """{
   "name": "growableAddOneField",
