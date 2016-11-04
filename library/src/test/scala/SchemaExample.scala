@@ -2,6 +2,8 @@ package sbt.datatype
 
 import java.io.File
 
+import scala.collection.immutable.ListMap
+
 object SchemaExample {
   val basicSchema = """{
   "namespace": "com.example",
@@ -595,7 +597,7 @@ object PriorityLevel {
 }""".stripMargin
 
   val completeExampleCodeJava =
-    Map(
+    ListMap(
       new File("com/example/GreetingHeader.java") ->
         """package com.example;
           |/** Meta information of a Greeting */
