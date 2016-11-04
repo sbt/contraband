@@ -6,9 +6,11 @@ import scala.collection.JavaConverters._
 import difflib._
 
 object TestUtils {
-  def printUnifiedDiff(expected: sciSeq[String], obtained: sciSeq[String]) = {
+  def unifiedDiff(expectedName: String, obtainedName: String, expected: sciSeq[String], obtained: sciSeq[String], contextSize: Int): Vector[String] = {
     val patch = DiffUtils.diff(expected.asJava, obtained.asJava)
-    val unifiedDiff = DiffUtils.generateUnifiedDiff("expected", "obtained", expected.asJava, patch, 99).asScala.toList
-    unifiedDiff foreach println
+    DiffUtils.generateUnifiedDiff(expectedName, obtainedName, expected.asJava, patch, contextSize).asScala.toVector
   }
+
+  def printUnifiedDiff(expected: sciSeq[String], obtained: sciSeq[String]) =
+    unifiedDiff("expected", "obtained", expected, obtained, 99) foreach println
 }

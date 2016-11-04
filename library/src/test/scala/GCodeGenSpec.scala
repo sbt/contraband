@@ -1,17 +1,49 @@
 package sbt.datatype
 
-import org.scalatest._
-import SchemaExample._
+import org.scalatest._, matchers._
 
 abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers {
+  final case class Lines(value: Vector[String]) {
+    def diff(expectedName: String, obtainedName: String, right: Lines) =
+      TestUtils.unifiedDiff(expectedName, obtainedName, value, right.value, 3)
+  }
+  private val emptyLines = Lines(Vector.empty)
+
   implicit class CleanedString(s: String) {
-    def unindent: List[String] = s.lines.toList map (_.trim) filterNot (_.isEmpty)
-    def withoutEmptyLines: List[String] = s.lines.toList filterNot (_.trim.isEmpty)
+    def unindent: Lines = Lines(s.lines map (_.trim) filterNot (_.isEmpty) toVector)
+    def withoutEmptyLines: Lines = Lines(s.lines filterNot (_.trim.isEmpty) toVector)
   }
 
-  implicit def definition2Schema(d: Definition): Schema =
-    Schema(List(d), Some("generated"), None)
+  final class EqualLines(right: Lines) extends Matcher[Lines] {
+    def apply(left: Lines): MatchResult = MatchResult(
+      left == right,
+      s"Left lines did not equal right lines:\n${left.diff("expected", "obtained", right) mkString ("\n")}",
+      "Left lines equaled right lines"
+    )
+  }
 
+  def equalLines(expectedLines: Lines) = new EqualLines(expectedLines)
+
+  final class EqualMapLines(right: Map[java.io.File, Lines]) extends Matcher[Map[java.io.File, Lines]] {
+    def apply(left: Map[java.io.File, Lines]): MatchResult = {
+      def diff = {
+        (left.keys.toSeq ++ right.keys).distinct flatMap { file =>
+          val l = left.getOrElse(file, emptyLines)
+          val r = right.getOrElse(file, emptyLines)
+          l.diff(s"expected/$file", s"obtained/$file", r)
+        } mkString "\n"
+      }
+      MatchResult(
+        left == right,
+        s"Left map lines did not equal right map lines:\n$diff",
+        "Left map lines equaled right map lines"
+      )
+    }
+  }
+
+  def equalMapLines(expectedMapLines: Map[java.io.File, Lines]) = new EqualMapLines(expectedMapLines)
+
+  implicit def definition2Schema(d: Definition): Schema = Schema(List(d), Some("generated"), None)
 
   "generate(Enumeration)" should "generate a simple enumeration" in enumerationGenerateSimple
 
@@ -30,15 +62,18 @@ abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers {
   it should "generate correct type references (no lazy)" in schemaGenerateTypeReferencesNoLazy
 
   def enumerationGenerateSimple: Unit
+
   def interfaceGenerateSimple: Unit
   def interfaceGenerateOneChild: Unit
   def interfaceGenerateNested: Unit
   def interfaceGenerateMessages: Unit
+
   def recordGenerateSimple: Unit
+  def recordGrowZeroToOneField: Unit
+  def recordGrowZeroToOneToTwoFields: Unit
+
   def schemaGenerateComplete: Unit
   def schemaGenerateCompletePlusIndent: Unit
   def schemaGenerateTypeReferences: Unit
   def schemaGenerateTypeReferencesNoLazy: Unit
-  def recordGrowZeroToOneField: Unit
-  def recordGrowZeroToOneToTwoFields: Unit
 }

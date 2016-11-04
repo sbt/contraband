@@ -2,7 +2,7 @@ package sbt.datatype
 
 import java.io.File
 
-import NewSchema._
+import SchemaExample._
 
 class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   val codecParents = List("sjsonnew.BasicJsonProtocol")
@@ -16,7 +16,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -46,7 +46,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.writeString(str)
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateSimple = {
@@ -54,7 +54,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = Interface parse simpleInterfaceExample
     val code = gen generate intf
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -71,7 +71,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of simpleInterfaceExample.")
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateOneChild = {
@@ -79,7 +79,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = Interface parse oneChildInterfaceExample
     val code = gen generate intf
 
-    (code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should contain theSameElementsAs
+    code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -90,7 +90,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |trait OneChildInterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
         |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = unionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]
         |}""".stripMargin.unindent)
-    (code(new File("generated", "childRecordFormats.scala")).unindent should contain theSameElementsAs
+    code(new File("generated", "childRecordFormats.scala")).unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -127,7 +127,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = Interface parse nestedInterfaceExample
     val code = gen generate intf
 
-    (code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should contain theSameElementsAs
+    code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -138,7 +138,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.NestedProtocolFormats =>
         |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = unionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]
         |}""".stripMargin.unindent)
-    (code(new File("generated", "nestedProtocolFormats.scala")).unindent should contain theSameElementsAs
+    code(new File("generated", "nestedProtocolFormats.scala")).unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -163,7 +163,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -180,7 +180,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of generateArgDocExample.")
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def recordGenerateSimple = {
@@ -188,7 +188,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -215,7 +215,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
@@ -223,7 +223,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -250,7 +250,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneToTwoFields: Unit = {
@@ -258,8 +258,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = Record parse growableZeroToOneToTwoFieldsExample
     val code = gen generate record
 
-    val obtained = code.head._2.unindent
-    val expected =
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -288,9 +287,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent
-    TestUtils.printUnifiedDiff(expected, obtained)
-    obtained should contain theSameElementsAs expected
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
@@ -298,7 +295,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -335,7 +332,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
@@ -343,7 +340,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -371,15 +368,14 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
-    // println(code.values.mkString)
-    code.values.mkString.unindent should contain theSameElementsAs completeExampleCodeCodec.unindent
+    code.values.mkString.unindent should equalLines (completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
@@ -387,7 +383,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.values.mkString.withoutEmptyLines should contain theSameElementsAs completeExampleCodeCodec.withoutEmptyLines
+    code.values.mkString.withoutEmptyLines should equalLines (completeExampleCodeCodec.withoutEmptyLines)
   }
 
   "The full codec object" should "include the codec of all protocol defined in the schema" in {
@@ -403,7 +399,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.
         | */
@@ -419,6 +415,6 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      serializationError("No known implementation of Greeting.")
         |    }
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 }
