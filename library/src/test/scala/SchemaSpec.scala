@@ -2,7 +2,6 @@ package sbt.datatype
 
 import org.scalatest.FlatSpec
 import SchemaExample._
-import NewSchema._
 
 class SchemaSpec extends FlatSpec {
   "ProtocolSchema.parse" should "parse" in {

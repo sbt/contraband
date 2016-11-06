@@ -2,7 +2,9 @@ package sbt.datatype
 
 import java.io.File
 
-import NewSchema._
+import scala.collection.immutable.ListMap
+
+import SchemaExample._
 
 class JavaCodeGenSpec extends GCodeGenSpec("Java") {
 
@@ -10,21 +12,21 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate enumeration
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** Example of simple enumeration */
         |public enum simpleEnumerationExample {
         |    /** First symbol */
         |    first,
         |    second;
         |    // Some extra code...
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateSimple = {
     val protocol = Interface parse simpleInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** example of simple interface */
         |public abstract class simpleInterfaceExample implements java.io.Serializable {
         |    // Some extra code...
@@ -52,7 +54,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return "simpleInterfaceExample("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateOneChild = {
@@ -60,7 +62,7 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
     val code1 = code.toList(0)._2.unindent
     val code2 = code.toList(1)._2.unindent
-    (code1 should contain theSameElementsAs
+    code1 should equalLines (
       """/** example of interface */
         |public abstract class oneChildInterfaceExample implements java.io.Serializable {
         |
@@ -88,9 +90,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent
-    )
-    (code2 should contain theSameElementsAs
+        |}""".stripMargin.unindent)
+    code2 should equalLines (
       """public final class childRecord extends oneChildInterfaceExample {
         |    private int x;
         |    public childRecord(int _field, int _x) {
@@ -100,11 +101,11 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public int x() {
         |        return this.x;
         |    }
-        |    public childRecord withX(int x) {
-        |        return new childRecord(field(), x);
-        |    }
         |    public childRecord withField(int field) {
         |        return new childRecord(field, x);
+        |    }
+        |    public childRecord withX(int x) {
+        |        return new childRecord(field(), x);
         |    }
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
@@ -129,8 +130,8 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
     val protocol = Interface parse nestedInterfaceExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate protocol
 
-    (code mapValues (_.unindent)) should contain theSameElementsAs
-      Map(
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
             |public abstract class nestedProtocolExample implements java.io.Serializable {
@@ -177,15 +178,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "nestedProtocol("  + ")";
             |    }
             |}""".stripMargin.unindent
-      ).toList
+      ))
   }
 
   override def interfaceGenerateMessages = {
     val schema = Schema parse generateArgDocExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
-    (code mapValues (_.withoutEmptyLines)) should contain theSameElementsAs
-      Map(
+    code mapValues (_.withoutEmptyLines) should equalMapLines (
+      ListMap(
         new File("generateArgDocExample.java") ->
           """public abstract class generateArgDocExample implements java.io.Serializable {
             |    /** I'm a field. */
@@ -222,15 +223,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "generateArgDocExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.withoutEmptyLines
-      ).toList
+      ))
   }
 
   override def recordGenerateSimple = {
     val record = Record parse simpleRecordExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
 
-    (code mapValues (_.unindent)) should contain theSameElementsAs
-      Map(
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
         new File("simpleRecordExample.java") ->
           """/** Example of simple record */
             |public final class simpleRecordExample implements java.io.Serializable {
@@ -264,15 +265,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
-      ).toList
+      ))
   }
 
   override def recordGrowZeroToOneField = {
     val record = Record parse growableAddOneFieldExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
 
-    (code mapValues (_.unindent)) should contain theSameElementsAs
-      Map(
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
         new File("growableAddOneField.java") ->
           """public final class growableAddOneField implements java.io.Serializable {
             |    private int field;
@@ -307,16 +308,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "growableAddOneField("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
-      ).toList
+      ))
   }
 
   override def recordGrowZeroToOneToTwoFields = {
     val record = Record parse growableZeroToOneToTwoFieldsExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate record
 
-    val obtained = code mapValues (_.unindent)
-    val expected =
-      Map(
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
             |    private int x;
@@ -365,16 +365,14 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
             |    }
             |}""".stripMargin.unindent
-      ).toList
-    TestUtils.printUnifiedDiff(expected.flatMap(_._2), obtained.toList.flatMap(_._2))
-    obtained should contain theSameElementsAs expected
+      ))
   }
 
   override def schemaGenerateTypeReferences = {
     val schema = Schema parse primitiveTypesExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """public final class primitiveTypesExample implements java.io.Serializable {
         |
         |    private int simpleInteger;
@@ -437,15 +435,15 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
         |    }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
 
-    (code mapValues (_.unindent)) should contain theSameElementsAs
-      Map(
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
         new File("primitiveTypesNoLazyExample.java") ->
           """public final class primitiveTypesNoLazyExample implements java.io.Serializable {
             |
@@ -486,22 +484,18 @@ class JavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
             |    }
             |}""".stripMargin.unindent
-      ).toList
+      ))
   }
 
   override def schemaGenerateComplete = {
     val schema = Schema parse completeExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
-    // println(code.toString)
-    (code mapValues (_.unindent)) should contain theSameElementsAs
-        (completeExampleCodeJava mapValues (_.unindent) toList)
+    code mapValues (_.unindent) should equalMapLines (completeExampleCodeJava mapValues (_.unindent))
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = Schema parse completeExample
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption") generate schema
-
-    (code mapValues (_.withoutEmptyLines)) should contain theSameElementsAs
-      (completeExampleCodeJava mapValues (_.withoutEmptyLines) toList)
+    code mapValues (_.withoutEmptyLines) should equalMapLines (completeExampleCodeJava mapValues (_.withoutEmptyLines))
   }
 }

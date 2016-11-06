@@ -2,7 +2,7 @@ package sbt.datatype
 
 import java.io.File
 
-import NewSchema._
+import SchemaExample._
 
 class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
@@ -15,16 +15,16 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val enumeration = Enumeration parse simpleEnumerationExample
     val code = gen generate enumeration
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** Example of simple enumeration */
         |sealed abstract class simpleEnumerationExample extends Serializable
         |object simpleEnumerationExample {
         |  // Some extra code...
         |  /** First symbol */
         |  case object first extends simpleEnumerationExample
-        |
         |  case object second extends simpleEnumerationExample
-        |}""".stripMargin.unindent
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def interfaceGenerateSimple = {
@@ -32,7 +32,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Interface parse simpleInterfaceExample
     val code = gen generate protocol
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** example of simple interface */
         |sealed abstract class simpleInterfaceExample(
         |  val field: type) extends Serializable {
@@ -47,7 +47,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleInterfaceExample(" + field + ")"
         |  }
-        |}""".stripMargin.unindent
+        |}
+        |""".stripMargin.unindent)
   }
 
   override def interfaceGenerateOneChild = {
@@ -55,7 +56,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Interface parse oneChildInterfaceExample
     val code = gen generate protocol
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** example of interface */
         |sealed abstract class oneChildInterfaceExample(
         |    val field: Int) extends Serializable {
@@ -96,7 +97,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object childRecord {
         |  def apply(field: Int, x: Int): childRecord = new childRecord(field, x)
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateNested = {
@@ -104,7 +105,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val protocol = Interface parse nestedInterfaceExample
     val code = gen generate protocol
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** example of nested protocols */
         |sealed abstract class nestedProtocolExample() extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
@@ -129,14 +130,14 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "nestedProtocol()"
         |  }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def interfaceGenerateMessages = {
     val schema = Schema parse generateArgDocExample
     val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
 
-    code.head._2.withoutEmptyLines should contain theSameElementsAs
+    code.head._2.withoutEmptyLines shouldBe
       """abstract class generateArgDocExample(
         |  /** I'm a field. */
         |  val field: Int) extends Serializable {
@@ -167,7 +168,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val record = Record parse simpleRecordExample
     val code = gen generate record
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """/** Example of simple record */
         |final class simpleRecordExample(
         |val field: java.net.URL) extends Serializable {
@@ -191,7 +192,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |object simpleRecordExample {
         |  def apply(field: java.net.URL): simpleRecordExample = new simpleRecordExample(field)
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneField = {
@@ -199,8 +200,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val record = Record parse growableAddOneFieldExample
     val code = gen generate record
 
-    val obtained = code.head._2.unindent
-    val expected =
+    code.head._2.unindent should equalLines (
       """final class growableAddOneField(
         |  val field: Int) extends Serializable {
         |  def this() = this(0)
@@ -227,9 +227,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |object growableAddOneField {
         |  def apply(): growableAddOneField = new growableAddOneField(0)
         |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
-        |}""".stripMargin.unindent
-    TestUtils.printUnifiedDiff(expected, obtained)
-    obtained should contain theSameElementsAs expected
+        |}""".stripMargin.unindent)
   }
 
   override def recordGrowZeroToOneToTwoFields = {
@@ -237,8 +235,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val record = Record parse growableZeroToOneToTwoFieldsExample
     val code = gen generate record
 
-    val obtained = code.head._2.unindent
-    val expected =
+    code.head._2.unindent should equalLines (
       """final class Foo(
         |  val x: Int,
         |  val y: Int) extends Serializable {
@@ -274,16 +271,14 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def apply(): Foo = new Foo(0, 0)
         |  def apply(x: Int): Foo = new Foo(x, 0)
         |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
-        |}""".stripMargin.unindent
-    TestUtils.printUnifiedDiff(expected, obtained)
-    obtained should contain theSameElementsAs expected
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferences = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse primitiveTypesExample
     val code = gen generate schema
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """final class primitiveTypesExample(
         |  val simpleInteger: Int,
         |  _lazyInteger: => Int,
@@ -331,7 +326,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object primitiveTypesExample {
         |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Vector[Int], optionInteger: Option[Int], lazyArrayInteger: => Vector[Int], lazyOptionInteger: => Option[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
@@ -339,7 +334,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val schema = Schema parse primitiveTypesNoLazyExample
     val code = gen generate schema
 
-    code.head._2.unindent should contain theSameElementsAs
+    code.head._2.unindent should equalLines (
       """final class primitiveTypesNoLazyExample(
         |
         |  val simpleInteger: Int,
@@ -370,26 +365,20 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object primitiveTypesNoLazyExample {
         |  def apply(simpleInteger: Int, arrayInteger: Vector[Int]): primitiveTypesNoLazyExample = new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
-        |}""".stripMargin.unindent
+        |}""".stripMargin.unindent)
   }
 
   override def schemaGenerateComplete = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
-    // println(code.toString)
-    code.head._2.unindent should contain theSameElementsAs completeExampleCodeScala.unindent
+    code.head._2.unindent should equalLines (completeExampleCodeScala.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = Schema parse completeExample
     val code = gen generate schema
-
-    val obtained = code.head._2.withoutEmptyLines
-    val expected = completeExampleCodeScala.withoutEmptyLines
-    TestUtils.printUnifiedDiff(expected, obtained)
-    obtained should contain theSameElementsAs expected
+    code.head._2.withoutEmptyLines should equalLines (completeExampleCodeScala.withoutEmptyLines)
   }
-
 }

@@ -26,10 +26,6 @@ object SchemaExample {
   ]
 }"""
 
-}
-
-object NewSchema {
-
   val emptySchemaExample = """{}"""
 
   val emptyInterfaceExample = """{
@@ -1038,7 +1034,6 @@ package generated
 trait CustomProtcol extends sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with java.util.DateFormats with generated.PriorityLevelFormats with generated.GreetingHeaderFormats with generated.GreetingsFormats
 object CustomProtcol extends CustomProtcol""".stripMargin
 
-
   val growableAddOneFieldExample = """{
   "name": "growableAddOneField",
   "target": "Scala",
@@ -1082,5 +1077,4 @@ object CustomProtcol extends CustomProtcol""".stripMargin
       |    "spans over multiple lines"
       |  ]
       |}""".stripMargin
-
 }
