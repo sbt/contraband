@@ -1,0 +1,4 @@
+
+### enhancements
+
+- Adds generating an empty companion object for abstract classes so that it can be target for enrich-my-type. [#40][40] by [@dwijnand][@dwijnand]

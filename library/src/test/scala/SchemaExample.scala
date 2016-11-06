@@ -411,6 +411,8 @@ sealed abstract class Greetings(
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
 }
+
+object Greetings
 /** A Greeting in its simplest form */
 final class SimpleGreeting(
   message: => String,
@@ -462,6 +464,8 @@ sealed abstract class GreetingExtra(
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
 }
+
+object GreetingExtra
 final class GreetingExtraImpl(
   message: => String,
   header: com.example.GreetingHeader,
