@@ -28,7 +28,7 @@ object KeywordPlugin extends AutoPlugin {
     }
   override def projectSettings: Seq[Setting[_]] = inConfig(Compile)(Seq(
     scalaKeywords := getScalaKeywords,
-    generateKeywords <<= (sourceManaged, scalaKeywords) map writeScalaKeywords,
-    sourceGenerators <+= generateKeywords map (x => Seq(x))
+    generateKeywords := writeScalaKeywords(sourceManaged.value, scalaKeywords.value),
+    sourceGenerators += Def.task(Seq(generateKeywords.value)).taskValue
   ))
 }
