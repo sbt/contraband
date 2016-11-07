@@ -221,7 +221,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent should equalLines (
       """final class growableAddOneField(
-        |  val field: Int) extends Serializable {
+        |  val field: Int = 0) extends Serializable {
         |  def this() = this(0)
         |  override def equals(o: Any): Boolean = o match {
         |    case x: growableAddOneField => (this.field == x.field)
@@ -245,7 +245,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |object growableAddOneField {
         |  def apply(): growableAddOneField = new growableAddOneField(0)
-        |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
+        |  def apply(field: Int = 0): growableAddOneField = new growableAddOneField(field)
         |}
         |""".stripMargin.unindent)
   }
@@ -257,8 +257,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent should equalLines (
       """final class Foo(
-        |  val x: Int,
-        |  val y: Int) extends Serializable {
+        |  val x: Int = 0,
+        |  val y: Int = 0) extends Serializable {
         |  def this() = this(0, 0)
         |  def this(x: Int) = this(x, 0)
         |  override def equals(o: Any): Boolean = o match {
@@ -290,7 +290,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |object Foo {
         |  def apply(): Foo = new Foo(0, 0)
         |  def apply(x: Int): Foo = new Foo(x, 0)
-        |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
+        |  def apply(x: Int = 0, y: Int = 0): Foo = new Foo(x, y)
         |}
         |""".stripMargin.unindent)
   }

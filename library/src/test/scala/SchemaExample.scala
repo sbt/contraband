@@ -408,7 +408,7 @@ object SchemaExample {
 sealed abstract class Greetings(
   _message: => String,
   /** The header of the Greeting */
-  val header: com.example.GreetingHeader) extends com.example.GreetingsLike with Serializable {
+  val header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown")) extends com.example.GreetingsLike with Serializable {
   def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
   /**
    * The message of the Greeting
@@ -434,7 +434,7 @@ object Greetings extends com.example.GreetingsCompanionLike {
 /** A Greeting in its simplest form */
 final class SimpleGreeting(
   message: => String,
-  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) with Serializable {
+  header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown")) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
 
   override def equals(o: Any): Boolean = o match {
@@ -462,12 +462,12 @@ final class SimpleGreeting(
 }
 object SimpleGreeting {
   def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
-  def apply(message: => String, header: com.example.GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
+  def apply(message: => String, header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown")): SimpleGreeting = new SimpleGreeting(message, header)
 }
 
 sealed abstract class GreetingExtra(
   message: => String,
-  header: com.example.GreetingHeader,
+  header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown"),
   val extra: Vector[String]) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String, extra: Vector[String]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra)
 
@@ -488,7 +488,7 @@ object GreetingExtra {
 
 final class GreetingExtraImpl(
   message: => String,
-  header: com.example.GreetingHeader,
+  header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown"),
   extra: Vector[String],
   val x: String) extends com.example.GreetingExtra(message, header, extra) with Serializable {
   def this(message: => String, extra: Vector[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
@@ -524,13 +524,13 @@ final class GreetingExtraImpl(
 }
 object GreetingExtraImpl {
   def apply(message: => String, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
-  def apply(message: => String, header: com.example.GreetingHeader, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
+  def apply(message: => String, header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
 }
 
 /** A Greeting with attachments */
 final class GreetingWithAttachments(
   message: => String,
-  header: com.example.GreetingHeader,
+  header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown"),
   /** The files attached to the greeting */
   val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
@@ -563,14 +563,14 @@ final class GreetingWithAttachments(
 }
 object GreetingWithAttachments {
   def apply(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
-  def apply(message: => String, header: com.example.GreetingHeader, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
+  def apply(message: => String, header: com.example.GreetingHeader = new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
 }
 
 /** Meta information of a Greeting */
 final class GreetingHeader(
   _created: => java.util.Date,
   /** The priority of this Greeting */
-  val priority: com.example.PriorityLevel,
+  val priority: com.example.PriorityLevel = com.example.PriorityLevel.Medium,
   /** The author of the Greeting */
   val author: String) extends Serializable {
   def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
@@ -606,7 +606,7 @@ object GreetingHeader {
   val default: GreetingHeader =
   new GreetingHeader(new java.util.Date(), com.example.PriorityLevel.Medium, scala.sys.props("user.name")
   def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, com.example.PriorityLevel.Medium, author)
-  def apply(created: => java.util.Date, priority: com.example.PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
+  def apply(created: => java.util.Date, priority: com.example.PriorityLevel = com.example.PriorityLevel.Medium, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
 }
 
 /** Priority levels */

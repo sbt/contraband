@@ -209,6 +209,14 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       List(s"def apply(): ${r.name} = new ${r.name}()")
     } else {
       perVersionNumber(r.since, allFields) { (provided, byDefault) =>
+        def genParam(f: Field) = {
+          val name = bq(f.name)
+          val tpe = genRealTpe(f.tpe, isParam = true)
+          if (byDefault.isEmpty) // when all fields are provided, then given them their default value
+            s"$name: $tpe${f.default.fold("")(d => s" = $d")}"
+          else
+            s"$name: $tpe"
+        }
         val applyParameters = provided map genParam mkString ", "
 
         val ctorCallArguments =
@@ -246,9 +254,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
 
       case f if cl.fields.contains(f) =>
         s"""$EOL${genDoc(f.doc)}
-           |val ${genParam(f)}""".stripMargin
+           |val ${genParam(f)}${f.default.fold("")(d => s" = $d")}""".stripMargin
 
-      case f => EOL + genParam(f)
+      case f => EOL + genParam(f) + f.default.fold("")(d => s" = $d")
     }
 
   private def genLazyMembers(fields: List[Field]): List[String] =
