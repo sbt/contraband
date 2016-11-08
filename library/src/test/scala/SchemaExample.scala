@@ -65,7 +65,8 @@ object SchemaExample {
     }
   ],
   "toString": "return \"custom\";",
-  "extra": "// Some extra code..."
+  "extra": "// Some extra code...",
+  "extraCompanion": "// Some extra companion code..."
 }"""
 
   val oneChildInterfaceExample = """{
@@ -343,7 +344,8 @@ object SchemaExample {
             }
           ]
         }
-      ]
+      ],
+      "extraCompanion": "val empty: com.example.Greeting = new com.example.SimpleGreeting(\"Hello, World!\")"
     },
     {
       "name": "GreetingHeader",
@@ -370,6 +372,10 @@ object SchemaExample {
           "doc": "The author of the Greeting",
           "type": "String"
         }
+      ],
+      "extraCompanion": [
+        "val default: GreetingHeader = ",
+        "  new GreetingHeader(new java.util.Date(), com.example.PriorityLevel.Medium, scala.sys.props(\"user.name\")"
       ]
     },
     {
@@ -386,7 +392,8 @@ object SchemaExample {
           "doc": "Default priority level"
         },
         "High"
-      ]
+      ],
+      "extraCompanion": "val default: com.example.PriorityLevel = com.example.PriorityLevel.Medium"
     }
   ]
 }"""
@@ -416,8 +423,10 @@ sealed abstract class Greetings(
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
 }
+object Greetings {
+  val empty: com.example.Greeting = new com.example.SimpleGreeting("Hello, World!")
+}
 
-object Greetings
 /** A Greeting in its simplest form */
 final class SimpleGreeting(
   message: => String,
@@ -451,6 +460,7 @@ object SimpleGreeting {
   def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
   def apply(message: => String, header: com.example.GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
 }
+
 sealed abstract class GreetingExtra(
   message: => String,
   header: com.example.GreetingHeader,
@@ -469,8 +479,9 @@ sealed abstract class GreetingExtra(
     return "Welcome, extra!";
   }
 }
+object GreetingExtra {
+}
 
-object GreetingExtra
 final class GreetingExtraImpl(
   message: => String,
   header: com.example.GreetingHeader,
@@ -511,6 +522,7 @@ object GreetingExtraImpl {
   def apply(message: => String, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
   def apply(message: => String, header: com.example.GreetingHeader, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
 }
+
 /** A Greeting with attachments */
 final class GreetingWithAttachments(
   message: => String,
@@ -549,6 +561,7 @@ object GreetingWithAttachments {
   def apply(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
   def apply(message: => String, header: com.example.GreetingHeader, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
 }
+
 /** Meta information of a Greeting */
 final class GreetingHeader(
   _created: => java.util.Date,
@@ -586,13 +599,15 @@ final class GreetingHeader(
   }
 }
 object GreetingHeader {
+  val default: GreetingHeader =
+  new GreetingHeader(new java.util.Date(), com.example.PriorityLevel.Medium, scala.sys.props("user.name")
   def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, com.example.PriorityLevel.Medium, author)
   def apply(created: => java.util.Date, priority: com.example.PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
 }
+
 /** Priority levels */
 sealed abstract class PriorityLevel extends Serializable
 object PriorityLevel {
-
   case object Low extends PriorityLevel
   /** Default priority level */
   case object Medium extends PriorityLevel

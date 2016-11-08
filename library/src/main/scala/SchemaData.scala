@@ -123,7 +123,8 @@ case class Interface(name: String,
   messages: List[Message],
   children: List[Definition],
   extra: List[String],
-  toStringBody: Option[String]) extends ClassLike
+  toStringBody: Option[String],
+  extraCompanion: List[String]) extends ClassLike
 
 object Interface extends Parser[Interface] {
   override def parse(json: JValue): Interface =
@@ -136,7 +137,8 @@ object Interface extends Parser[Interface] {
       json ->* "messages" map Message.parse,
       json ->* "types" map Definition.parse,
       json multiLineOpt "extra" getOrElse Nil,
-      json ->? "toString")
+      json ->? "toString",
+      json multiLineOpt "extraCompanion" getOrElse Nil)
 }
 
 /**
@@ -156,7 +158,8 @@ case class Record(name: String,
   doc: List[String],
   fields: List[Field],
   extra: List[String],
-  toStringImpl: Option[String]) extends ClassLike
+  toStringImpl: Option[String],
+  extraCompanion: List[String]) extends ClassLike
 
 object Record extends Parser[Record] {
   override def parse(json: JValue): Record =
@@ -167,7 +170,8 @@ object Record extends Parser[Record] {
       json multiLineOpt "doc" getOrElse Nil,
       json ->* "fields" map Field.parse,
       json multiLineOpt "extra" getOrElse Nil,
-      json ->? "toString")
+      json ->? "toString",
+      json multiLineOpt "extraCompanion" getOrElse Nil)
 }
 
 /**
