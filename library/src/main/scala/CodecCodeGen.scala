@@ -10,7 +10,7 @@ import CodeGen.bq
  * @param codecParents        The parents that appear in the self type of all codecs, and the full codec inherits from.
  * @param instantiateJavaLazy How to transform an expression to its lazy equivalent in Java.
  * @param formatsForType      Given a `TpeRef` t, returns the list of codecs needed to encode t.
- * @param includedSchemas     List of schemas that could be refereced.
+ * @param includedSchemas     List of schemas that could be referenced.
  */
 class CodecCodeGen(codecParents: List[String],
   instantiateJavaLazy: String => String,
@@ -157,7 +157,7 @@ class CodecCodeGen(codecParents: List[String],
   }
 
   override def generate(s: Schema): ListMap[File, String] = {
-    val codecs: ListMap[File, String] = ((s.definitions.toList map { d =>
+    val codecs: ListMap[File, String] = ((s.definitions map { d =>
       ListMap(generate(s, d, None, Nil).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
     val result = s.fullCodec match {
       case Some(x) =>
@@ -185,12 +185,7 @@ class CodecCodeGen(codecParents: List[String],
   private def getRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = {
     val typeFormats =
       d match {
-        case Interface(name, _, namespace, _, _, fields, _, _, _, _) =>
-          val allFields = superFields ++ fields
-          allFields flatMap (f => lookupFormats(f.tpe))
-        case Record(_, _, _, _, _, fields, _, _) =>
-          val allFields = superFields ++ fields
-          allFields flatMap (f => lookupFormats(f.tpe))
+        case c: ClassLike   => superFields ++ c.fields flatMap (f => lookupFormats(f.tpe))
         case _: Enumeration => Nil
       }
     typeFormats ++ codecParents
@@ -216,12 +211,10 @@ class CodecCodeGen(codecParents: List[String],
       }
     val allDefinitions = ds flatMap getAllDefinitions
     val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
-      val tpe = TpeRef((d.namespace.map(_ + ".").getOrElse("")) + d.name, false, false, false)
+      val requiredFormats = getRequiredFormats(s, d, superFields)
       fullFormatsName(s, d) -> (d match {
-        case i: Interface =>
-          i.children.map( c => fullFormatsName(s, c)) :::
-          getRequiredFormats(s, d, superFields)
-        case _            => getRequiredFormats(s, d, superFields)
+        case i: Interface => i.children.map( c => fullFormatsName(s, c)) ::: requiredFormats
+        case _            => requiredFormats
       })
     }: _*)
     val xs = sbt.Dag.topologicalSortUnchecked[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
@@ -291,28 +284,8 @@ class CodecCodeGen(codecParents: List[String],
       s"""${genPackage(s)}
          |trait $name $parents
          |object $name extends $name""".stripMargin
-    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None)
+    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil)
     ListMap(new File(genFile(s, syntheticDefinition).getParentFile, s"$name.scala") -> code)
-  }
-
-  private def allChildrenOf(d: Definition): List[Definition] = d match {
-    case i: Interface => i :: i.children.flatMap(allChildrenOf)
-    case r: Record => r :: Nil
-    case e: Enumeration => e :: Nil
-  }
-
-  private def definitionsMap(s: Schema): Map[String, Definition] = {
-    val allDefinitions = s.definitions flatMap allChildrenOf
-    allDefinitions.map(d => d.namespace.map(_ + ".").getOrElse("") + d.name -> d).toMap
-  }
-
-  private def requiresUnionFormats(s: Schema, d: Definition, superFields: List[Field]): Boolean = d match {
-    case _: Interface => true
-    case r: Record =>
-      val defsMap = definitionsMap(s)
-      val allFields = superFields ++ r.fields
-      allFields exists { f => defsMap get f.tpe.name exists { case _: Interface => true ; case _ => false } }
-    case _: Enumeration => false
   }
 
   private def lookupFormats(tpe: TpeRef): List[String] =

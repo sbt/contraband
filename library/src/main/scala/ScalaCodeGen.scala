@@ -69,6 +69,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |}
          |
          |object ${r.name} {
+         |  ${r.extraCompanion mkString EOL}
          |  ${genApplyOverloads(r, allFields) mkString EOL}
          |}""".stripMargin
 
@@ -104,7 +105,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genToString(i, superFields, i.toStringBody)}
          |}
          |
-         |object ${i.name}""".stripMargin
+         |object ${i.name} {
+         |  ${i.extraCompanion mkString EOL}
+         |}""".stripMargin
 
     val childrenCode = i.children map (generate(s, _, Some(i), superFields ++ i.fields))
     ListMap(genFile(i) -> code) :: childrenCode reduce (_ merge _)
@@ -250,7 +253,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     messages map { case Message(name, doc, responseTpe, request) =>
       val params = request map (a => s"${bq(a.name)}: ${genRealTpe(a.tpe, isParam = true)}") mkString ", "
       val argsDoc = request flatMap {
-        case Request(name, Nil, _)        => Nil
+        case Request(_, Nil, _)           => Nil
         case Request(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
         case Request(name, doc, _)        =>
           val prefix = s"@param $name "

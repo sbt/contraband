@@ -21,7 +21,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(s.definitions flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Interface(name, _, namespace, _, doc, fields, messages, children, extra, toString) = i
+    val Interface(name, _, _, _, doc, fields, messages, children, extra, toString, _) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -42,7 +42,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Record(name, _, namespace, _, doc, fields, extra, toString) = r
+    val Record(name, _, _, _, doc, fields, extra, toString, _) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -63,7 +63,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
-    val Enumeration(name, _, namespace, _, doc, values, extra) = e
+    val Enumeration(name, _, _, _, doc, values, extra) = e
 
     val valuesCode =
       if (values.isEmpty) ""
@@ -148,7 +148,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   private def genMessage(message: Message) = {
     val requests = message.request map { case Request(name, _, tpe) => s"${genRealTpe(tpe)} $name" }
     val requestsDoc = message.request flatMap {
-      case Request(name, Nil, _)        => Nil
+      case Request(_, Nil, _)           => Nil
       case Request(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
       case Request(name, doc, _)        =>
         val prefix = s"@param $name "

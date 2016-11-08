@@ -60,7 +60,7 @@ object DatatypePlugin extends AutoPlugin {
           (datatypeFormatsForType in generateDatatypes).value,
           streams.value)
       },
-      sourceGenerators in Compile <+= generateDatatypes
+      sourceGenerators in Compile += generateDatatypes.taskValue
     )
   }
 

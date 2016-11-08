@@ -20,7 +20,7 @@ class SchemaSpec extends FlatSpec {
 
   "Definition.parse" should "parse interface" in {
     Definition parse emptyInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
         assert((name === "emptyInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -29,21 +29,23 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 0) &&
         (extra === List()) &&
-        (toString === None))
+        (toString === None) &&
+        (extraCompanion === Nil))
       case _ =>
         fail()
     }
   }
   it should "parse record" in {
     Definition parse emptyRecordExample match {
-      case Record(name, target, namespace, _, doc, fields, extra, toString) =>
+      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion) =>
         assert((name === "emptyRecordExample") &&
         (target === "Scala") &&
         (namespace === None) &&
         (doc === List()) &&
         (fields.size === 0) &&
         (extra === List()) &&
-        (toString === None))
+        (toString === None) &&
+        (extraCompanion === Nil))
       case _ =>
         fail()
     }
@@ -69,7 +71,7 @@ class SchemaSpec extends FlatSpec {
 
   "Interface.parse" should "parse simple interface" in {
     Interface parse simpleInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra, toString) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
         assert((name === "simpleInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -79,13 +81,14 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 0) &&
         (extra === List("// Some extra code...")) &&
-        (toString === Some("return \"custom\";")))
+        (toString === Some("return \"custom\";")) &&
+        (extraCompanion === List("// Some extra companion code...")))
     }
   }
 
   it should "parse interface with one child" in {
     Interface parse oneChildInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra, toString) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
         assert((name === "oneChildInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -95,14 +98,15 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
         (children(0) === Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
-          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None)) &&
+          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None, Nil)) &&
         (extra === List()) &&
-        (toString === None))
+        (toString === None) &&
+        (extraCompanion === Nil))
     }
   }
   it should "parse nested interfaces" in {
     Interface parse nestedInterfaceExample match {
-      case Interface(name, target, namespace, since, doc, fields, abstractMethods, children, extra, toString) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
         assert((name === "nestedProtocolExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -110,15 +114,16 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 0) &&
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
-        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None)) &&
+        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil)) &&
         (extra === List()) &&
-        (toString === None))
+        (toString === None) &&
+        (extraCompanion === Nil))
     }
   }
 
   "Record.parse" should "parse simple record" in {
     Record parse simpleRecordExample match {
-      case Record(name, target, namespace, since, doc, fields, extra, toString) =>
+      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion) =>
         assert((name === "simpleRecordExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -126,13 +131,14 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 1) &&
         (fields(0) === Field("field", Nil, TpeRef("java.net.URL", false, false, false), Field.emptyVersion, None)) &&
         (extra === List("// Some extra code...")) &&
-        (toString === None))
+        (toString === None) &&
+        (extraCompanion === Nil))
     }
   }
 
   "Enumeration.parse" should "parse simple enumeration" in {
     Enumeration parse simpleEnumerationExample match {
-      case Enumeration(name, target, namespace, since, doc, values, extra) =>
+      case Enumeration(name, target, namespace, _, doc, values, extra) =>
         assert((name === "simpleEnumerationExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -167,72 +173,52 @@ class SchemaSpec extends FlatSpec {
 
   it should "parse multiline doc comments" in {
     Field parse multiLineDocExample match {
-      case Field(name, doc, tpe, since, default) =>
-        assert((name === "multiLineDocField") &&
-        (doc === List("A field whose documentation",
-                              "spans over multiple lines")))
-      case _ =>
-        fail()
+      case Field(name, doc, _, _, _) =>
+        assert((name === "multiLineDocField")
+          && (doc === List("A field whose documentation", "spans over multiple lines")))
+      case _ => fail()
     }
   }
 
   "TpeRef.apply" should "parse simple types" in {
     TpeRef apply simpleTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "simpleTpeRefExample") &&
-        (lzy === false) &&
-        (repeated === false) &&
-        (opt === false))
+        assert((name === "simpleTpeRefExample") && (lzy === false) && (repeated === false) && (opt === false))
     }
   }
 
   it should "parse lazy types" in {
     TpeRef apply lazyTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "lazyTpeRefExample") &&
-        (lzy === true) &&
-        (repeated === false) &&
-        (opt === false))
+        assert((name === "lazyTpeRefExample") && (lzy === true) && (repeated === false) && (opt === false))
     }
   }
 
   it should "parse array types" in {
     TpeRef apply arrayTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "arrayTpeRefExample") &&
-        (lzy === false) &&
-        (repeated === true) &&
-        (opt === false))
+        assert((name === "arrayTpeRefExample") && (lzy === false) && (repeated === true) && (opt === false))
     }
   }
 
   it should "parse option types" in {
     TpeRef apply optionTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "optionTpeRefExample") &&
-        (lzy === false) &&
-        (repeated === false) &&
-        (opt === true))
+        assert((name === "optionTpeRefExample") && (lzy === false) && (repeated === false) && (opt === true))
     }
   }
 
   it should "parse lazy array types" in {
     TpeRef apply lazyArrayTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "lazyArrayTpeRefExample") &&
-        (lzy === true) &&
-        (repeated === true) &&
-        (opt === false))
+        assert((name === "lazyArrayTpeRefExample") && (lzy === true) && (repeated === true) && (opt === false))
     }
   }
 
   it should "parse lazy option types" in {
     TpeRef apply lazyOptionTpeRefExample match {
       case TpeRef(name, lzy, repeated, opt) =>
-        assert((name === "lazyOptionTpeRefExample") &&
-        (lzy === true) &&
-        (repeated === false) &&
-        (opt === true))
+        assert((name === "lazyOptionTpeRefExample") && (lzy === true) && (repeated === false) && (opt === true))
     }
   }
 }

@@ -49,7 +49,9 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |
-        |object simpleInterfaceExample
+        |object simpleInterfaceExample {
+        |  // Some extra companion code...
+        |}
         |""".stripMargin.unindent)
   }
 
@@ -73,8 +75,9 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "oneChildInterfaceExample(" + field + ")"
         |  }
         |}
+        |object oneChildInterfaceExample {
+        |}
         |
-        |object oneChildInterfaceExample
         |final class childRecord(
         |  field: Int,
         |  val x: Int) extends oneChildInterfaceExample(field) {
@@ -124,8 +127,9 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    "nestedProtocolExample()"
         |  }
         |}
+        |object nestedProtocolExample {
+        |}
         |
-        |object nestedProtocolExample
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocol => true
@@ -139,7 +143,8 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |
-        |object nestedProtocol
+        |object nestedProtocol {
+        |}
         |""".stripMargin.unindent)
   }
 
@@ -147,7 +152,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     val schema = Schema parse generateArgDocExample
     val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
 
-    code.head._2.withoutEmptyLines shouldBe
+    code.head._2.withoutEmptyLines should equalLines (
       """abstract class generateArgDocExample(
         |  /** I'm a field. */
         |  val field: Int) extends Serializable {
@@ -171,9 +176,9 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |
-        |object generateArgDocExample
-        |""".stripMargin.withoutEmptyLines
-
+        |object generateArgDocExample {
+        |}
+        |""".stripMargin.withoutEmptyLines)
   }
 
   override def recordGenerateSimple = {
