@@ -20,7 +20,7 @@ class SchemaSpec extends FlatSpec {
 
   "Definition.parse" should "parse interface" in {
     Definition parse emptyInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "emptyInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -30,14 +30,16 @@ class SchemaSpec extends FlatSpec {
         (children.size === 0) &&
         (extra === List()) &&
         (toString === None) &&
-        (extraCompanion === Nil))
+        (extraCompanion === Nil) &&
+        (parents === Nil) &&
+        (parentsCompanion === Nil))
       case _ =>
         fail()
     }
   }
   it should "parse record" in {
     Definition parse emptyRecordExample match {
-      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion) =>
+      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "emptyRecordExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -45,7 +47,9 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 0) &&
         (extra === List()) &&
         (toString === None) &&
-        (extraCompanion === Nil))
+        (extraCompanion === Nil) &&
+        (parents === Nil) &&
+        (parentsCompanion === Nil))
       case _ =>
         fail()
     }
@@ -71,7 +75,7 @@ class SchemaSpec extends FlatSpec {
 
   "Interface.parse" should "parse simple interface" in {
     Interface parse simpleInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "simpleInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -82,13 +86,15 @@ class SchemaSpec extends FlatSpec {
         (children.size === 0) &&
         (extra === List("// Some extra code...")) &&
         (toString === Some("return \"custom\";")) &&
-        (extraCompanion === List("// Some extra companion code...")))
+        (extraCompanion === List("// Some extra companion code...")) &&
+        (parents === List("Interface1", "Interface2")) &&
+        (parentsCompanion === List("CompanionInterface1", "CompanionInterface2")))
     }
   }
 
   it should "parse interface with one child" in {
     Interface parse oneChildInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "oneChildInterfaceExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -98,15 +104,17 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
         (children(0) === Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
-          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None, Nil)) &&
+          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None, Nil, Nil, Nil)) &&
         (extra === List()) &&
         (toString === None) &&
-        (extraCompanion === Nil))
+        (extraCompanion === Nil) &&
+        (parents === Nil) &&
+        (parentsCompanion === Nil))
     }
   }
   it should "parse nested interfaces" in {
     Interface parse nestedInterfaceExample match {
-      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion) =>
+      case Interface(name, target, namespace, _, doc, fields, abstractMethods, children, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "nestedProtocolExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -114,16 +122,18 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 0) &&
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
-        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil)) &&
+        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil, Nil, Nil)) &&
         (extra === List()) &&
         (toString === None) &&
-        (extraCompanion === Nil))
+        (extraCompanion === Nil) &&
+        (parents === Nil) &&
+        (parentsCompanion === Nil))
     }
   }
 
   "Record.parse" should "parse simple record" in {
     Record parse simpleRecordExample match {
-      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion) =>
+      case Record(name, target, namespace, _, doc, fields, extra, toString, extraCompanion, parents, parentsCompanion) =>
         assert((name === "simpleRecordExample") &&
         (target === "Scala") &&
         (namespace === None) &&
@@ -132,7 +142,9 @@ class SchemaSpec extends FlatSpec {
         (fields(0) === Field("field", Nil, TpeRef("java.net.URL", false, false, false), Field.emptyVersion, None)) &&
         (extra === List("// Some extra code...")) &&
         (toString === None) &&
-        (extraCompanion === Nil))
+        (extraCompanion === Nil) &&
+        (parents === Nil) &&
+        (parentsCompanion === Nil))
     }
   }
 

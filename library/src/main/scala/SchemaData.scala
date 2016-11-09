@@ -124,7 +124,9 @@ case class Interface(name: String,
   children: List[Definition],
   extra: List[String],
   toStringBody: Option[String],
-  extraCompanion: List[String]) extends ClassLike
+  extraCompanion: List[String],
+  parents: List[String],
+  parentsCompanion: List[String]) extends ClassLike
 
 object Interface extends Parser[Interface] {
   override def parse(json: JValue): Interface =
@@ -138,7 +140,9 @@ object Interface extends Parser[Interface] {
       json ->* "types" map Definition.parse,
       json multiLineOpt "extra" getOrElse Nil,
       json ->? "toString",
-      json multiLineOpt "extraCompanion" getOrElse Nil)
+      json multiLineOpt "extraCompanion" getOrElse Nil,
+      json multiLineOpt "parents" getOrElse Nil,
+      json multiLineOpt "parentsCompanion" getOrElse Nil)
 }
 
 /**
@@ -159,7 +163,9 @@ case class Record(name: String,
   fields: List[Field],
   extra: List[String],
   toStringImpl: Option[String],
-  extraCompanion: List[String]) extends ClassLike
+  extraCompanion: List[String],
+  parents: List[String],
+  parentsCompanion: List[String]) extends ClassLike
 
 object Record extends Parser[Record] {
   override def parse(json: JValue): Record =
@@ -171,7 +177,9 @@ object Record extends Parser[Record] {
       json ->* "fields" map Field.parse,
       json multiLineOpt "extra" getOrElse Nil,
       json ->? "toString",
-      json multiLineOpt "extraCompanion" getOrElse Nil)
+      json multiLineOpt "extraCompanion" getOrElse Nil,
+      json multiLineOpt "parents" getOrElse Nil,
+      json multiLineOpt "parentsCompanion" getOrElse Nil)
 }
 
 /**

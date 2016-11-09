@@ -21,7 +21,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     ListMap(s.definitions flatMap (generate(s, _, None, Nil).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Interface(name, _, _, _, doc, fields, messages, children, extra, toString, _) = i
+    val Interface(name, _, _, _, doc, fields, messages, children, extra, toString, _, _, _) = i
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =
@@ -42,7 +42,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   }
 
   override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val Record(name, _, _, _, doc, fields, extra, toString, _) = r
+    val Record(name, _, _, _, doc, fields, extra, toString, _, _, _) = r
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
 
     val code =

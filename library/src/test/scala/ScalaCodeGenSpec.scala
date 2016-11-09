@@ -35,7 +35,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent should equalLines (
       """/** example of simple interface */
         |sealed abstract class simpleInterfaceExample(
-        |  val field: type) extends Serializable {
+        |  val field: type) extends Interface1 with Interface2 with Serializable {
         |  // Some extra code...
         |  override def equals(o: Any): Boolean = o match {
         |    case x: simpleInterfaceExample => (this.field == x.field)
@@ -49,7 +49,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |
-        |object simpleInterfaceExample {
+        |object simpleInterfaceExample extends CompanionInterface1 with CompanionInterface2 {
         |  // Some extra companion code...
         |}
         |""".stripMargin.unindent)
@@ -80,7 +80,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |final class childRecord(
         |  field: Int,
-        |  val x: Int) extends oneChildInterfaceExample(field) {
+        |  val x: Int) extends oneChildInterfaceExample(field) with Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: childRecord => (this.field == x.field) && (this.x == x.x)
         |    case _ => false
@@ -130,7 +130,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |object nestedProtocolExample {
         |}
         |
-        |sealed abstract class nestedProtocol() extends nestedProtocolExample() {
+        |sealed abstract class nestedProtocol() extends nestedProtocolExample() with Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: nestedProtocol => true
         |    case _ => false

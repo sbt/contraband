@@ -17,7 +17,7 @@ abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers {
   final class EqualLines(right: Lines) extends Matcher[Lines] {
     def apply(left: Lines): MatchResult = MatchResult(
       left == right,
-      s"Left lines did not equal right lines:\n${left.diff("expected", "obtained", right) mkString ("\n")}",
+      s"Left lines did not equal right lines:\n${right.diff("expected", "obtained", left) mkString ("\n")}",
       "Left lines equaled right lines"
     )
   }
@@ -30,7 +30,7 @@ abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers {
         (left.keys.toSeq ++ right.keys).distinct flatMap { file =>
           val l = left.getOrElse(file, emptyLines)
           val r = right.getOrElse(file, emptyLines)
-          l.diff(s"expected/$file", s"obtained/$file", r)
+          r.diff(s"expected/$file", s"obtained/$file", l)
         } mkString "\n"
       }
       MatchResult(

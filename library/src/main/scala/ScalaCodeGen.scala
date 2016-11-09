@@ -15,7 +15,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       s.endsWith("{") ||
       (s.contains(" class ") && s.endsWith("(")) // Constructor definition
     override def reduceIndentTrigger(s: String) = s.startsWith("}")
-    override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith("extends Serializable {") // End of constructor definition
+    override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(" Serializable {") // End of constructor definition
     override def enterMultilineJavadoc(s: String) = s == "/**"
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
@@ -49,10 +49,8 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     val ctorParameters = genCtorParameters(r, allFields) mkString ","
     val superCtorArguments = superFields map (_.name) mkString ", "
 
-    val extendsCode = (parent
-      map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)")
-      getOrElse "extends Serializable"
-    )
+    val extendsCode = genExtendsCode(parent, r.parents, superCtorArguments)
+    val extendsCodeCompanion = genExtendsCodeCompanion(r.parentsCompanion)
 
     val code =
       s"""${genPackage(r)}
@@ -68,7 +66,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genWith(r, superFields)}
          |}
          |
-         |object ${r.name} {
+         |object ${r.name}$extendsCodeCompanion {
          |  ${r.extraCompanion mkString EOL}
          |  ${genApplyOverloads(r, allFields) mkString EOL}
          |}""".stripMargin
@@ -83,10 +81,8 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     val ctorParameters = genCtorParameters(i, allFields) mkString ", "
     val superCtorArguments = superFields map (_.name) mkString ", "
 
-    val extendsCode = (parent
-      map (p => s"extends ${fullyQualifiedName(p)}($superCtorArguments)")
-      getOrElse "extends Serializable"
-    )
+    val extendsCode = genExtendsCode(parent, i.parents, superCtorArguments)
+    val extendsCodeCompanion = genExtendsCodeCompanion(i.parentsCompanion)
 
     val alternativeCtors = genAlternativeConstructors(i.since, allFields) mkString EOL
     val lazyMembers = genLazyMembers(i.fields) mkString EOL
@@ -105,7 +101,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          |  ${genToString(i, superFields, i.toStringBody)}
          |}
          |
-         |object ${i.name} {
+         |object ${i.name}$extendsCodeCompanion {
          |  ${i.extraCompanion mkString EOL}
          |}""".stripMargin
 
@@ -121,6 +117,18 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
       s"""/**
          |$doc
          | */""".stripMargin
+  }
+
+  private def genExtendsCode(parent: Option[Interface], parents: List[String], superCtorArguments: String): String = {
+    val parentInterface = parent.map(p => s"${fullyQualifiedName(p)}($superCtorArguments)")
+    val allParents = parentInterface.toList ::: parents ::: List("Serializable")
+    val extendsCode = allParents.mkString(" with ")
+    if (extendsCode == "") "" else s"extends $extendsCode"
+  }
+
+  private def genExtendsCodeCompanion(companion: List[String]): String = {
+    val extendsCodeCompanion = companion.mkString(" with ")
+    if (extendsCodeCompanion == "") "" else s" extends $extendsCodeCompanion"
   }
 
   private def genParam(f: Field): String = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)}"

@@ -66,7 +66,9 @@ object SchemaExample {
   ],
   "toString": "return \"custom\";",
   "extra": "// Some extra code...",
-  "extraCompanion": "// Some extra companion code..."
+  "extraCompanion": "// Some extra companion code...",
+  "parents": [ "Interface1", "Interface2" ],
+  "parentsCompanion": [ "CompanionInterface1", "CompanionInterface2" ]
 }"""
 
   val oneChildInterfaceExample = """{
@@ -345,7 +347,9 @@ object SchemaExample {
           ]
         }
       ],
-      "extraCompanion": "val empty: com.example.Greeting = new com.example.SimpleGreeting(\"Hello, World!\")"
+      "extraCompanion": "val empty: com.example.Greeting = new com.example.SimpleGreeting(\"Hello, World!\")",
+      "parents": "com.example.GreetingsLike",
+      "parentsCompanion": "com.example.GreetingsCompanionLike"
     },
     {
       "name": "GreetingHeader",
@@ -404,7 +408,7 @@ object SchemaExample {
 sealed abstract class Greetings(
   _message: => String,
   /** The header of the Greeting */
-  val header: com.example.GreetingHeader) extends Serializable {
+  val header: com.example.GreetingHeader) extends com.example.GreetingsLike with Serializable {
   def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
   /**
    * The message of the Greeting
@@ -423,14 +427,14 @@ sealed abstract class Greetings(
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
 }
-object Greetings {
+object Greetings extends com.example.GreetingsCompanionLike {
   val empty: com.example.Greeting = new com.example.SimpleGreeting("Hello, World!")
 }
 
 /** A Greeting in its simplest form */
 final class SimpleGreeting(
   message: => String,
-  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) {
+  header: com.example.GreetingHeader) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
 
   override def equals(o: Any): Boolean = o match {
@@ -464,7 +468,7 @@ object SimpleGreeting {
 sealed abstract class GreetingExtra(
   message: => String,
   header: com.example.GreetingHeader,
-  val extra: Vector[String]) extends com.example.Greetings(message, header) {
+  val extra: Vector[String]) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String, extra: Vector[String]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra)
 
 
@@ -486,7 +490,7 @@ final class GreetingExtraImpl(
   message: => String,
   header: com.example.GreetingHeader,
   extra: Vector[String],
-  val x: String) extends com.example.GreetingExtra(message, header, extra) {
+  val x: String) extends com.example.GreetingExtra(message, header, extra) with Serializable {
   def this(message: => String, extra: Vector[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
 
   override def equals(o: Any): Boolean = o match {
@@ -528,7 +532,7 @@ final class GreetingWithAttachments(
   message: => String,
   header: com.example.GreetingHeader,
   /** The files attached to the greeting */
-  val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) {
+  val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) with Serializable {
   def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
 
   override def equals(o: Any): Boolean = o match {
