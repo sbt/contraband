@@ -3,11 +3,13 @@ import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
 import CodeGen.bq
+import ast.{ Definition => _, _ }
+import AstUtil._
 
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocols: Boolean) extends CodeGenerator {
+class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -21,92 +23,116 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   }
 
 
-  override def generate(s: Schema): ListMap[File, String] =
-    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) mapV (_.indented)
+  override def generate(s: Document): ListMap[File, String] =
+    (s.definitions collect {
+      case td: TypeDefinition => td
+    }) map (generate (s, _)) reduce (_ merge _) mapV (_.indented)
 
-  override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
+  override def generateEnum(s: Document, e: EnumTypeDefinition): ListMap[File, String] = {
     val values =
-      e.values map { case (EnumerationValue(name, doc)) =>
-        s"""${genDoc(doc)}
+      e.values map { case (EnumValueDefinition(name, _, comments, _)) =>
+        s"""${genDoc(toDoc(comments))}
            |case object $name extends ${e.name}""".stripMargin
       } mkString EOL
 
+    val extra: List[String] = toExtra(e)
     val code =
       s"""${genPackage(e)}
-         |${genDoc(e.doc)}
+         |${genDoc(toDoc(e.comments))}
          |sealed abstract class ${e.name} extends Serializable
          |object ${e.name} {
-         |  ${e.extra mkString EOL}
+         |  ${extra mkString EOL}
          |  $values
          |}""".stripMargin
 
     ListMap(genFile(e) -> code)
   }
 
-  override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val allFields = superFields ++ r.fields
-
-    val ctorParameters = genCtorParameters(r, allFields) mkString ","
+  override def generateRecord(s: Document, r: ObjectTypeDefinition): ListMap[File, String] = {
+    // println(s"generateRecord: ${r.name}")
+    val allFields = r.fields filter { _.arguments.isEmpty }
+    val extraParents = toExtraIntf(r)
+    val parents = r.interfaces
+    val parentsInSchema = lookupInterfaces(s, parents)
+    val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
+    // println(s"parents: $parents,  parent: $parent")
+    val ctorParameters = genCtorParameters(r, parent) mkString ","
+    val superFields = (parent map { _.fields }).toList.flatten
     val superCtorArguments = superFields map (_.name) mkString ", "
+    val extendsCode = genExtendsCode(parent, extraParents, superCtorArguments)
+    val extendsCodeCompanion = genExtendsCodeCompanion(toCompanionExtraIntfComment(r))
+    val companionExtra: List[String] = toCompanionExtra(r)
+    val toStringImpl: List[String] = toToStringImpl(r)
+    val lazyMembers = genLazyMembers(localFields(r, parentsInSchema)) mkString EOL
 
-    val extendsCode = genExtendsCode(parent, r.parents, superCtorArguments)
-    val extendsCodeCompanion = genExtendsCodeCompanion(r.parentsCompanion)
-
+    val doc = toDoc(r.comments)
+    val extra = toExtra(r)
+    val since = getSince(r.directives)
     val code =
       s"""${genPackage(r)}
-         |${genDoc(r.doc)}
+         |${genDoc(doc)}
          |final class ${r.name}($ctorParameters) $extendsCode {
-         |  ${r.extra mkString EOL}
-         |  ${genAlternativeConstructors(r.since, allFields) mkString EOL}
-         |  ${genLazyMembers(r.fields) mkString EOL}
-         |  ${genEquals(r, superFields)}
-         |  ${genHashCode(r, superFields)}
-         |  ${genToString(r, superFields, r.toStringImpl)}
-         |  ${genCopy(r, allFields)}
-         |  ${genWith(r, superFields)}
+         |  ${extra mkString EOL}
+         |  ${genAlternativeConstructors(since, allFields) mkString EOL}
+         |  ${lazyMembers}
+         |  ${genEquals(r)}
+         |  ${genHashCode(r)}
+         |  ${genToString(r, toStringImpl)}
+         |  ${genCopy(r)}
+         |  ${genWith(r)}
          |}
          |
          |object ${r.name}$extendsCodeCompanion {
-         |  ${r.extraCompanion mkString EOL}
+         |  ${companionExtra mkString EOL}
          |  ${genApplyOverloads(r, allFields) mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(r) -> code)
   }
 
-  override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    val allFields = superFields ++ i.fields
-
+  override def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
+    val extraParents = toExtraIntf(i)
+    val parents = i.interfaces
+    val parentsInSchema = lookupInterfaces(s, parents)
+    val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
+    val allFields = i.fields filter { _.arguments.isEmpty }
     val classDef = if (sealProtocols) "sealed abstract class" else "abstract class"
-    val ctorParameters = genCtorParameters(i, allFields) mkString ", "
-    val superCtorArguments = superFields map (_.name) mkString ", "
-
-    val extendsCode = genExtendsCode(parent, i.parents, superCtorArguments)
-    val extendsCodeCompanion = genExtendsCodeCompanion(i.parentsCompanion)
-
-    val alternativeCtors = genAlternativeConstructors(i.since, allFields) mkString EOL
-    val lazyMembers = genLazyMembers(i.fields) mkString EOL
-    val messages = genMessages(i.messages) mkString EOL
+    val ctorParameters = genCtorParameters(i, parent) mkString ", "
+    val superCtorArguments =
+      parent match {
+        case Some(x) => x.fields map (_.name) mkString ", "
+        case _       => ""
+      }
+    val extendsCode = genExtendsCode(parent, extraParents, superCtorArguments)
+    val extendsCodeCompanion = genExtendsCodeCompanion(toCompanionExtraIntfComment(i))
+    val doc = toDoc(i.comments)
+    val extra = toExtra(i)
+    val since = getSince(i.directives)
+    val alternativeCtors = genAlternativeConstructors(since, allFields) mkString EOL
+    val lazyMembers = genLazyMembers(localFields(i, parentsInSchema)) mkString EOL
+    val msgs = i.fields filter { _.arguments.nonEmpty }
+    val messages = genMessages(msgs) mkString EOL
+    val toStringImpl: List[String] = toToStringImpl(i)
+    val companionExtra: List[String] = toCompanionExtra(i)
 
     val code =
       s"""${genPackage(i)}
-         |${genDoc(i.doc)}
+         |${genDoc(doc)}
          |$classDef ${i.name}($ctorParameters) $extendsCode {
-         |  ${i.extra mkString EOL}
+         |  ${extra mkString EOL}
          |  $alternativeCtors
          |  $lazyMembers
          |  $messages
-         |  ${genEquals(i, superFields)}
-         |  ${genHashCode(i, superFields)}
-         |  ${genToString(i, superFields, i.toStringBody)}
+         |  ${genEquals(i)}
+         |  ${genHashCode(i)}
+         |  ${genToString(i, toStringImpl)}
          |}
          |
          |object ${i.name}$extendsCodeCompanion {
-         |  ${i.extraCompanion mkString EOL}
+         |  ${companionExtra mkString EOL}
          |}""".stripMargin
 
-    val childrenCode = i.children map (generate(s, _, Some(i), superFields ++ i.fields))
-    ListMap(genFile(i) -> code) :: childrenCode reduce (_ merge _)
+    ListMap(genFile(i) -> code)
   }
 
   private def genDoc(doc: List[String]) = doc match {
@@ -119,9 +145,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
          | */""".stripMargin
   }
 
-  private def genExtendsCode(parent: Option[Interface], parents: List[String], superCtorArguments: String): String = {
+  private def genExtendsCode(parent: Option[InterfaceTypeDefinition], extraParents: List[String], superCtorArguments: String): String = {
     val parentInterface = parent.map(p => s"${fullyQualifiedName(p)}($superCtorArguments)")
-    val allParents = parentInterface.toList ::: parents ::: List("Serializable")
+    val allParents = parentInterface.toList ::: extraParents ::: List("Serializable")
     val extendsCode = allParents.mkString(" with ")
     if (extendsCode == "") "" else s"extends $extendsCode"
   }
@@ -131,7 +157,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     if (extendsCodeCompanion == "") "" else s" extends $extendsCodeCompanion"
   }
 
-  private def genParam(f: Field): String = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)}"
+  private def genParam(f: FieldDefinition): String = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)}"
 
   private def lookupTpe(tpe: String): String = tpe match {
     case "boolean" => "Boolean"
@@ -145,20 +171,20 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     case other     => other
   }
 
-  private def genRealTpe(tpe: TpeRef, isParam: Boolean) = {
+  private def genRealTpe(tpe: ast.Type, isParam: Boolean) = {
     val scalaTpe = lookupTpe(tpe.name)
     val base = tpe match {
-      case x if x.repeated => s"$scalaArray[$scalaTpe]"
-      case x if x.optional => s"Option[$scalaTpe]"
-      case _               => scalaTpe
+      case x if x.isListType      => s"$scalaArray[$scalaTpe]"
+      case x if !x.isNotNullType  => s"Option[$scalaTpe]"
+      case _                      => scalaTpe
     }
-    if (tpe.lzy && isParam) s"=> $base" else base
+    if (tpe.isLazyType && isParam) s"=> $base" else base
   }
 
-  private def genEquals(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+  private def genEquals(cl: RecordLikeDefinition) = {
+    val allFields = cl.fields filter { _.arguments.isEmpty }
     val comparisonCode =
-      if (allFields exists (_.tpe.lzy)) {
+      if (allFields exists (_.fieldType.isLazyType)) {
         "super.equals(o) // We have lazy members, so use object identity to avoid circularity."
       } else if (allFields.isEmpty) {
         "true"
@@ -172,10 +198,10 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
        |}""".stripMargin
   }
 
-  private def genHashCode(cl: ClassLike, superFields: List[Field]) = {
-    val allFields = superFields ++ cl.fields
+  private def genHashCode(cl: RecordLikeDefinition) = {
+    val allFields = cl.fields filter { _.arguments.isEmpty }
     val computationCode =
-      if (allFields exists (_.tpe.lzy)) {
+      if (allFields exists (_.fieldType.isLazyType)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
         (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
@@ -186,10 +212,10 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
        |}""".stripMargin
   }
 
-  private def genToString(cl: ClassLike, superFields: List[Field], toString: List[String]) = {
-    val body = if (toString.isEmpty) {
-      val allFields = superFields ++ cl.fields
-      if (allFields exists (_.tpe.lzy)) {
+  private def genToString(cl: RecordLikeDefinition, toStringImpl: List[String]) = {
+    val body = if (toStringImpl.isEmpty) {
+      val allFields = cl.fields filter { _.arguments.isEmpty }
+      if (allFields exists (_.fieldType.isLazyType)) {
         s"super.toString // Avoid evaluating lazy members in toString to avoid circularity."
       } else if (allFields.isEmpty) {
         s""""${cl.name}()""""
@@ -197,38 +223,47 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
         val fieldsToString = allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
         s""""${cl.name}("$fieldsToString")""""
       }
-    } else toString mkString s"$EOL  "
+    } else toStringImpl mkString s"$EOL  "
 
     s"""override def toString: String = {
        |  $body
        |}""".stripMargin
   }
 
-  private def genApplyOverloads(r: Record, allFields: List[Field]): List[String] =
+  private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition]): List[String] =
     if (allFields.isEmpty) { // If there are no fields, we still need an `apply` method with an empty parameter list
       List(s"def apply(): ${r.name} = new ${r.name}()")
     } else {
-      perVersionNumber(r.since, allFields) { (provided, byDefault) =>
+      val since = getSince(r.directives)
+      perVersionNumber(since, allFields) { (provided, byDefault) =>
         val applyParameters = provided map genParam mkString ", "
 
         val ctorCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
+            case f if byDefault contains f =>
+              f.defaultValue match {
+                case Some(v) => v.renderPretty
+                case _       => sys.error(s"Need a default value for field ${f.name}.")
+              }
           } mkString ", "
 
         s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
       }
     }
 
-  private def genAlternativeConstructors(since: VersionNumber, allFields: List[Field]) =
+  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition]) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
         val ctorParameters = provided map genParam mkString ", "
         val thisCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f => f.default getOrElse sys.error(s"Need a default value for field ${f.name}.")
+            case f if byDefault contains f =>
+              f.defaultValue match {
+                case Some(v) => v.renderPretty
+                case _       => sys.error(s"Need a default value for field ${f.name}.")
+              }
           } mkString ", "
 
         s"def this($ctorParameters) = this($thisCallArguments)"
@@ -240,47 +275,63 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
   // parameter. Because val parameters may not be call-by-name, we prefix the parameter with `_`
   // and we will create the actual lazy val as a regular class member.
   // Non-lazy fields that belong to `cl` are made val parameters.
-  private def genCtorParameters(cl: ClassLike, allFields: List[Field]): List[String] =
-    allFields map {
-      case f if cl.fields.contains(f) && f.tpe.lzy => EOL + "_" + genParam(f)
-
-      case f if cl.fields.contains(f) =>
-        s"""$EOL${genDoc(f.doc)}
-           |val ${genParam(f)}""".stripMargin
-
-      case f => EOL + genParam(f)
-    }
-
-  private def genLazyMembers(fields: List[Field]): List[String] =
-    fields filter (_.tpe.lzy) map { f =>
-        s"""${genDoc(f.doc)}
-           |lazy val ${bq(f.name)}: ${genRealTpe(f.tpe, isParam = false)} = _${f.name}""".stripMargin
-    }
-
-  private def genMessages(messages: List[Message]): List[String] =
-    messages map { case Message(name, doc, responseTpe, request) =>
-      val params = request map (a => s"${bq(a.name)}: ${genRealTpe(a.tpe, isParam = true)}") mkString ", "
-      val argsDoc = request flatMap {
-        case Request(_, Nil, _)           => Nil
-        case Request(name, doc :: Nil, _) => s"@param $name $doc" :: Nil
-        case Request(name, doc, _)        =>
-          val prefix = s"@param $name "
-          doc.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
+  private def genCtorParameters(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]): List[String] =
+    {
+      val allFields = cl.fields filter { _.arguments.isEmpty }
+      val parentFields: List[FieldDefinition] =
+        parent match {
+          case Some(x) => x.fields filter { _.arguments.isEmpty }
+          case _       => Nil
+        }
+      def inParent(f: FieldDefinition): Boolean = {
+        val x = parentFields exists { _.name == f.name }
+        x
       }
-
-      s"""${genDoc(doc ++ argsDoc)}
-         |def $name($params): ${genRealTpe(responseTpe, isParam = false)}"""
+      allFields map {
+        case f if !inParent(f) && f.fieldType.isLazyType =>
+          EOL + "_" + genParam(f)
+        case f if !inParent(f) =>
+          val doc = toDoc(f.comments)
+          s"""$EOL${genDoc(doc)}
+             |val ${genParam(f)}""".stripMargin
+        case f => EOL + genParam(f)
+      }
     }
 
-  private def fullyQualifiedName(d: Definition): String = {
+  private def genLazyMembers(fields: List[FieldDefinition]): List[String] =
+    fields filter (_.fieldType.isLazyType) map { f =>
+        val doc = toDoc(f.comments)
+        s"""${genDoc(doc)}
+           |lazy val ${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = false)} = _${f.name}""".stripMargin
+    }
+
+  private def genMessages(messages: List[FieldDefinition]): List[String] =
+    messages map { case FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) =>
+      val params = arguments map (a => s"${bq(a.name)}: ${genRealTpe(a.valueType, isParam = true)}") mkString ", "
+      val argsDoc = arguments flatMap { a: InputValueDefinition =>
+        toDoc(a.comments) match {
+          case Nil        => Nil
+          case doc :: Nil => s"@param ${a.name} $doc" :: Nil
+          case docs =>
+            val prefix = s"@param ${a.name} "
+            docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
+        }
+      }
+      val doc = toDoc(comments)
+      s"""${genDoc(doc ++ argsDoc)}
+         |def $name($params): ${genRealTpe(fieldType, isParam = false)}"""
+    }
+
+  private def fullyQualifiedName(d: TypeDefinition): String = {
     val path = d.namespace map (ns => ns + ".") getOrElse ""
     path + d.name
   }
 
-  private def genPackage(d: Definition): String = d.namespace map (ns => s"package $ns") getOrElse ""
+  private def genPackage(d: TypeDefinition): String = d.namespace map (ns => s"package $ns") getOrElse ""
 
-  private def genCopy(r: Record, allFields: List[Field]) = {
-    def genParam(f: Field) = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}"
+  private def genCopy(r: ObjectTypeDefinition) = {
+    val allFields = r.fields filter { _.arguments.isEmpty }
+    def genParam(f: FieldDefinition) = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)} = ${bq(f.name)}"
     val params = allFields map genParam mkString ", "
     val constructorCall = allFields map (f => bq(f.name)) mkString ", "
     s"""protected[this] def copy($params): ${r.name} = {
@@ -288,12 +339,10 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
        |}""".stripMargin
   }
 
-  private def genWith(r: Record, superFields: List[Field]) = {
+  private def genWith(r: ObjectTypeDefinition) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
-    val allFields = superFields ++ r.fields
-
-    allFields map { f =>
-      s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)}): ${r.name} = {
+    r.fields map { f =>
+      s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)}): ${r.name} = {
          |  copy(${bq(f.name)} = ${bq(f.name)})
          |}""".stripMargin
     } mkString (EOL + EOL)

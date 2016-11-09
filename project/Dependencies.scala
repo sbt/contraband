@@ -17,4 +17,6 @@ object Dependencies {
   val junitInterface    = "com.novocode" % "junit-interface" % "0.11"
   val scalaCheck        = "org.scalacheck" %% "scalacheck" % scalaCheckVersion
   val scalaTest         = "org.scalatest" %% "scalatest" % "3.0.0"
+  val parboiled         = "org.parboiled" %% "parboiled" % "2.1.3"
+  val diffutils         = "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
 }

@@ -4,7 +4,7 @@ import java.io.File
 
 import scala.collection.immutable.ListMap
 
-object SchemaExample {
+object JsonSchemaExample {
   val basicSchema = """{
   "namespace": "com.example",
   "protocol": "HelloWorld",
@@ -873,7 +873,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingsFormats { self: sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingHeaderFormats =>
+trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats =>
 implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]
 }
 /**
@@ -1047,7 +1047,7 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 
 // DO NOT EDIT MANUALLY
 package generated
-trait CustomProtocol extends sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with java.util.DateFormats with generated.PriorityLevelFormats with generated.GreetingHeaderFormats with generated.GreetingsFormats
+trait CustomProtocol extends generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingsFormats with java.util.DateFormats with generated.PriorityLevelFormats
 object CustomProtocol extends CustomProtocol""".stripMargin
 
   val growableAddOneFieldExample = """{

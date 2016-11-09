@@ -48,6 +48,5 @@ lazy val library = project.
     pluginSettings,
     name := "datatype",
     description := "Code generation library to generate growable datatypes.",
-    libraryDependencies ++= jsonDependencies ++ Seq(scalaTest % Test),
-    libraryDependencies += "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0" % Test
+    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies ++ Seq(scalaTest % Test, diffutils % Test)
   )

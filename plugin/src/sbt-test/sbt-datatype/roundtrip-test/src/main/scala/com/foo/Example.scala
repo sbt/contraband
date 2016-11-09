@@ -2,7 +2,6 @@ package com.foo
 
 import sjsonnew.JsonFormat
 import sjsonnew.support.scalajson.unsafe.Converter
-import com.example.interfaces.Greeting
 import com.example._
 
 object Example extends App {

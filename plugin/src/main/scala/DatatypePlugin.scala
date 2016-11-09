@@ -2,11 +2,16 @@ package sbt.datatype
 
 import sbt._
 import Keys._
+import ast._
+import parser.{ JsonParser, SchemaParser }
+import scala.util.Success
 
 object DatatypePlugin extends AutoPlugin {
 
-  private def scalaDef2File(d: Definition) =
-    d.namespace map (ns => new File(ns.replace(".", "/"))) map (new File(_, d.name + ".scala")) getOrElse new File(d.name + ".scala")
+  private def scalaDef2File(x: Any) =
+    x match {
+      case d: TypeDefinition => d.namespace map (ns => new File(ns.replace(".", "/"))) map (new File(_, d.name + ".scala")) getOrElse new File(d.name + ".scala")
+    }
 
   object autoImport {
     val skipGeneration = settingKey[Boolean]("skip")
@@ -17,11 +22,11 @@ object DatatypePlugin extends AutoPlugin {
     val datatypeJavaOption = settingKey[String]("Interface to use to provide options in Java.")
     val datatypeScalaArray = settingKey[String]("Repeated type in Scala.")
     val datatypeSource = settingKey[File]("Datatype source directory.")
-    val datatypeScalaFileNames = settingKey[Definition => File]("Mapping from `Definition` to file for Scala generator.")
+    val datatypeScalaFileNames = settingKey[Any => File]("Mapping from `Definition` to file for Scala generator.")
     val datatypeScalaSealInterface = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
     val datatypeCodecParents = settingKey[List[String]]("Parents to add all o of the codec object.")
     val datatypeInstantiateJavaLazy = settingKey[String => String]("Function that instantiate a lazy expression from an expression in Java.")
-    val datatypeFormatsForType = settingKey[TpeRef => List[String]]("Function that maps types to the list of required codecs for them.")
+    val datatypeFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
 
     sealed trait DatatypeTargetLang
     object DatatypeTargetLang {
@@ -96,13 +101,24 @@ object Generate {
     javaLazy: String,
     javaOption: String,
     scalaArray: String,
-    scalaFileNames: Definition => File,
+    scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
-    formatsForType: TpeRef => List[String],
+    formatsForType: Type => List[String],
     log: Logger): Seq[File] = {
-    val input = definitions.toList map (f => Schema.parse(IO read f))
+    val jsonFiles = definitions.toList collect {
+      case f: File if f.getName endsWith ".json" => f
+    }
+    val cslFiles = definitions.toList collect {
+      case f: File if (f.getName endsWith ".csl") || (f.getName endsWith ".gql") => f
+    }
+    val input =
+      (jsonFiles map { f => JsonParser.Document.parse(IO read f) }) ++
+      (cslFiles map { f =>
+        val ast = SchemaParser.parse(IO read f).get
+        Transform.propateNamespace(ast)
+      })
     val generator = new MixedCodeGen(javaLazy, javaOption, scalaArray, scalaFileNames, scalaSealInterface)
     val jsonFormatsGenerator = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, input)
 
@@ -127,6 +143,8 @@ object Generate {
         input flatMap { s =>
           jsonFormatsGenerator.generate(s).map {
             case (file, code) =>
+              println(code)
+              println("---------")
               val outputFile = new File(target, "/" + file.toString)
               IO.write(outputFile, code)
               log.info(s"sbt-datatype created $outputFile")
@@ -137,7 +155,6 @@ object Generate {
       } else {
         List.empty
       }
-
     datatypes ++ formats
   }
 
@@ -148,11 +165,11 @@ object Generate {
     javaLazy: String,
     javaOption: String,
     scalaArray: String,
-    scalaFileNames: Definition => File,
+    scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
-    formatsForType: TpeRef => List[String],
+    formatsForType: Type => List[String],
     s: TaskStreams): Seq[File] = {
     val definitions = IO listFiles base
     def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,

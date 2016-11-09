@@ -3,6 +3,8 @@ import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
 import CodeGen.bq
+import ast._
+import AstUtil._
 
 /**
  * Code generator to produce a codec for a given type.
@@ -16,8 +18,8 @@ class CodecCodeGen(codecParents: List[String],
   instantiateJavaLazy: String => String,
   javaOption: String,
   scalaArray: String,
-  formatsForType: TpeRef => List[String],
-  includedSchemas: List[Schema]) extends CodeGenerator {
+  formatsForType: ast.Type => List[String],
+  includedSchemas: List[Document]) extends CodeGenerator {
   import CodecCodeGen._
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -30,7 +32,7 @@ class CodecCodeGen(codecParents: List[String],
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
-  override def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] = {
+  override def generateEnum(s: Document, e: EnumTypeDefinition): ListMap[File, String] = {
     val fqn = fullyQualifiedName(e)
     // Java enum can have additional parameter such as MERCURY (3.303e+23, 2.4397e6)
     val EnumPattern = """([^\(]+)(\([^\)]*\))?""".r
@@ -40,16 +42,16 @@ class CodecCodeGen(codecParents: List[String],
         case _                 => s
       }
     val readerValues =
-      e.values map { case EnumerationValue(v0, _) =>
+      e.values map { case EnumValueDefinition(v0, _, _, _) =>
         val v = stripParam(v0)
         s"""case "$v" => $fqn.$v"""
       }
     val writerValues =
-      e.values map { case EnumerationValue(v0, _) =>
+      e.values map { case EnumValueDefinition(v0, _, _, _) =>
         val v = stripParam(v0)
         s"""case $fqn.$v => "$v""""
       }
-    val selfType = makeSelfType(s, e, Nil)
+    val selfType = makeSelfType(s, e)
 
     val code =
       s"""${genPackage(s)}
@@ -79,17 +81,21 @@ class CodecCodeGen(codecParents: List[String],
     ListMap(genFile(s, e) -> code)
   }
 
-  override def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    def accessField(f: Field) = {
-      if (f.tpe.lzy && r.targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
+  override def generateRecord(s: Document, r: ObjectTypeDefinition): ListMap[File, String] = {
+    val targetLang = toTarget(r.directives) match {
+      case Some(x) => x
+      case _       => sys.error(s"@target is missing for ${r.name}")
+    }
+    def accessField(f: FieldDefinition) = {
+      if (f.fieldType.isLazyType && targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else bq(f.name)
     }
     val fqn = fullyQualifiedName(r)
-    val allFields = superFields ++ r.fields
-    val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.tpe, r.targetLang)}]("${f.name}")""") mkString EOL
+    val allFields = r.fields // superFields ++ r.fields
+    val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.fieldType, targetLang)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${bq(f.name)})""") mkString EOL
-    val selfType = makeSelfType(s, r, superFields)
+    val selfType = makeSelfType(s, r)
 
     val code =
       s"""${genPackage(s)}
@@ -119,11 +125,12 @@ class CodecCodeGen(codecParents: List[String],
     ListMap(genFile(s, r) -> code)
   }
 
-  override def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  override def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
     val name = i.name
     val fqn = fullyQualifiedName(i)
+    val children: List[TypeDefinition] = lookupChildren(s, i)
     val code =
-      i.children match {
+      children match {
         case Nil =>
           s"""${genPackage(s)}
              |$sjsonImports
@@ -139,9 +146,10 @@ class CodecCodeGen(codecParents: List[String],
              |}""".stripMargin
 
         case xs =>
-          val unionFormat = s"unionFormat${xs.length}[$fqn, ${xs map (c => c.namespace.getOrElse("_root_") + "." + c.name) mkString ", "}]"
-
-          val selfType = getAllRequiredFormats(s, i, superFields).distinct match {
+          val unionFormat = s"unionFormat${xs.length}[$fqn, ${xs map (c => fullyQualifiedName(c)) mkString ", "}]"
+          val fmt = fullFormatsName(s, i)
+          val rfs = getAllRequiredFormats(s, i).distinct filter { _ != fmt }
+          val selfType = rfs match {
             case Nil => ""
             case fms => fms.mkString("self: ", " with ", " =>")
           }
@@ -153,13 +161,15 @@ class CodecCodeGen(codecParents: List[String],
 
       }
 
-    ListMap(genFile(s, i) -> code) :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields))) reduce (_ merge _)
+    ListMap(genFile(s, i) -> code)
   }
 
-  override def generate(s: Schema): ListMap[File, String] = {
-    val codecs: ListMap[File, String] = ((s.definitions map { d =>
-      ListMap(generate(s, d, None, Nil).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
-    val result = s.fullCodec match {
+  override def generate(s: Document): ListMap[File, String] = {
+    val codecs: ListMap[File, String] = ((s.definitions collect {
+      case td: TypeDefinition => td
+    } map { d =>
+      ListMap(generate(s, d).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
+    val result = toFullCodec(s) match {
       case Some(x) =>
         val full = generateFullCodec(s, x)
         codecs merge full
@@ -169,8 +179,8 @@ class CodecCodeGen(codecParents: List[String],
     result map { case (k, v) => (k, generateHeader + v) }
   }
 
-  private def genFile(s: Schema, d: Definition): File =
-    s.codecNamespace match {
+  private def genFile(s: Document, d: TypeDefinition): File =
+    toCodecPackage(s) match {
       case Some(ns) =>
         val dir = new File(ns.replace(".", "/"))
         new File(dir, s"${d.name}Formats.scala")
@@ -178,23 +188,11 @@ class CodecCodeGen(codecParents: List[String],
         new File(s"${d.name}Formats.scala")
     }
 
-  /**
-   * Returns the list of fully qualified codec names that we (non-transitively) need to generate a codec for `d`,
-   * knowing that it inherits fields `superFields` in the context of schema `s`.
-   */
-  private def getRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = {
-    val typeFormats =
-      d match {
-        case c: ClassLike   => superFields ++ c.fields flatMap (f => lookupFormats(f.tpe))
-        case _: Enumeration => Nil
-      }
-    typeFormats ++ codecParents
-  }
 
-  private def fullyQualifiedName(d: Definition): String =
-    s"""${d.namespace getOrElse "_root_"}.${bq(d.name)}"""
-
-  private def getAllRequiredFormats(s: Schema): List[String] = getAllRequiredFormats(s, s.definitions, Nil)
+  private def getAllRequiredFormats(s: Document): List[String] =
+    s.definitions collect {
+      case td: TypeDefinition => td
+    } flatMap { getAllRequiredFormats(s, _) }
 
   /**
    * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `ds`,
@@ -202,19 +200,21 @@ class CodecCodeGen(codecParents: List[String],
    *
    * The results are sorted topologically.
    */
-  private def getAllRequiredFormats(s: Schema, ds: List[Definition], superFields: List[Field]): List[String] = {
+  private def getAllRequiredFormats(s: Document, ds: List[TypeDefinition]): List[String] = {
     val seedFormats = ds map { d => fullFormatsName(s, d) }
-    def getAllDefinitions(d: Definition): List[Definition] =
+    def getAllDefinitions(d: TypeDefinition): List[TypeDefinition] =
       d match {
-        case i: Interface => i :: (i.children flatMap {getAllDefinitions})
-        case _            => d :: Nil
+        case i: InterfaceTypeDefinition =>
+          i :: (lookupChildren(s, i) flatMap {getAllDefinitions})
+        case _ => d :: Nil
       }
     val allDefinitions = ds flatMap getAllDefinitions
     val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
-      val requiredFormats = getRequiredFormats(s, d, superFields)
+      val requiredFormats = getRequiredFormats(s, d)
       fullFormatsName(s, d) -> (d match {
-        case i: Interface => i.children.map( c => fullFormatsName(s, c)) ::: requiredFormats
-        case _            => requiredFormats
+        case i: InterfaceTypeDefinition =>
+          lookupChildren(s, i).map( c => fullFormatsName(s, c)) ::: requiredFormats
+        case _  => requiredFormats
       })
     }: _*)
     val xs = sbt.Dag.topologicalSortUnchecked[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
@@ -227,41 +227,54 @@ class CodecCodeGen(codecParents: List[String],
    *
    * If `d` is an `Interface`, we recurse to get the codecs required by its children.
    */
-  private def getAllRequiredFormats(s: Schema, d: Definition, superFields: List[Field]): List[String] = d match {
-    case i: Interface =>
-      val fmt = fullFormatsName(s, d)
-      getAllRequiredFormats(s, i :: Nil, superFields) filter { _ != fmt }
-    case r: Record =>
-      getRequiredFormats(s, r, superFields)
-    case e: Enumeration =>
-      getRequiredFormats(s, e, Nil)
+  private def getAllRequiredFormats(s: Document, d: TypeDefinition): List[String] = d match {
+    case i: InterfaceTypeDefinition => getAllRequiredFormats(s, i :: Nil)
+    case r: ObjectTypeDefinition    => getRequiredFormats(s, r)
+    case e: EnumTypeDefinition      => getRequiredFormats(s, e)
   }
+
+  /**
+   * Returns the list of fully qualified codec names that we (non-transitively) need to generate a codec for `d`,
+   * knowing that it inherits fields `superFields` in the context of schema `s`.
+   */
+  private def getRequiredFormats(s: Document, d: TypeDefinition): List[String] =
+    {
+      val typeFormats =
+        d match {
+          case _: EnumTypeDefinition   => Nil
+          case c: RecordLikeDefinition => c.fields flatMap (f => lookupFormats(f.fieldType))
+        }
+      typeFormats ++ codecParents
+    }
+
+  private def fullyQualifiedName(d: TypeDefinition): String =
+    s"""${d.namespace getOrElse "_root_"}.${bq(d.name)}"""
 
   /**
    * Returns the self type declaration of the codec for `d`, knowing that it inherits fields `superFields`
    * in the context of schema `s`.
    */
-  private def makeSelfType(s: Schema, d: Definition, superFields: List[Field]): String =
-    getRequiredFormats(s, d, superFields).distinct match {
+  private def makeSelfType(s: Document, d: TypeDefinition): String =
+    getRequiredFormats(s, d).distinct match {
       case Nil => ""
       case fms => fms.mkString("self: ", " with ", " =>")
     }
 
-  private def genPackage(s: Schema): String =
-    s.codecNamespace map (p => s"package $p") getOrElse ""
+  private def genPackage(s: Document): String =
+    toCodecPackage(s) map (p => s"package $p") getOrElse ""
 
   private val sjsonImports: String = "import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }"
 
   private def scalaifyType(t: String) = t.replace("<", "[").replace(">", "]")
 
-  private def genRealTpe(tpe: TpeRef, targetLang: String) = {
+  private def genRealTpe(tpe: ast.Type, targetLang: String) = {
     val scalaTpe = lookupTpe(scalaifyType(tpe.name))
     tpe match {
-      case x if x.repeated && targetLang == "Java" => s"Array[$scalaTpe]"
-      case x if x.repeated => s"$scalaArray[$scalaTpe]"
-      case x if x.optional && targetLang == "Java" => s"$javaOption[$scalaTpe]"
-      case x if x.optional => s"Option[$scalaTpe]"
-      case _               => scalaTpe
+      case x if x.isListType && targetLang == "Java" => s"Array[$scalaTpe]"
+      case x if x.isListType     => s"$scalaArray[$scalaTpe]"
+      case x if !x.isNotNullType && targetLang == "Java" => s"$javaOption[$scalaTpe]"
+      case x if !x.isNotNullType => s"Option[$scalaTpe]"
+      case _                     => scalaTpe
     }
   }
 
@@ -277,42 +290,38 @@ class CodecCodeGen(codecParents: List[String],
     case other     => other
   }
 
-  private def generateFullCodec(s: Schema, name: String): ListMap[File, String] = {
+  private def generateFullCodec(s: Document, name: String): ListMap[File, String] = {
     val allFormats = getAllRequiredFormats(s).distinct
     val parents = allFormats.mkString("extends ", " with ", "")
     val code =
       s"""${genPackage(s)}
          |trait $name $parents
          |object $name extends $name""".stripMargin
-    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
+    val syntheticDefinition = InterfaceTypeDefinition(name, None, Nil, Nil,
+      Directive.targetScala :: Nil, Nil, Nil, None)
     ListMap(new File(genFile(s, syntheticDefinition).getParentFile, s"$name.scala") -> code)
   }
 
-  private def lookupFormats(tpe: TpeRef): List[String] =
+  private def lookupFormats(tpe: ast.Type): List[String] =
     lookupDefinition(tpe.name) match {
       case Some((s, d)) => fullFormatsName(s, d) :: Nil
       case _            => formatsForType(tpe)
     }
 
-  private def lookupDefinition(fullName: String): Option[(Schema, Definition)] =
+  private def lookupDefinition(fullName: String): Option[(Document, TypeDefinition)] =
     {
       val (ns, name) = splitName(fullName)
-      (for {
-        s <- includedSchemas
-        d <- s.definitions if d.name == name && d.namespace == ns
-      } yield (s, d)).headOption
+      (includedSchemas flatMap { s =>
+        s.definitions collect {
+          case d: TypeDefinition if d.name == name && d.namespace == ns => (s, d)
+        }
+      }).headOption
     }
 }
 
 object CodecCodeGen {
-  def fullFormatsName(s: Schema, d: Definition): String =
-    s"""${s.codecNamespace map (_ + ".") getOrElse ""}${d.name.capitalize}Formats"""
-
-  /** Removes all type parameters from `tpe` */
-  def removeTypeParameters(tpe: TpeRef): TpeRef = tpe.copy(name = removeTypeParameters(tpe.name))
-
-  /** Removes all type parameters from `tpe` */
-  def removeTypeParameters(tpe: String): String = tpe.replaceAll("<.+>", "").replaceAll("\\[.+\\]", "")
+  def fullFormatsName(s: Document, d: TypeDefinition): String =
+    s"""${toCodecPackage(s) map (_ + ".") getOrElse ""}${d.name.capitalize}Formats"""
 
   /**
    * A function that, given a `TpeRef`, returns the list of `JsonFormat`s that are required to encode
@@ -320,9 +329,9 @@ object CodecCodeGen {
    *
    * A non-primitive types `com.example.Tpe` (except java.io.File) is mapped to `com.example.TpeFormat`.
    */
-  val formatsForType: TpeRef => List[String] =
+  val formatsForType: ast.Type => List[String] =
     extensibleFormatsForType { ref =>
-      val tpe = removeTypeParameters(ref)
+      val tpe = ref.removeTypeParameters
       val (ns, name) = splitName(tpe.name)
       s"${ ns getOrElse "_root_" }.${name.capitalize}Formats" :: Nil
     }
@@ -338,9 +347,10 @@ object CodecCodeGen {
    * Creates a mapping that maps all primitive types to provided codecs and uses `forOthers`
    * to determine mapping for non-primitive types.
    */
-  def extensibleFormatsForType(forOthers: TpeRef => List[String]): TpeRef => List[String] = { tpe =>
-    removeTypeParameters(tpe).name match {
+  def extensibleFormatsForType(forOthers: ast.Type => List[String]): ast.Type => List[String] = { tpe =>
+    tpe.removeTypeParameters.name match {
       case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => Nil
+      case "Boolean" | "Byte" | "Char" | "Float" | "Int" | "Long" | "Short" | "Double" => Nil
       case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger"
         | "java.math.BigDecimal" | "java.io.File" => Nil
       case _ => forOthers(tpe)

@@ -2,40 +2,47 @@ package sbt.datatype
 
 import java.io.File
 import scala.collection.immutable.ListMap
+import ast._
+import AstUtil._
 
 /**
  * Generator that produces both Scala and Java code.
  */
-class MixedCodeGen(javaLazy: String, javaOptional: String, scalaArray: String, genScalaFileName: Definition => File, scalaSealprotocols: Boolean) extends CodeGenerator {
+class MixedCodeGen(javaLazy: String, javaOptional: String, scalaArray: String, genScalaFileName: Any => File, scalaSealprotocols: Boolean) extends CodeGenerator {
   val javaGen  = new JavaCodeGen(javaLazy, javaOptional)
   val scalaGen = new ScalaCodeGen(scalaArray, genScalaFileName, scalaSealprotocols)
 
-  def generate(s: Schema): ListMap[File, String] =
-    s.definitions map (generate (s, _, None, Nil)) reduce (_ merge _) map { case (k, v) =>
+  def generate(s: Document): ListMap[File, String] =
+    s.definitions collect {
+      case td: TypeDefinition => td
+    } map (generate (s, _)) reduce (_ merge _) map { case (k, v) =>
       (k, generateHeader + v) }
 
-  def generateInterface(s: Schema, i: Interface, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
+  def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
     // We generate the code that corresponds to this protocol, but without its children, because they
     // may target another language. In this case, we have to make sure that we won't generate them
     // in the wrong language.
-    val childLessProtocol = i.copy(children = Nil)
-    val parentResult = childLessProtocol.targetLang match {
-      case "Scala" => scalaGen.generateInterface(s, childLessProtocol, parent, superFields) mapV (_ indentWith scalaGen.indentationConfiguration)
-      case "Java"  => javaGen.generateInterface(s, childLessProtocol, parent, superFields) mapV (_ indentWith javaGen.indentationConfiguration)
-    }
-    (parentResult :: (i.children map (generate(s, _, Some(i), superFields ++ i.fields)))) reduce (_ merge _)
+    val childLessProtocol = i
+    val targetLang = toTarget(i.directives)
+    val parentResult =
+      targetLang match {
+        case Some("Scala") => scalaGen.generateInterface(s, childLessProtocol) mapV (_ indentWith scalaGen.indentationConfiguration)
+        case Some("Java")  => javaGen.generateInterface(s, childLessProtocol) mapV (_ indentWith javaGen.indentationConfiguration)
+        case None          => sys.error(s"target language was not specified for ${i.name}!")
+      }
+    parentResult
   }
 
-  def generateRecord(s: Schema, r: Record, parent: Option[Interface], superFields: List[Field]): ListMap[File, String] = {
-    r.targetLang match {
-      case "Scala" => scalaGen.generateRecord(s, r, parent, superFields) mapV (_ indentWith scalaGen.indentationConfiguration)
-      case "Java"  => javaGen.generateRecord(s, r, parent, superFields) mapV (_ indentWith javaGen.indentationConfiguration)
+  def generateRecord(s: Document, r: ObjectTypeDefinition): ListMap[File, String] = {
+    toTarget(r.directives) match {
+      case Some("Java")  => javaGen.generateRecord(s, r) mapV (_ indentWith javaGen.indentationConfiguration)
+      case _             => scalaGen.generateRecord(s, r) mapV (_ indentWith scalaGen.indentationConfiguration)
     }
   }
 
-  def generateEnum(s: Schema, e: Enumeration): ListMap[File, String] =
-    e.targetLang match {
-      case "Scala" => scalaGen.generateEnum(s, e) mapV (_ indentWith scalaGen.indentationConfiguration)
-      case "Java"  => javaGen.generateEnum(s, e) mapV (_ indentWith javaGen.indentationConfiguration)
+  def generateEnum(s: Document, e: EnumTypeDefinition): ListMap[File, String] =
+    toTarget(e.directives) match {
+      case Some("Java") => javaGen.generateEnum(s, e) mapV (_ indentWith javaGen.indentationConfiguration)
+      case _            => scalaGen.generateEnum(s, e) mapV (_ indentWith scalaGen.indentationConfiguration)
     }
 }

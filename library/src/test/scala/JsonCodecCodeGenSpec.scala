@@ -2,18 +2,19 @@ package sbt.datatype
 
 import java.io.File
 
-import SchemaExample._
+import JsonSchemaExample._
+import parser.JsonParser
 
-class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
+class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
   val codecParents = List("sjsonnew.BasicJsonProtocol")
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
   val javaOption = "com.example.Option"
   val scalaArray = "Vector"
-  val formatsForType: TpeRef => List[String] = CodecCodeGen.formatsForType
+  val formatsForType: ast.Type => List[String] = CodecCodeGen.formatsForType
 
   override def enumerationGenerateSimple = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val enumeration = Enumeration parse simpleEnumerationExample
+    val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
     val code = gen generate enumeration
 
     code.head._2.unindent should equalLines (
@@ -51,7 +52,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def interfaceGenerateSimple = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse simpleInterfaceExample
+    val intf = JsonParser.InterfaceTypeDefinition.parseInterface(simpleInterfaceExample)
     val code = gen generate intf
 
     code.head._2.unindent should equalLines (
@@ -76,7 +77,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def interfaceGenerateOneChild = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse oneChildInterfaceExample
+    val intf = JsonParser.InterfaceTypeDefinition.parseInterface(oneChildInterfaceExample)
     val code = gen generate intf
 
     code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should equalLines (
@@ -124,7 +125,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def interfaceGenerateNested = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val intf = Interface parse nestedInterfaceExample
+    val intf = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     val code = gen generate intf
 
     code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should equalLines (
@@ -159,7 +160,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   def interfaceGenerateMessages = {
-    val schema = Schema parse generateArgDocExample
+    val schema = JsonParser.Document.parse(generateArgDocExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
@@ -185,7 +186,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def recordGenerateSimple = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val record = Record parse simpleRecordExample
+    val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
     val code = gen generate record
 
     code.head._2.unindent should equalLines (
@@ -220,7 +221,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def recordGrowZeroToOneField = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val record = Record parse growableAddOneFieldExample
+    val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
     val code = gen generate record
 
     code.head._2.unindent should equalLines (
@@ -255,7 +256,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
   override def recordGrowZeroToOneToTwoFields: Unit = {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
-    val record = Record parse growableZeroToOneToTwoFieldsExample
+    val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsExample)
     val code = gen generate record
 
     code.head._2.unindent should equalLines (
@@ -291,7 +292,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateTypeReferences = {
-    val schema = Schema parse primitiveTypesExample
+    val schema = JsonParser.Document.parse(primitiveTypesExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
@@ -336,7 +337,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val schema = Schema parse primitiveTypesNoLazyExample
+    val schema = JsonParser.Document.parse(primitiveTypesNoLazyExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
@@ -372,14 +373,14 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   override def schemaGenerateComplete = {
-    val schema = Schema parse completeExample
+    val schema = JsonParser.Document.parse(completeExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
     code.values.mkString.unindent should equalLines (completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val schema = Schema parse completeExample
+    val schema = JsonParser.Document.parse(completeExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
@@ -387,7 +388,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
   }
 
   "The full codec object" should "include the codec of all protocol defined in the schema" in {
-    val schema = Schema parse s"""{
+    val schema = JsonParser.Document.parse(s"""{
                                  |  "types": [
                                  |    {
                                  |      "name": "Greeting",
@@ -395,7 +396,7 @@ class CodecCodeGenSpec extends GCodeGenSpec("Codec") {
                                  |      "type": "interface"
                                  |    }
                                  |  ]
-                                 |}""".stripMargin
+                                 |}""".stripMargin)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 

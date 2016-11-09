@@ -1,3 +1,5 @@
+> generateDatatypes
+
 > compile
 
 $ exists target/scala-2.10/src_managed/main/generated/CustomProtocol.scala

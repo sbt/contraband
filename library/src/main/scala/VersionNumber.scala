@@ -69,6 +69,8 @@ trait VersionNumberInstances {
 }
 
 object VersionNumber extends VersionNumberInstances {
+  def empty: VersionNumber = VersionNumber("0.0.0")
+
   /**
    * @param numbers numbers delimited by a dot.
    * @param tags string prefixed by a dash.
