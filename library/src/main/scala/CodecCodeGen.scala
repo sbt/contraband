@@ -284,7 +284,7 @@ class CodecCodeGen(codecParents: List[String],
       s"""${genPackage(s)}
          |trait $name $parents
          |object $name extends $name""".stripMargin
-    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil, Nil, Nil)
+    val syntheticDefinition = Interface(name, "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)
     ListMap(new File(genFile(s, syntheticDefinition).getParentFile, s"$name.scala") -> code)
   }
 
