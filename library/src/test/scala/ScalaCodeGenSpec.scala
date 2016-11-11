@@ -80,7 +80,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |final class childRecord(
         |  field: Int,
-        |  val x: Int) extends oneChildInterfaceExample(field) with Serializable {
+        |  val x: Int = 0) extends oneChildInterfaceExample(field) with Serializable {
         |  override def equals(o: Any): Boolean = o match {
         |    case x: childRecord => (this.field == x.field) && (this.x == x.x)
         |    case _ => false
@@ -103,7 +103,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |
         |object childRecord {
-        |  def apply(field: Int, x: Int): childRecord = new childRecord(field, x)
+        |  def apply(field: Int, x: Int = 0): childRecord = new childRecord(field, x)
         |}
         |""".stripMargin.unindent)
   }

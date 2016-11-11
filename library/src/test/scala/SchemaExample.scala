@@ -90,7 +90,8 @@ object SchemaExample {
       "fields": [
         {
           "name": "x",
-          "type": "int"
+          "type": "int",
+          "default": "0"
         }
       ]
     }

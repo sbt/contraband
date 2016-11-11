@@ -104,7 +104,7 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
         (children(0) === Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
-          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None, Nil, Nil, Nil)) &&
+          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, Some("0")) :: Nil, Nil, None, Nil, Nil, Nil)) &&
         (extra === List()) &&
         (toString === None) &&
         (extraCompanion === Nil) &&
