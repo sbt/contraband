@@ -1,0 +1,7 @@
+
+### enhancements
+
+- Adds to the primary constructor and the primary companion apply the parameter's default value. This allows invoking these using by-name selection (eg. `Foo(1, 2, f = 6)`). [#44][44] by [@dwijnand][@dwijnand]
+
+  [44]: https://github.com/sbt/sbt-datatype/pull/44
+  [@dwijnand]: http://github.com/dwijnand
