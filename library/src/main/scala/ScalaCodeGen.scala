@@ -186,8 +186,8 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
        |}""".stripMargin
   }
 
-  private def genToString(cl: ClassLike, superFields: List[Field], toString: Option[String]) = {
-    val body = toString getOrElse {
+  private def genToString(cl: ClassLike, superFields: List[Field], toString: List[String]) = {
+    val body = if (toString.isEmpty) {
       val allFields = superFields ++ cl.fields
       if (allFields exists (_.tpe.lzy)) {
         s"super.toString // Avoid evaluating lazy members in toString to avoid circularity."
@@ -197,7 +197,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
         val fieldsToString = allFields.map(f => bq(f.name)).mkString(" + ", """ + ", " + """, " + ")
         s""""${cl.name}("$fieldsToString")""""
       }
-    }
+    } else toString mkString s"$EOL  "
 
     s"""override def toString: String = {
        |  $body

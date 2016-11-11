@@ -250,8 +250,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
        |}""".stripMargin
   }
 
-  private def genToString(cl: ClassLike, superFields: List[Field], toString: Option[String]) = {
-    val body = toString getOrElse {
+  private def genToString(cl: ClassLike, superFields: List[Field], toString: List[String]) = {
+    val body = if (toString.isEmpty) {
       val allFields = superFields ++ cl.fields
       if (allFields exists (_.tpe.lzy)) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."
@@ -260,7 +260,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
           s""" + "${f.name}: " + ${f.name}()"""
         }.mkString(s"""return "${cl.name}(" """, " + \", \"", " + \")\";")
       }
-    }
+    } else toString mkString s"$EOL    "
 
     s"""public String toString() {
        |    $body

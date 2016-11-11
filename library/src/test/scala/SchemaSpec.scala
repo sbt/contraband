@@ -29,7 +29,7 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 0) &&
         (extra === List()) &&
-        (toString === None) &&
+        (toString === Nil) &&
         (extraCompanion === Nil) &&
         (parents === Nil) &&
         (parentsCompanion === Nil))
@@ -46,7 +46,7 @@ class SchemaSpec extends FlatSpec {
         (doc === List()) &&
         (fields.size === 0) &&
         (extra === List()) &&
-        (toString === None) &&
+        (toString === Nil) &&
         (extraCompanion === Nil) &&
         (parents === Nil) &&
         (parentsCompanion === Nil))
@@ -85,7 +85,7 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 0) &&
         (extra === List("// Some extra code...")) &&
-        (toString === Some("return \"custom\";")) &&
+        (toString === List("return \"custom\";")) &&
         (extraCompanion === List("// Some extra companion code...")) &&
         (parents === List("Interface1", "Interface2")) &&
         (parentsCompanion === List("CompanionInterface1", "CompanionInterface2")))
@@ -104,9 +104,9 @@ class SchemaSpec extends FlatSpec {
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
         (children(0) === Record("childRecord", "Scala", None, VersionNumber("0.0.0"), Nil,
-          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, None, Nil, Nil, Nil)) &&
+          Field("x", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None) :: Nil, Nil, Nil, Nil, Nil, Nil)) &&
         (extra === List()) &&
-        (toString === None) &&
+        (toString === Nil) &&
         (extraCompanion === Nil) &&
         (parents === Nil) &&
         (parentsCompanion === Nil))
@@ -122,9 +122,9 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 0) &&
         (abstractMethods.size === 0) &&
         (children.size === 1) &&
-        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil, Nil, Nil)) &&
+        (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil, Nil)) &&
         (extra === List()) &&
-        (toString === None) &&
+        (toString === Nil) &&
         (extraCompanion === Nil) &&
         (parents === Nil) &&
         (parentsCompanion === Nil))
@@ -141,7 +141,7 @@ class SchemaSpec extends FlatSpec {
         (fields.size === 1) &&
         (fields(0) === Field("field", Nil, TpeRef("java.net.URL", false, false, false), Field.emptyVersion, None)) &&
         (extra === List("// Some extra code...")) &&
-        (toString === None) &&
+        (toString === Nil) &&
         (extraCompanion === Nil) &&
         (parents === Nil) &&
         (parentsCompanion === Nil))
