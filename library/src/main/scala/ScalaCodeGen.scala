@@ -283,7 +283,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Definition => File, sealProtocol
     def genParam(f: Field) = s"${bq(f.name)}: ${genRealTpe(f.tpe, isParam = true)} = ${bq(f.name)}"
     val params = allFields map genParam mkString ", "
     val constructorCall = allFields map (f => bq(f.name)) mkString ", "
-    s"""private[this] def copy($params): ${r.name} = {
+    s"""protected[this] def copy($params): ${r.name} = {
        |  new ${r.name}($constructorCall)
        |}""".stripMargin
   }
