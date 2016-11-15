@@ -1,0 +1,17 @@
+
+### breaking changes
+
+- Removes use of default arguments and therefore the copy overloads. [#48][48]/[#50][50] by [@dwijnand][@dwijnand]
+
+### enhancements
+
+- Adds generating extra code for companion objects (in Scala) using the "extraCompanion" key [#45][45] by [@dwijnand][@dwijnand]
+- Adds defining class parents and companion object parents (in Scala) using the "parents" and "parentsCompanion" keys. [#46][46] by [@dwijnand][@dwijnand]
+- Adds multi-line support to the custom toString support. [#47][47] by [@dwijnand][@dwijnand]
+
+  [45]: https://github.com/sbt/sbt-datatype/pull/45
+  [46]: https://github.com/sbt/sbt-datatype/pull/46
+  [47]: https://github.com/sbt/sbt-datatype/pull/47
+  [48]: https://github.com/sbt/sbt-datatype/issues/48
+  [50]: https://github.com/sbt/sbt-datatype/pull/50
+  [@dwijnand]: http://github.com/dwijnand
