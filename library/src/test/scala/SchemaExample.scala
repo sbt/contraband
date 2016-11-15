@@ -447,10 +447,7 @@ final class SimpleGreeting(
   override def toString: String = {
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
-  def copy(message: => String): SimpleGreeting = {
-    new SimpleGreeting(message, header)
-  }
-  def copy(message: => String = message, header: com.example.GreetingHeader = header): SimpleGreeting = {
+  protected[this] def copy(message: => String = message, header: com.example.GreetingHeader = header): SimpleGreeting = {
     new SimpleGreeting(message, header)
   }
   def withMessage(message: => String): SimpleGreeting = {
@@ -503,10 +500,7 @@ final class GreetingExtraImpl(
   override def toString: String = {
     return "Welcome, extra implosion!";
   }
-  def copy(message: => String, extra: Vector[String], x: String): GreetingExtraImpl = {
-    new GreetingExtraImpl(message, header, extra, x)
-  }
-  def copy(message: => String = message, header: com.example.GreetingHeader = header, extra: Vector[String] = extra, x: String = x): GreetingExtraImpl = {
+  protected[this] def copy(message: => String = message, header: com.example.GreetingHeader = header, extra: Vector[String] = extra, x: String = x): GreetingExtraImpl = {
     new GreetingExtraImpl(message, header, extra, x)
   }
   def withMessage(message: => String): GreetingExtraImpl = {
@@ -545,10 +539,7 @@ final class GreetingWithAttachments(
   override def toString: String = {
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
-  def copy(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = {
-    new GreetingWithAttachments(message, header, attachments)
-  }
-  def copy(message: => String = message, header: com.example.GreetingHeader = header, attachments: Vector[java.io.File] = attachments): GreetingWithAttachments = {
+  protected[this] def copy(message: => String = message, header: com.example.GreetingHeader = header, attachments: Vector[java.io.File] = attachments): GreetingWithAttachments = {
     new GreetingWithAttachments(message, header, attachments)
   }
   def withMessage(message: => String): GreetingWithAttachments = {
@@ -586,10 +577,7 @@ final class GreetingHeader(
   override def toString: String = {
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
-  def copy(created: => java.util.Date, author: String): GreetingHeader = {
-    new GreetingHeader(created, priority, author)
-  }
-  def copy(created: => java.util.Date = created, priority: com.example.PriorityLevel = priority, author: String = author): GreetingHeader = {
+  protected[this] def copy(created: => java.util.Date = created, priority: com.example.PriorityLevel = priority, author: String = author): GreetingHeader = {
     new GreetingHeader(created, priority, author)
   }
   def withCreated(created: => java.util.Date): GreetingHeader = {

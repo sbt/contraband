@@ -91,7 +91,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "childRecord(" + field + ", " + x + ")"
         |  }
-        |  def copy(field: Int = field, x: Int = x): childRecord = {
+        |  protected[this] def copy(field: Int = field, x: Int = x): childRecord = {
         |    new childRecord(field, x)
         |  }
         |  def withField(field: Int): childRecord = {
@@ -201,7 +201,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleRecordExample(" + field + ")"
         |  }
-        |  def copy(field: java.net.URL = field): simpleRecordExample = {
+        |  protected[this] def copy(field: java.net.URL = field): simpleRecordExample = {
         |    new simpleRecordExample(field)
         |  }
         |  def withField(field: java.net.URL): simpleRecordExample = {
@@ -233,10 +233,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "growableAddOneField(" + field + ")"
         |  }
-        |  def copy(): growableAddOneField = {
-        |    new growableAddOneField(field)
-        |  }
-        |  def copy(field: Int = field): growableAddOneField = {
+        |  protected[this] def copy(field: Int = field): growableAddOneField = {
         |    new growableAddOneField(field)
         |  }
         |  def withField(field: Int): growableAddOneField = {
@@ -271,13 +268,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "Foo(" + x + ", " + y + ")"
         |  }
-        |  def copy(): Foo = {
-        |    new Foo(x, y)
-        |  }
-        |  def copy(x: Int): Foo = {
-        |    new Foo(x, y)
-        |  }
-        |  def copy(x: Int = x, y: Int = y): Foo = {
+        |  protected[this] def copy(x: Int = x, y: Int = y): Foo = {
         |    new Foo(x, y)
         |  }
         |  def withX(x: Int): Foo = {
@@ -322,7 +313,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    super.toString // Avoid evaluating lazy members in toString to avoid circularity.
         |  }
-        |  def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Vector[Int] = arrayInteger, optionInteger: Option[Int] = optionInteger, lazyArrayInteger: => Vector[Int] = lazyArrayInteger, lazyOptionInteger: => Option[Int] = lazyOptionInteger): primitiveTypesExample = {
+        |  protected[this] def copy(simpleInteger: Int = simpleInteger, lazyInteger: => Int = lazyInteger, arrayInteger: Vector[Int] = arrayInteger, optionInteger: Option[Int] = optionInteger, lazyArrayInteger: => Vector[Int] = lazyArrayInteger, lazyOptionInteger: => Option[Int] = lazyOptionInteger): primitiveTypesExample = {
         |    new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesExample = {
@@ -374,7 +365,7 @@ class ScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "primitiveTypesNoLazyExample(" + simpleInteger + ", " + arrayInteger + ")"
         |  }
-        |  def copy(simpleInteger: Int = simpleInteger, arrayInteger: Vector[Int] = arrayInteger): primitiveTypesNoLazyExample = {
+        |  protected[this] def copy(simpleInteger: Int = simpleInteger, arrayInteger: Vector[Int] = arrayInteger): primitiveTypesNoLazyExample = {
         |    new primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |  }
         |  def withSimpleInteger(simpleInteger: Int): primitiveTypesNoLazyExample = {
