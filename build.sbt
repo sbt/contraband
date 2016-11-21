@@ -11,7 +11,7 @@ lazy val commonSettings = Seq(
   )
 
 lazy val pluginSettings = commonSettings ++ Seq(
-  bintrayPackage := "sbt-datatype",
+  bintrayPackage := "sbt-contraband",
   version := "0.2.9-SNAPSHOT",
   sbtPlugin := true
 )
@@ -20,7 +20,7 @@ lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
     commonSettings,
-    name := "datatype root",
+    name := "contraband root",
     publish := {},
     publishLocal := {},
     publishArtifact in Compile := false,
@@ -32,7 +32,7 @@ lazy val root = (project in file(".")).
 lazy val plugin = (project in file("plugin")).
   settings(
     pluginSettings,
-    name := "sbt-datatype",
+    name := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
     ScriptedPlugin.scriptedSettings,
     scriptedLaunchOpts := { scriptedLaunchOpts.value ++
@@ -46,7 +46,7 @@ lazy val library = project.
   enablePlugins(KeywordPlugin).
   settings(
     pluginSettings,
-    name := "datatype",
+    name := "contraband",
     description := "Code generation library to generate growable datatypes.",
     libraryDependencies ++= Seq(parboiled) ++ jsonDependencies ++ Seq(scalaTest % Test, diffutils % Test)
   )

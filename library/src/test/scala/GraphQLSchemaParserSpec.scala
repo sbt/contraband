@@ -1,4 +1,4 @@
-package sbt.datatype
+package sbt.contraband
 
 import org.parboiled2.Position
 import parser.SchemaParser

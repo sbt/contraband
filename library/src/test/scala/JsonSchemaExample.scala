@@ -1,4 +1,4 @@
-package sbt.datatype
+package sbt.contraband
 
 import java.io.File
 
