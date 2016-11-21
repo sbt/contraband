@@ -12,7 +12,7 @@ enum EnumExample {
   First
   Second
 
-  #x def extra: String = ???
+  #x // Some extra code
 }"""
 
   val recordExample = """
@@ -58,6 +58,13 @@ interface IntfExample {
     ## This argument is not important, so it gets single line doc.
     arg1: Boolean): [Int]
 }
+"""
 
+  val growableAddOneFieldExample = """
+package com.example @target(Scala) @codecPackage("generated")
+
+type Growable @target(Scala) {
+  field: Int = 0 @since("0.1.0")
+}
 """
 }

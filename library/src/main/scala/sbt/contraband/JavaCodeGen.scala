@@ -200,6 +200,19 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
          |public abstract ${genRealTpe(fieldType)} ${name}(${params mkString ","});"""
     }
 
+  private def renderJavaValue(v: Value, tpe: Type): String =
+    v match {
+      case x: NullValue =>
+        if (!tpe.isNotNullType) s"$optionalInterface.apply(null)"
+        else if (tpe.isListType) "Array()"
+        else sys.error(s"Expected $tpe but found $v")
+      case x: ScalarValue =>
+        if (tpe.isListType) "new Array { ${x.renderPretty} }"
+        else if (tpe.isNotNullType) x.renderPretty
+        else s"$optionalInterface.apply(${x.renderPretty})"
+      case _ => v.renderPretty
+    }
+
   private def genConstructors(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
     perVersionNumber(getSince(cl.directives), cl.fields filter { _.arguments.isEmpty }) { (provided, byDefault) =>
       val lfs = localFields(cl, parent.toList)
@@ -213,7 +226,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
         case f if provided contains f  => s"_${f.name}"
         case f if byDefault contains f =>
           f.defaultValue match {
-            case Some(v) => v.renderPretty
+            case Some(v) => renderJavaValue(v, f.fieldType)
             case _       => sys.error(s"Need a default value for field ${f.name}.")
           }
       }
@@ -222,7 +235,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
         case f if provided contains f  => s"${f.name} = _${f.name};"
         case f if byDefault contains f =>
           f.defaultValue match {
-            case Some(v) => s"${f.name} = ${v.renderPretty};"
+            case Some(v) => s"${f.name} = ${renderJavaValue(v, f.fieldType)};"
             case _       => sys.error(s"Need a default value for field ${f.name}.")
           }
       } mkString EOL

@@ -17,7 +17,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |/** Example of an enumeration */
         |sealed abstract class EnumExample extends Serializable
         |object EnumExample {
-        |  def extra: String = ???
+        |  // Some extra code
         |  /** First symbol */
         |  case object First extends EnumExample
         |
@@ -56,6 +56,41 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |object TypeExample {
         |  def apply(field: Option[java.net.URL]): TypeExample = new TypeExample(field)
         |}""".stripMargin.unindent)
+  }
+
+  it should "grow a record from 0 to 1 field" in {
+    val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
+    // println(ast)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
+    val code = gen generate Transform.propateNamespace(ast)
+
+    code.head._2.unindent should equalLines (
+      """package com.example
+        |final class Growable(
+        |  val field: Option[Int]) extends Serializable {
+        |  def this() = this(Some(0))
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: Growable => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (17 + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "Growable(" + field + ")"
+        |  }
+        |  protected[this] def copy(field: Option[Int] = field): Growable = {
+        |    new Growable(field)
+        |  }
+        |  def withField(field: Option[Int]): Growable = {
+        |    copy(field = field)
+        |  }
+        |}
+        |object Growable {
+        |  def apply(): Growable = new Growable(Some(0))
+        |  def apply(field: Option[Int]): Growable = new Growable(field)
+        |}
+        |""".stripMargin.unindent)
   }
 
   "generate(Interface)" should "generate an interface with one child" in {
