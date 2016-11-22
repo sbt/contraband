@@ -93,6 +93,47 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |""".stripMargin.unindent)
   }
 
+  it should "grow a record from 0 to 2 field" in {
+    val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
+    // println(ast)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
+    val code = gen generate Transform.propateNamespace(ast)
+
+    code.head._2.unindent should equalLines (
+      """package com.example
+        |final class Foo(
+        |  val x: Option[Int],
+        |  val y: Vector[Int]) extends Serializable {
+        |  def this() = this(None, Vector())
+        |  def this(x: Option[Int]) = this(x, Vector())
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: Foo => (this.x == x.x) && (this.y == x.y)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + x.##) + y.##)
+        |  }
+        |  override def toString: String = {
+        |    "Foo(" + x + ", " + y + ")"
+        |  }
+        |  protected[this] def copy(x: Option[Int] = x, y: Vector[Int] = y): Foo = {
+        |    new Foo(x, y)
+        |  }
+        |  def withX(x: Option[Int]): Foo = {
+        |    copy(x = x)
+        |  }
+        |  def withY(y: Vector[Int]): Foo = {
+        |    copy(y = y)
+        |  }
+        |}
+        |object Foo {
+        |  def apply(): Foo = new Foo(None, Vector())
+        |  def apply(x: Option[Int]): Foo = new Foo(x, Vector())
+        |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
+        |}
+        |""".stripMargin.unindent)
+  }
+
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
     val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)

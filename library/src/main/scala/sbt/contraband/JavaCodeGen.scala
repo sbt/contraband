@@ -203,14 +203,22 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
   private def renderJavaValue(v: Value, tpe: Type): String =
     v match {
       case x: NullValue =>
-        if (!tpe.isNotNullType) s"$optionalInterface.apply(null)"
-        else if (tpe.isListType) "Array()"
+        if (tpe.isListType) "new Array {}"
+        else if (!tpe.isNotNullType) s"$optionalInterface.apply(null)"
         else sys.error(s"Expected $tpe but found $v")
       case x: ScalarValue =>
         if (tpe.isListType) "new Array { ${x.renderPretty} }"
         else if (tpe.isNotNullType) x.renderPretty
         else s"$optionalInterface.apply(${x.renderPretty})"
       case _ => v.renderPretty
+    }
+
+  private def renderDefaultValue(f: FieldDefinition): String =
+    f.defaultValue match {
+      case Some(v) => renderJavaValue(v, f.fieldType)
+      case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
+        renderJavaValue(NullValue(), f.fieldType)
+      case _       => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
   private def genConstructors(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
@@ -224,20 +232,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
         }
       val superFieldsValues = superFields map {
         case f if provided contains f  => s"_${f.name}"
-        case f if byDefault contains f =>
-          f.defaultValue match {
-            case Some(v) => renderJavaValue(v, f.fieldType)
-            case _       => sys.error(s"Need a default value for field ${f.name}.")
-          }
+        case f if byDefault contains f => renderDefaultValue(f)
       }
       val superCall = superFieldsValues.mkString("super(", ", ", ");")
       val assignments = lfs map {
         case f if provided contains f  => s"${f.name} = _${f.name};"
-        case f if byDefault contains f =>
-          f.defaultValue match {
-            case Some(v) => s"${f.name} = ${renderJavaValue(v, f.fieldType)};"
-            case _       => sys.error(s"Need a default value for field ${f.name}.")
-          }
+        case f if byDefault contains f => s"${f.name} = ${renderDefaultValue(f)};"
       } mkString EOL
 
       s"""public ${cl.name}($ctorParameters) {

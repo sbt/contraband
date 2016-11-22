@@ -234,14 +234,22 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
   private def renderScalaValue(v: Value, tpe: Type): String =
     v match {
       case x: NullValue =>
-        if (!tpe.isNotNullType) "None"
-        else if (tpe.isListType) "Vector()"
+        if (tpe.isListType) "Vector()"
+        else if (!tpe.isNotNullType) "None"
         else sys.error(s"Expected $tpe but found $v")
       case x: ScalarValue =>
         if (tpe.isListType) "Vector(${x.renderPretty})"
         else if (tpe.isNotNullType) x.renderPretty
         else s"Some(${x.renderPretty})"
       case _ => v.renderPretty
+    }
+
+  private def renderDefaultValue(f: FieldDefinition): String =
+    f.defaultValue match {
+      case Some(v) => renderScalaValue(v, f.fieldType)
+      case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
+        renderScalaValue(NullValue(), f.fieldType)
+      case _       => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
   private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition]): List[String] =
@@ -255,11 +263,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
         val ctorCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f =>
-              f.defaultValue match {
-                case Some(v) => renderScalaValue(v, f.fieldType)
-                case _       => sys.error(s"Need a default value for field ${f.name}.")
-              }
+            case f if byDefault contains f => renderDefaultValue(f)
           } mkString ", "
 
         s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
@@ -273,11 +277,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
         val thisCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f =>
-              f.defaultValue match {
-                case Some(v) => renderScalaValue(v, f.fieldType)
-                case _       => sys.error(s"Need a default value for field ${f.name}.")
-              }
+            case f if byDefault contains f => renderDefaultValue(f)
           } mkString ", "
 
         s"def this($ctorParameters) = this($thisCallArguments)"

@@ -84,4 +84,13 @@ type Growable @target(Scala) {
   field: Int = 0 @since("0.1.0")
 }
 """
+
+  val growableZeroToOneToTwoFieldsExample = """
+package com.example @target(Scala) @codecPackage("generated")
+
+type Foo @target(Scala) {
+  x: Int @since("0.1.0")
+  y: [Int] @since("0.2.0")
+}
+""".stripMargin
 }

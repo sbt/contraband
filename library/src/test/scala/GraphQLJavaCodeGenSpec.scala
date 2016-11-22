@@ -107,6 +107,63 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |}""".stripMargin.unindent)
   }
 
+  it should "grow a record from 0 to 2 field" in {
+    val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
+    // println(ast)
+    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption")
+    val code = gen generate Transform.propateNamespace(ast)
+
+    code.head._2.unindent should equalLines (
+      """package com.example;
+        |public final class Foo implements java.io.Serializable {
+        |    private com.example.MyOption<Integer> x;
+        |    private int[] y;
+        |    public Foo() {
+        |        super();
+        |        x = com.example.MyOption.apply(null);
+        |        y = new Array {};
+        |    }
+        |    public Foo(com.example.MyOption<Integer> _x) {
+        |        super();
+        |        x = _x;
+        |        y = new Array {};
+        |    }
+        |    public Foo(com.example.MyOption<Integer> _x, int[] _y) {
+        |        super();
+        |        x = _x;
+        |        y = _y;
+        |    }
+        |    public int x() {
+        |        return this.x;
+        |    }
+        |    public int[] y() {
+        |        return this.y;
+        |    }
+        |    public Foo withX(com.example.MyOption<Integer> x) {
+        |        return new Foo(x, y);
+        |    }
+        |    public Foo withY(int[] y) {
+        |        return new Foo(x, y);
+        |    }
+        |    public boolean equals(Object obj) {
+        |        if (this == obj) {
+        |            return true;
+        |        } else if (!(obj instanceof Foo)) {
+        |            return false;
+        |        } else {
+        |            Foo o = (Foo)obj;
+        |            return (x() == o.x()) && java.util.Arrays.equals(y(), o.y());
+        |        }
+        |    }
+        |    public int hashCode() {
+        |        return 37 * (37 * (17 + (new Integer(x())).hashCode()) + y().hashCode());
+        |    }
+        |    public String toString() {
+        |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
+        |    }
+        |}""".stripMargin.unindent)
+  }
+
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
     val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption")
