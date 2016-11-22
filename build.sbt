@@ -1,25 +1,23 @@
 import Dependencies._
 
-lazy val commonSettings = Seq(
-    organization in ThisBuild := "org.scala-sbt",
-    crossScalaVersions := Seq("2.11.8", "2.10.6"),
-    scalaVersion := "2.10.6",
-    licenses += ("Apache-2.0", url("https://github.com/sbt/sbt-datatype/blob/master/LICENSE")),
-    bintrayOrganization := Some("sbt"),
-    bintrayRepository := "sbt-plugin-releases",
-    bintrayVcsUrl := Some("git@github.com:sbt/sbt-datatype.git")
-  )
-
-lazy val pluginSettings = commonSettings ++ Seq(
+lazy val pluginSettings = Seq(
   bintrayPackage := "sbt-contraband",
-  version := "0.2.9-SNAPSHOT",
   sbtPlugin := true
 )
 
 lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
-    commonSettings,
+    inThisBuild(List(
+      version := "0.3.0-SNAPSHOT",
+      organization := "org.scala-sbt",
+      crossScalaVersions := Seq("2.11.8", "2.10.6"),
+      scalaVersion := "2.10.6",
+      licenses += ("Apache-2.0", url("https://github.com/sbt/contraband/blob/master/LICENSE")),
+      bintrayOrganization := Some("sbt"),
+      bintrayRepository := "sbt-plugin-releases",
+      bintrayVcsUrl := Some("git@github.com:sbt/contraband.git")
+    )),
     name := "contraband root",
     publish := {},
     publishLocal := {},
@@ -45,7 +43,6 @@ lazy val plugin = (project in file("plugin")).
 lazy val library = project.
   enablePlugins(KeywordPlugin).
   settings(
-    pluginSettings,
     name := "contraband",
     description := "Code generation library to generate growable datatypes.",
     libraryDependencies ++= Seq(parboiled) ++ jsonDependencies ++ Seq(scalaTest % Test, diffutils % Test)
