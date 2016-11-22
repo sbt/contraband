@@ -60,6 +60,23 @@ interface IntfExample {
 }
 """
 
+  val customizationExample = """
+package com.example @target(Scala) @codecPackage("generated")
+
+## Example of an interface
+interface IntfExample {
+  field: Int
+
+  #x // Some extra code...
+  #xinterface Interface1
+  #xinterface Interface2
+  #xtostring return "custom";
+  #xcompanion // Some extra companion code...
+  #xcompanioninterface CompanionInterface1
+  #xcompanioninterface CompanionInterface2
+}
+"""
+
   val growableAddOneFieldExample = """
 package com.example @target(Scala) @codecPackage("generated")
 

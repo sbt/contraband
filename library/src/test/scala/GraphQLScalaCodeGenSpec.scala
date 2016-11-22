@@ -180,6 +180,35 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     )
   }
 
+  it should "generate with customization" in {
+    val Success(ast) = SchemaParser.parse(customizationExample)
+    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
+    val code = gen generate Transform.propateNamespace(ast)
+    code.head._2.unindent should equalLines(
+      """package com.example
+        |/** Example of an interface */
+        |sealed abstract class IntfExample(
+        |  val field: Option[Int]) extends Interface1 with Interface2 with Serializable {
+        |  // Some extra code...
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: IntfExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (17 + field.##)
+        |  }
+        |  override def toString: String = {
+        |    return "custom";
+        |  }
+        |}
+        |
+        |object IntfExample extends CompanionInterface1 with CompanionInterface2 {
+        |  // Some extra companion code...
+        |}
+        |""".stripMargin.unindent
+    )
+  }
+
   val outputFile = new File("output.scala")
   val scalaArray = "Vector"
   val genFileName = (_: Any) => outputFile

@@ -27,12 +27,6 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
       fields shouldEqual Nil
       val toStringImpl = toToStringImpl(x)
       toStringImpl shouldEqual Nil
-      // (abstractMethods.size === 0) &&
-      // (children.size === 0) &&
-      // (extra === List()) &&
-      // (extraCompanion === Nil) &&
-      // (parents === Nil) &&
-      // (parentsCompanion === Nil))
     }
   }
   it should "parse record" in {
@@ -46,10 +40,6 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
       fields shouldEqual Nil
       val toStringImpl = toToStringImpl(x)
       toStringImpl shouldEqual Nil
-      // (extra === List()) &&
-      // (extraCompanion === Nil) &&
-      // (parents === Nil) &&
-      // (parentsCompanion === Nil)
     }
   }
   it should "parse enumeration" in {
@@ -61,8 +51,6 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
       namespace shouldEqual None
       toDoc(comments) shouldEqual Nil
       values shouldEqual Nil
-      // (values.size === 0)) // &&
-      //(extra === List()))
     }
   }
   it should "throw an error on invalid definition kind" in {
@@ -83,14 +71,6 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
       fields.size shouldEqual 1
       val toStringImpl = toToStringImpl(x)
       toStringImpl shouldEqual List("return \"custom\";")
-      //   (fields.size === 1) &&
-      //   (fields(0) === Field("field", Nil, TpeRef("type", false, false, false), Field.emptyVersion, None)) &&
-      //   (abstractMethods.size === 0) &&
-      //   (children.size === 0) &&
-      //   (extra === List("// Some extra code...")) &&
-      //   (extraCompanion === List("// Some extra companion code...")) &&
-      //   (parents === List("Interface1", "Interface2")) &&
-      //   (parentsCompanion === List("CompanionInterface1", "CompanionInterface2")))
       inside(fields(0)) { case ast.FieldDefinition(name, fieldType, arguments, defaultValue, directives, comments, position) =>
         name shouldEqual "field"
         fieldType shouldEqual NotNullType(NamedType("type" :: Nil, None))
@@ -107,15 +87,6 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
       namespace shouldEqual None
       val doc = toDoc(comments)
       doc shouldEqual List("example of interface")
-      // (fields.size ===1) &&
-      // (fields(0) === Field("field", Nil, TpeRef("int", false, false, false), Field.emptyVersion, None)) &&
-      // (abstractMethods.size === 0) &&
-      // (children.size === 1) &&
-      // (extra === List()) &&
-      // (toString === None) &&
-      // (extraCompanion === Nil) &&
-      // (parents === Nil) &&
-      // (parentsCompanion === Nil))
     }
     inside(x2) { case ObjectTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) =>
       name shouldEqual "childRecord"
@@ -131,21 +102,9 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
     val List(x1, x2) = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     inside(x1) { case ast.InterfaceTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) =>
       name shouldEqual "nestedProtocolExample"
-      //     assert((name === "nestedProtocolExample") &&
-      //     (target === "Scala") &&
-      //     (namespace === None) &&
-      //     (doc === List("example of nested protocols")) &&
-      //     (fields.size === 0) &&
-      //     (abstractMethods.size === 0) &&
     }
     inside(x2) { case ast.InterfaceTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) =>
       name shouldEqual "nestedProtocol"
-      //     (children(0) === Interface("nestedProtocol", "Scala", None, VersionNumber("0.0.0"), Nil, Nil, Nil, Nil, Nil, None, Nil, Nil, Nil)) &&
-      //     (extra === List()) &&
-      //     (toString === None) &&
-      //     (extraCompanion === Nil) &&
-      //     (parents === Nil) &&
-      //     (parentsCompanion === Nil))
     }
   }
 
@@ -153,16 +112,7 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
     inside(JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)) {
       case ObjectTypeDefinition(name, namespace, interfaces, fields, directives, comments, trailingComments, position) =>
         name shouldEqual "simpleRecordExample"
-        // (target === "Scala") &&
         namespace shouldEqual None
-        // (doc === List("Example of simple record")) &&
-        // (fields.size === 1) &&
-        // (fields(0) === Field("field", Nil, TpeRef("java.net.URL", false, false, false), Field.emptyVersion, None)) &&
-        // (extra === List("// Some extra code...")) &&
-        // (toString === None) &&
-        // (extraCompanion === Nil) &&
-        // (parents === Nil) &&
-        // (parentsCompanion === Nil)
     }
   }
 

@@ -90,13 +90,21 @@ trait Ignored extends PositionTracking { this: Parser ⇒
 
   def Comments = rule { (DocComment | CommentCap).* ~ Ignored.* ~> (_.toList)}
 
-  def ExtraComments = rule { (ExtraComment | DocComment | CommentCap).* ~ Ignored.* ~> (_.toList)}
+  def ExtraComments = rule { (ExtraIntfComment | ToStringImplComment | CompanionExtraIntfComment | CompanionExtraComment | ExtraComment | DocComment | CommentCap).* ~ Ignored.* ~> (_.toList)}
 
   def CommentCap = rule { trackPos ~ "#" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.CommentLine(comment, Some(pos))) }
 
   def DocComment = rule { trackPos ~ "##" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.DocComment(comment, Some(pos))) }
 
   def ExtraComment = rule { trackPos ~ "#x" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.ExtraComment(comment, Some(pos))) }
+
+  def ExtraIntfComment = rule { trackPos ~ "#xinterface" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.ExtraIntfComment(comment.trim, Some(pos))) }
+
+  def ToStringImplComment = rule { trackPos ~ "#xtostring" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.ToStringImplComment(comment.trim, Some(pos))) }
+
+  def CompanionExtraIntfComment = rule { trackPos ~ "#xcompanioninterface" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.CompanionExtraIntfComment(comment.trim, Some(pos))) }
+
+  def CompanionExtraComment = rule { trackPos ~ "#xcompanion" ~ capture(CommentChar.*) ~ IgnoredNoComment.* ~> ((pos, comment) => ast.CompanionExtraComment(comment.trim, Some(pos))) }
 
   def Comment = rule { "#" ~ CommentChar.* }
 
