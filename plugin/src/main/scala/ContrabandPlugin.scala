@@ -150,8 +150,8 @@ object Generate {
         input flatMap { s =>
           jsonFormatsGenerator.generate(s).map {
             case (file, code) =>
-              println(code)
-              println("---------")
+              // println(code)
+              // println("---------")
               val outputFile = new File(target, "/" + file.toString)
               IO.write(outputFile, code)
               log.info(s"sbt-contraband created $outputFile")
