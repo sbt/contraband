@@ -9,7 +9,8 @@ import AstUtil._
 /**
  * Code generator for Java.
  */
-class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends CodeGenerator {
+class JavaCodeGen(lazyInterface: String, optionalInterface: String,
+  instantiateJavaOptional: String => String) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -204,12 +205,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String) extends Code
     v match {
       case x: NullValue =>
         if (tpe.isListType) "new Array {}"
-        else if (!tpe.isNotNullType) s"$optionalInterface.apply(null)"
+        else if (!tpe.isNotNullType) s"""${instantiateJavaOptional("null")}"""
         else sys.error(s"Expected $tpe but found $v")
       case x: ScalarValue =>
         if (tpe.isListType) "new Array { ${x.renderPretty} }"
         else if (tpe.isNotNullType) x.renderPretty
-        else s"$optionalInterface.apply(${x.renderPretty})"
+        else s"${instantiateJavaOptional(x.renderPretty)}"
       case _ => v.renderPretty
     }
 
