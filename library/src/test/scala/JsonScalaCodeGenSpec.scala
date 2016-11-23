@@ -329,11 +329,17 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  def withOptionInteger(optionInteger: Option[Int]): primitiveTypesExample = {
         |    copy(optionInteger = optionInteger)
         |  }
+        |  def withOptionInteger(optionInteger: Int): primitiveTypesExample = {
+        |    copy(optionInteger = Option(optionInteger))
+        |  }
         |  def withLazyArrayInteger(lazyArrayInteger: => Vector[Int]): primitiveTypesExample = {
         |    copy(lazyArrayInteger = lazyArrayInteger)
         |  }
         |  def withLazyOptionInteger(lazyOptionInteger: => Option[Int]): primitiveTypesExample = {
         |    copy(lazyOptionInteger = lazyOptionInteger)
+        |  }
+        |  def withLazyOptionInteger(lazyOptionInteger: => Int): primitiveTypesExample = {
+        |    copy(lazyOptionInteger = Option(lazyOptionInteger))
         |  }
         |}
         |

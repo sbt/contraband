@@ -52,6 +52,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  def withField(field: Option[java.net.URL]): TypeExample = {
         |    copy(field = field)
         |  }
+        |  def withField(field: java.net.URL): TypeExample = {
+        |    copy(field = Option(field))
+        |  }
         |}
         |object TypeExample {
         |  def apply(field: Option[java.net.URL]): TypeExample = new TypeExample(field)
@@ -84,6 +87,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  }
         |  def withField(field: Option[Int]): Growable = {
         |    copy(field = field)
+        |  }
+        |  def withField(field: Int): Growable = {
+        |    copy(field = Option(field))
         |  }
         |}
         |object Growable {
@@ -121,6 +127,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  }
         |  def withX(x: Option[Int]): Foo = {
         |    copy(x = x)
+        |  }
+        |  def withX(x: Int): Foo = {
+        |    copy(x = Option(x))
         |  }
         |  def withY(y: Vector[Int]): Foo = {
         |    copy(y = y)
@@ -176,8 +185,14 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  def withName(name: Option[String]): ChildType = {
         |    copy(name = name)
         |  }
+        |  def withName(name: String): ChildType = {
+        |    copy(name = Option(name))
+        |  }
         |  def withField(field: Option[Int]): ChildType = {
         |    copy(field = field)
+        |  }
+        |  def withField(field: Int): ChildType = {
+        |    copy(field = Option(field))
         |  }
         |}
         |

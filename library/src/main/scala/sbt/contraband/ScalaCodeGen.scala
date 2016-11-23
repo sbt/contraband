@@ -358,8 +358,13 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     r.fields map { f =>
       s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)}): ${r.name} = {
          |  copy(${bq(f.name)} = ${bq(f.name)})
-         |}""".stripMargin
+         |}""".stripMargin +
+      ( if (f.fieldType.isListType || f.fieldType.isNotNullType) ""
+        else s"""
+                |def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType.notNull, isParam = true)}): ${r.name} = {
+                |  copy(${bq(f.name)} = Option(${bq(f.name)}))
+                |}""".stripMargin
+      )
     } mkString (EOL + EOL)
   }
-
 }

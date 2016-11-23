@@ -128,6 +128,18 @@ sealed trait Type extends AstNode {
         }
       loop(this)
     }
+
+  def notNull: ast.Type =
+    {
+      def loop(tpe: Type): Type =
+        tpe match {
+          case nn: NotNullType       => nn
+          case lt: ListType          => lt
+          case LazyType(ofType, pos) => LazyType(loop(ofType), pos)
+          case named: NamedType      => NotNullType(named, None)
+        }
+      loop(this)
+    }
 }
 
 case class NamedType(names: List[String], position: Option[Position] = None) extends Type {
