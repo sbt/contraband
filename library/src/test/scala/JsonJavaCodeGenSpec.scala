@@ -8,11 +8,6 @@ import JsonSchemaExample._
 import parser.JsonParser
 
 class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
-  val instantiateJavaOptional: String => String =
-    {
-      case "null" => "com.example.MyOption.nothing()"
-      case e      => s"com.example.MyOption.just($e)"
-    }
   override def enumerationGenerateSimple = {
     val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate enumeration
@@ -404,13 +399,13 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public int[] arrayInteger() {
         |        return this.arrayInteger;
         |    }
-        |    public int optionInteger() {
+        |    public com.example.MyOption<Integer> optionInteger() {
         |        return this.optionInteger;
         |    }
         |    public int[] lazyArrayInteger() {
         |        return this.lazyArrayInteger.get();
         |    }
-        |    public int lazyOptionInteger() {
+        |    public com.example.MyOption<Integer> lazyOptionInteger() {
         |        return this.lazyOptionInteger.get();
         |    }
         |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
@@ -425,11 +420,17 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public primitiveTypesExample withOptionInteger(com.example.MyOption<Integer> optionInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
+        |    public primitiveTypesExample withOptionInteger(int optionInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, com.example.MyOption.<Integer>just(optionInteger), lazyArrayInteger, lazyOptionInteger);
+        |    }
         |    public primitiveTypesExample withLazyArrayInteger(com.example.MyLazy<int[]> lazyArrayInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
         |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<com.example.MyOption<Integer>> lazyOptionInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
+        |    }
+        |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<Integer> lazyOptionInteger) {
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, com.example.MyOption.<Integer>just(lazyOptionInteger));
         |    }
         |    public boolean equals(Object obj) {
         |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
@@ -503,4 +504,13 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
     code mapValues (_.withoutEmptyLines) should equalMapLines (completeExampleCodeJava mapValues (_.withoutEmptyLines))
   }
+
+  lazy val instantiateJavaOptional: (String, String) => String =
+    {
+      (tpe: String, e: String) =>
+        e match {
+          case "null" => s"com.example.MyOption.<$tpe>nothing()"
+          case e      => s"com.example.MyOption.<$tpe>just($e)"
+        }
+    }
 }

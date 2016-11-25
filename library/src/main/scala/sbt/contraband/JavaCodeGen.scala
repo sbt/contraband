@@ -10,7 +10,7 @@ import AstUtil._
  * Code generator for Java.
  */
 class JavaCodeGen(lazyInterface: String, optionalInterface: String,
-  instantiateJavaOptional: String => String) extends CodeGenerator {
+  instantiateJavaOptional: (String, String) => String) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -127,8 +127,10 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     s"""${genDoc(toDoc(f.comments))}
        |private ${genRealTpe(f.fieldType)} ${f.name};""".stripMargin
 
-  private def isPrimitive(tpe: ast.Type) = !tpe.isListType && !tpe.isLazyType && tpe.name != boxedType(tpe.name)
-  private def isPrimitiveArray(tpe: ast.Type) = tpe.isListType && !tpe.isLazyType && tpe.name != boxedType(tpe.name)
+  private def isPrimitive(tpe: ast.Type) =
+    !tpe.isListType && !tpe.isLazyType && tpe.isNotNullType && tpe.name != boxedType(tpe.name)
+  private def isPrimitiveArray(tpe: ast.Type) =
+    tpe.isListType && !tpe.isLazyType && tpe.name != boxedType(tpe.name)
 
   private def boxedType(tpe: String): String =
     tpe match {
@@ -175,6 +177,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     // if it is lazy.
     val tpeSig =
       if (field.fieldType.isListType) s"${unboxedType(field.fieldType.name)}[]"
+      else if (!field.fieldType.isNotNullType) s"$optionalInterface<${boxedType(field.fieldType.name)}>"
       else unboxedType(field.fieldType.name)
 
     s"""public $tpeSig ${field.name}() {
@@ -205,12 +208,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     v match {
       case x: NullValue =>
         if (tpe.isListType) "new Array {}"
-        else if (!tpe.isNotNullType) s"""${instantiateJavaOptional("null")}"""
+        else if (!tpe.isNotNullType) s"""${instantiateJavaOptional(boxedType(tpe.name), "null")}"""
         else sys.error(s"Expected $tpe but found $v")
       case x: ScalarValue =>
         if (tpe.isListType) "new Array { ${x.renderPretty} }"
         else if (tpe.isNotNullType) x.renderPretty
-        else s"${instantiateJavaOptional(x.renderPretty)}"
+        else s"${instantiateJavaOptional(boxedType(tpe.name), x.renderPretty)}"
       case _ => v.renderPretty
     }
 
@@ -264,10 +267,20 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
     allFields map { case (f, idx) =>
       val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
+      val tpe = f.fieldType
       val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
-      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.fieldType)} ${f.name}) {
+      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(tpe)} ${f.name}) {
          |    return new ${r.name}($params);
-         |}""".stripMargin
+         |}""".stripMargin +
+      ( if (tpe.isListType || tpe.isNotNullType) ""
+        else {
+          val wrappedParams = (before map nonParam) ::: instantiateJavaOptional(boxedType(tpe.name), f.name) :: (after map nonParam) mkString ", "
+          s"""
+             |public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.fieldType.notNull)} ${f.name}) {
+             |    return new ${r.name}($wrappedParams);
+             |}""".stripMargin
+        }
+      )
     } mkString (EOL + EOL)
   }
 

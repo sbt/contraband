@@ -26,7 +26,7 @@ object ContrabandPlugin extends AutoPlugin {
     val contrabandScalaSealInterface = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
     val contrabandCodecParents = settingKey[List[String]]("Parents to add all o of the codec object.")
     val contrabandInstantiateJavaLazy = settingKey[String => String]("Function that instantiate a lazy expression from an expression in Java.")
-    val contrabandInstantiateJavaOptional = settingKey[String => String]("Function that instantiate a optional expression from an expression in Java.")
+    val contrabandInstantiateJavaOptional = settingKey[(String, String) => String]("Function that instantiate a optional expression from an expression in Java.")
     val contrabandFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
 
     sealed trait ContrabandTargetLang
@@ -50,9 +50,9 @@ object ContrabandPlugin extends AutoPlugin {
       contrabandScalaSealInterface in generateContrabands := false,
       contrabandCodecParents in generateContrabands := List("sjsonnew.BasicJsonProtocol"),
       contrabandInstantiateJavaLazy in generateContrabands := { (e: String) => s"xsbti.SafeLazy($e)" },
-      contrabandInstantiateJavaOptional in generateContrabands := { (e: String) =>
-        if (e == "null") "xsbti.Maybe.nothing()"
-        else s"xsbti.Maybe.just($e)"
+      contrabandInstantiateJavaOptional in generateContrabands := { (tpe: String, e: String) =>
+        if (e == "null") s"xsbti.Maybe.<$tpe>nothing()"
+        else s"xsbti.Maybe.<$tpe>just($e)"
       },
       contrabandFormatsForType in generateContrabands := CodecCodeGen.formatsForType,
       generateContrabands := {
@@ -111,7 +111,7 @@ object Generate {
     scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
-    instantiateJavaOptional: String => String,
+    instantiateJavaOptional: (String, String) => String,
     formatsForType: Type => List[String],
     log: Logger): Seq[File] = {
     val jsonFiles = definitions.toList collect {
@@ -138,6 +138,7 @@ object Generate {
               IO.write(outputFile, code)
               log.info(s"sbt-contraband created $outputFile")
               // println(code)
+              // println("---------")
               outputFile
           }.toList
         }
@@ -176,7 +177,7 @@ object Generate {
     scalaSealInterface: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
-    instantiateJavaOptional: String => String,
+    instantiateJavaOptional: (String, String) => String,
     formatsForType: Type => List[String],
     s: TaskStreams): Seq[File] = {
     val definitions = IO listFiles base

@@ -39,11 +39,14 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super();
         |        field = _field;
         |    }
-        |    public java.net.URL field() {
+        |    public com.example.MyOption<java.net.URL> field() {
         |        return this.field;
         |    }
         |    public TypeExample withField(com.example.MyOption<java.net.URL> field) {
         |        return new TypeExample(field);
+        |    }
+        |    public TypeExample withField(java.net.URL field) {
+        |        return new TypeExample(com.example.MyOption.<java.net.URL>just(field));
         |    }
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
@@ -76,17 +79,20 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    private com.example.MyOption<Integer> field;
         |    public Growable() {
         |        super();
-        |        field = com.example.MyOption.just(0);
+        |        field = com.example.MyOption.<Integer>just(0);
         |    }
         |    public Growable(com.example.MyOption<Integer> _field) {
         |        super();
         |        field = _field;
         |    }
-        |    public int field() {
+        |    public com.example.MyOption<Integer> field() {
         |        return this.field;
         |    }
         |    public Growable withField(com.example.MyOption<Integer> field) {
         |        return new Growable(field);
+        |    }
+        |    public Growable withField(int field) {
+        |        return new Growable(com.example.MyOption.<Integer>just(field));
         |    }
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
@@ -95,11 +101,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            Growable o = (Growable)obj;
-        |            return (field() == o.field());
+        |            return field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (17 + (new Integer(field())).hashCode());
+        |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
         |        return "Growable("  + "field: " + field() + ")";
@@ -120,7 +126,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    private int[] y;
         |    public Foo() {
         |        super();
-        |        x = com.example.MyOption.nothing();
+        |        x = com.example.MyOption.<Integer>nothing();
         |        y = new Array {};
         |    }
         |    public Foo(com.example.MyOption<Integer> _x) {
@@ -133,7 +139,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        x = _x;
         |        y = _y;
         |    }
-        |    public int x() {
+        |    public com.example.MyOption<Integer> x() {
         |        return this.x;
         |    }
         |    public int[] y() {
@@ -141,6 +147,9 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    }
         |    public Foo withX(com.example.MyOption<Integer> x) {
         |        return new Foo(x, y);
+        |    }
+        |    public Foo withX(int x) {
+        |        return new Foo(com.example.MyOption.<Integer>just(x), y);
         |    }
         |    public Foo withY(int[] y) {
         |        return new Foo(x, y);
@@ -152,11 +161,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            Foo o = (Foo)obj;
-        |            return (x() == o.x()) && java.util.Arrays.equals(y(), o.y());
+        |            return x().equals(o.x()) && java.util.Arrays.equals(y(), o.y());
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + (new Integer(x())).hashCode()) + y().hashCode());
+        |        return 37 * (37 * (17 + x().hashCode()) + y().hashCode());
         |    }
         |    public String toString() {
         |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
@@ -182,7 +191,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super();
         |        field = _field;
         |    }
-        |    public int field() {
+        |    public com.example.MyOption<Integer> field() {
         |        return this.field;
         |    }
         |    public boolean equals(Object obj) {
@@ -192,11 +201,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            InterfaceExample o = (InterfaceExample)obj;
-        |            return (field() == o.field());
+        |            return field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (17 + (new Integer(field())).hashCode());
+        |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
         |        return "InterfaceExample("  + "field: " + field() + ")";
@@ -210,14 +219,20 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super(_field);
         |         name = _name;
         |    }
-        |    public String name() {
+        |    public com.example.MyOption<String> name() {
         |        return this.name;
         |    }
         |    public ChildType withName(com.example.MyOption<String> name) {
         |        return new ChildType(name, field());
         |    }
+        |    public ChildType withName(String name) {
+        |        return new ChildType(com.example.MyOption.<String>just(name), field());
+        |    }
         |    public ChildType withField(com.example.MyOption<Integer> field) {
         |        return new ChildType(name, field);
+        |    }
+        |    public ChildType withField(int field) {
+        |        return new ChildType(name, com.example.MyOption.<Integer>just(field));
         |    }
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
@@ -226,11 +241,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            ChildType o = (ChildType)obj;
-        |            return name().equals(o.name()) && (field() == o.field());
+        |            return name().equals(o.name()) && field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + name().hashCode()) + (new Integer(field())).hashCode());
+        |        return 37 * (37 * (17 + name().hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "ChildType("  + "name: " + name() + ", " + "field: " + field() + ")";
@@ -251,7 +266,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super();
         |        field = _field;
         |    }
-        |    public int field() {
+        |    public com.example.MyOption<Integer> field() {
         |        return this.field;
         |    }
         |    /**
@@ -269,11 +284,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            IntfExample o = (IntfExample)obj;
-        |            return (field() == o.field());
+        |            return field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (17 + (new Integer(field())).hashCode());
+        |        return 37 * (17 + field().hashCode());
         |    }
         |    public String toString() {
         |        return "IntfExample("  + "field: " + field() + ")";
@@ -281,10 +296,12 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |}""".stripMargin.unindent
     )
   }
-
-  lazy val instantiateJavaOptional: String => String =
+  lazy val instantiateJavaOptional: (String, String) => String =
     {
-      case "null" => "com.example.MyOption.nothing()"
-      case e      => s"com.example.MyOption.just($e)"
+      (tpe: String, e: String) =>
+        e match {
+          case "null" => s"com.example.MyOption.<$tpe>nothing()"
+          case e      => s"com.example.MyOption.<$tpe>just($e)"
+        }
     }
 }

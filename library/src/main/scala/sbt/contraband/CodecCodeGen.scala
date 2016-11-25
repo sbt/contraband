@@ -271,13 +271,26 @@ class CodecCodeGen(codecParents: List[String],
   private def genRealTpe(tpe: ast.Type, targetLang: String) = {
     val scalaTpe = lookupTpe(scalaifyType(tpe.name))
     tpe match {
-      case x if x.isListType && targetLang == "Java" => s"Array[$scalaTpe]"
+      case x if x.isListType && targetLang == "Java" => s"Array[${scalaTpe}]"
       case x if x.isListType     => s"$scalaArray[$scalaTpe]"
-      case x if !x.isNotNullType && targetLang == "Java" => s"$javaOption[$scalaTpe]"
+      case x if !x.isNotNullType && targetLang == "Java" => s"$javaOption[${boxedType(scalaTpe)}]"
       case x if !x.isNotNullType => s"Option[$scalaTpe]"
       case _                     => scalaTpe
     }
   }
+
+  private def boxedType(tpe: String): String =
+    tpe match {
+      case "boolean" | "Boolean" => "Boolean"
+      case "byte" | "Byte"       => "Byte"
+      case "char" | "Char"       => "Character"
+      case "float" | "Float"     => "Float"
+      case "int" | "Int"         => "Integer"
+      case "long" | "Long"       => "Long"
+      case "short" | "Short"     => "Short"
+      case "double" | "Double"   => "Double"
+      case other     => other
+    }
 
   private def lookupTpe(tpe: String): String = scalaifyType(tpe) match {
     case "boolean" => "Boolean"
