@@ -1,23 +1,31 @@
-package com.example @codecPackage("generated") @fullCodec("CustomProtocol")
+package com.example
+@codecPackage("generated")
+@fullCodec("CustomProtocol")
+@target(Java)
 
-interface Greeting @target(Java) {
+interface Greeting {
   message: String!
   number: Int @since("0.1.0")
 }
 
-type SimpleGreeting implements Greeting @target(Java) {
+type SimpleGreeting implements Greeting {
   message: String!
   number: Int @since("0.1.0")
 }
 
-type GreetingWithAttachments implements Greeting @target(Java) {
+type GreetingWithAttachments implements Greeting {
   message: String!
   number: Int @since("0.1.0")
   attachments: [java.io.File]
 }
 
-type GreetingWithOption implements Greeting @target(Java) {
+type GreetingWithOption implements Greeting {
   message: String!
   number: Int @since("0.1.0")
   opt: String
+}
+
+type Person {
+  name: String!
+  age: Int
 }

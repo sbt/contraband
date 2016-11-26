@@ -1,6 +1,6 @@
 package com.example
-@codecPackage("generated")
-@fullCodec("CustomProtocol")
+@codecPackage("com.example.codec")
+@fullCodec("CustomJsonProtocol")
 @target(Scala)
 
 interface Greeting {
@@ -23,4 +23,9 @@ type GreetingWithOption implements Greeting {
   message: String!
   number: Int @since("0.1.0")
   opt: String
+}
+
+type Person {
+  name: String!
+  age: Int
 }

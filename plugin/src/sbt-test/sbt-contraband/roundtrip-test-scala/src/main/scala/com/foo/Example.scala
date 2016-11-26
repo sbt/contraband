@@ -5,7 +5,7 @@ import sjsonnew.support.scalajson.unsafe.{ Converter, CompactPrinter }
 import com.example._
 
 object Example extends App {
-  import generated.CustomProtocol._
+  import codec.CustomJsonProtocol._
   val g0: Greeting = SimpleGreeting("Hello")
   val g1: Greeting = SimpleGreeting("Hello", None)
   val g21: Greeting = GreetingWithAttachments("Hello", Vector.empty)

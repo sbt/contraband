@@ -1,18 +1,21 @@
-package com.example @codecPackage("generated") @fullCodec("CustomProtocol")
+package com.example
+@codecPackage("generated")
+@fullCodec("CustomProtocol")
+@target(Scala)
 
-type Person @target(Scala) {
-  name: String
+type Person {
+  name: String!
   age: Int
 }
 
-type PersonList @target(Scala) {
+type PersonList {
   values: [com.example.Person]
 }
 
-interface EmptyInterface @target(Scala) {
+interface EmptyInterface {
 }
 
-type ScalaKeywordExample @target(Scala) {
+type ScalaKeywordExample {
   type: String
   private: Boolean
 }
