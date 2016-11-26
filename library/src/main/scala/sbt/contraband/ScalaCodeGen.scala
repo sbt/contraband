@@ -11,7 +11,8 @@ import AstUtil._
  * Code generator for Scala.
  */
 class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
-  scalaArray: String, genFile: Any => File, sealProtocols: Boolean) extends CodeGenerator {
+  scalaArray: String, genFile: Any => File,
+  scalaSealProtocols: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -100,7 +101,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val intfLang = interfaceLanguage(parentsInSchema)
     val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
     val allFields = i.fields filter { _.arguments.isEmpty }
-    val classDef = if (sealProtocols) "sealed abstract class" else "abstract class"
+    val classDef = if (scalaSealProtocols) "sealed abstract class" else "abstract class"
     val ctorParameters = genCtorParameters(i, parent, intfLang) mkString ", "
     val superCtorArguments =
       parent match {

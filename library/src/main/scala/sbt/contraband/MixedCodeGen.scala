@@ -9,10 +9,10 @@ import AstUtil._
  * Generator that produces both Scala and Java code.
  */
 class MixedCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
-  scalaArray: String, genScalaFileName: Any => File, scalaSealprotocols: Boolean) extends CodeGenerator {
+  scalaArray: String, genScalaFileName: Any => File, scalaSealProtocols: Boolean) extends CodeGenerator {
   val javaGen  = new JavaCodeGen(javaLazy, javaOptional, instantiateJavaOptional)
   val scalaGen = new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-    scalaArray, genScalaFileName, scalaSealprotocols)
+    scalaArray, genScalaFileName, scalaSealProtocols)
 
   def generate(s: Document): ListMap[File, String] =
     s.definitions collect {
