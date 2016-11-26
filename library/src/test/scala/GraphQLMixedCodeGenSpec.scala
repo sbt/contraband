@@ -12,7 +12,7 @@ class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     val Success(ast) = SchemaParser.parse(mixedExample)
     // println(ast)
     val gen = new MixedCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-      scalaArray, genFileName, scalaSealprotocols = true)
+      scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true)
     val code = gen generate Transform.propateNamespace(ast)
 
     code mapValues (_.unindent) should equalMapLines (
@@ -71,10 +71,10 @@ public abstract class Greeting implements java.io.Serializable {
 
 // DO NOT EDIT MANUALLY
 package com.example
-final class SimpleGreeting(
+final class SimpleGreeting private (
   message: String,
   number: com.example.Maybe[java.lang.Integer]) extends com.example.Greeting(message, number) with Serializable {
-  def this(message: String) = this(message, com.example.Maybe.nothing[java.lang.Integer]())
+  private def this(message: String) = this(message, com.example.Maybe.nothing[java.lang.Integer]())
   override def equals(o: Any): Boolean = o match {
     case x: SimpleGreeting => (this.message == x.message) && (this.number == x.number)
     case _ => false

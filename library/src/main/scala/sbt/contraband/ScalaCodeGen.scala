@@ -12,7 +12,7 @@ import AstUtil._
  */
 class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
   scalaArray: String, genFile: Any => File,
-  scalaSealProtocols: Boolean) extends CodeGenerator {
+  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -68,6 +68,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val companionExtra: List[String] = toCompanionExtra(r)
     val toStringImpl: List[String] = toToStringImpl(r)
     val lazyMembers = genLazyMembers(localFields(r, parentsInSchema), intfLang) mkString EOL
+    val privateCtr = if (scalaPrivateConstructor) " private " else ""
 
     val doc = toDoc(r.comments)
     val extra = toExtra(r)
@@ -75,9 +76,9 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val code =
       s"""${genPackage(r)}
          |${genDoc(doc)}
-         |final class ${r.name}($ctorParameters) $extendsCode {
+         |final class ${r.name}$privateCtr($ctorParameters) $extendsCode {
          |  ${extra mkString EOL}
-         |  ${genAlternativeConstructors(since, allFields, intfLang) mkString EOL}
+         |  ${genAlternativeConstructors(since, allFields, scalaPrivateConstructor, intfLang) mkString EOL}
          |  ${lazyMembers}
          |  ${genEquals(r)}
          |  ${genHashCode(r)}
@@ -113,7 +114,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val doc = toDoc(i.comments)
     val extra = toExtra(i)
     val since = getSince(i.directives)
-    val alternativeCtors = genAlternativeConstructors(since, allFields, intfLang) mkString EOL
+    val alternativeCtors = genAlternativeConstructors(since, allFields, false, intfLang) mkString EOL
     val lazyMembers = genLazyMembers(localFields(i, parentsInSchema), intfLang) mkString EOL
     val msgs = i.fields filter { _.arguments.nonEmpty }
     val messages = genMessages(msgs, intfLang) mkString EOL
@@ -321,7 +322,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
       }
     }
 
-  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], intfLang: String) =
+  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], privateConstructor: Boolean, intfLang: String) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
         val ctorParameters = provided map { f => genParam(f, intfLang) } mkString ", "
@@ -330,8 +331,9 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
             case f if provided contains f  => bq(f.name)
             case f if byDefault contains f => renderDefaultValue(f, intfLang)
           } mkString ", "
+        val privateCtr = if (privateConstructor) "private " else ""
 
-        s"def this($ctorParameters) = this($thisCallArguments)"
+        s"${privateCtr}def this($ctorParameters) = this($thisCallArguments)"
 
       case _ => ""
     }

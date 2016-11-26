@@ -108,7 +108,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          val field = unbuilder.readField[Int]("field")
         |          val x = unbuilder.readField[Int]("x")
         |          unbuilder.endObject()
-        |          new _root_.childRecord(field, x)
+        |          _root_.childRecord(field, x)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -205,7 +205,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          unbuilder.beginObject(js)
         |          val field = unbuilder.readField[java.net.URL]("field")
         |          unbuilder.endObject()
-        |          new _root_.simpleRecordExample(field)
+        |          _root_.simpleRecordExample(field)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -240,7 +240,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          unbuilder.beginObject(js)
         |          val field = unbuilder.readField[Int]("field")
         |          unbuilder.endObject()
-        |          new _root_.growableAddOneField(field)
+        |          _root_.growableAddOneField(field)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -276,7 +276,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          val x = unbuilder.readField[Int]("x")
         |          val y = unbuilder.readField[Int]("y")
         |          unbuilder.endObject()
-        |          new _root_.Foo(x, y)
+        |          _root_.Foo(x, y)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -316,7 +316,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          val lazyArrayInteger = unbuilder.readField[Vector[Int]]("lazyArrayInteger")
         |          val lazyOptionInteger = unbuilder.readField[Option[Int]]("lazyOptionInteger")
         |          unbuilder.endObject()
-        |          new _root_.primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
+        |          _root_.primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }
@@ -357,7 +357,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
         |          val arrayInteger = unbuilder.readField[Vector[Int]]("arrayInteger")
         |          unbuilder.endObject()
-        |          new _root_.primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
+        |          _root_.primitiveTypesNoLazyExample(simpleInteger, arrayInteger)
         |        case None =>
         |          deserializationError("Expected JsObject but found None")
         |      }

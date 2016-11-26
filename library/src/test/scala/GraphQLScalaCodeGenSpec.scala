@@ -31,7 +31,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     code.head._2.unindent should equalLines(
       """package com.example
         |/** Example of a type */
-        |final class TypeExample(
+        |final class TypeExample private (
         |val field: Option[java.net.URL]) extends Serializable {
         |  // Some extra code
         |  override def equals(o: Any): Boolean = o match {
@@ -66,9 +66,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
     code.head._2.unindent should equalLines (
       """package com.example
-        |final class Growable(
+        |final class Growable private (
         |  val field: Option[Int]) extends Serializable {
-        |  def this() = this(Option(0))
+        |  private def this() = this(Option(0))
         |  override def equals(o: Any): Boolean = o match {
         |    case x: Growable => (this.field == x.field)
         |    case _ => false
@@ -103,11 +103,11 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
     code.head._2.unindent should equalLines (
       """package com.example
-        |final class Foo(
+        |final class Foo private (
         |  val x: Option[Int],
         |  val y: Vector[Int]) extends Serializable {
-        |  def this() = this(None, Vector())
-        |  def this(x: Option[Int]) = this(x, Vector())
+        |  private def this() = this(None, Vector())
+        |  private def this(x: Option[Int]) = this(x, Vector())
         |  override def equals(o: Any): Boolean = o match {
         |    case x: Foo => (this.x == x.x) && (this.y == x.y)
         |    case _ => false
@@ -161,7 +161,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |}
         |object InterfaceExample {
         |}
-        |final class ChildType(
+        |final class ChildType private (
         |  val name: Option[String],
         |  field: Option[Int]) extends com.example.InterfaceExample(field) with Serializable {
         |  override def equals(o: Any): Boolean = o match {
@@ -259,7 +259,8 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   }
 
   def mkScalaCodeGen: ScalaCodeGen =
-    new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName, sealProtocols = true)
+    new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName,
+        scalaSealProtocols = true, scalaPrivateConstructor = true)
   lazy val instantiateJavaOptional: (String, String) => String =
     {
       (tpe: String, e: String) =>

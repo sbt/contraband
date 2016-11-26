@@ -10,5 +10,6 @@ lazy val root = (project in file(".")).
       if (substitutions contains name) substitutions(name) :: Nil
       else ((contrabandFormatsForType in generateContrabands in Compile).value)(tpe)
     },
-    contrabandScalaArray in (Compile, generateContrabands) := "Array"
+    contrabandScalaArray in (Compile, generateContrabands) := "Array",
+    contrabandScalaPrivateConstructor in (Compile, generateContrabands) := false
   )

@@ -432,10 +432,10 @@ object Greetings extends com.example.GreetingsCompanionLike {
 }
 
 /** A Greeting in its simplest form */
-final class SimpleGreeting(
+final class SimpleGreeting private (
   message: => String,
   header: com.example.GreetingHeader) extends com.example.Greetings(message, header) with Serializable {
-  def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+  private def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
 
   override def equals(o: Any): Boolean = o match {
     case x: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -483,12 +483,12 @@ sealed abstract class GreetingExtra(
 object GreetingExtra {
 }
 
-final class GreetingExtraImpl(
+final class GreetingExtraImpl private (
   message: com.example.Lazy[String],
   header: com.example.GreetingHeader,
   extra: Array[String],
   val x: String) extends com.example.GreetingExtra(message, header, extra) with Serializable {
-  def this(message: com.example.Lazy[String], extra: Array[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
+  private def this(message: com.example.Lazy[String], extra: Array[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
 
   override def equals(o: Any): Boolean = o match {
     case x: GreetingExtraImpl => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -522,12 +522,12 @@ object GreetingExtraImpl {
 }
 
 /** A Greeting with attachments */
-final class GreetingWithAttachments(
+final class GreetingWithAttachments private (
   message: => String,
   header: com.example.GreetingHeader,
   /** The files attached to the greeting */
   val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) with Serializable {
-  def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+  private def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
 
   override def equals(o: Any): Boolean = o match {
     case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -558,13 +558,13 @@ object GreetingWithAttachments {
 }
 
 /** Meta information of a Greeting */
-final class GreetingHeader(
+final class GreetingHeader private (
   _created: => java.util.Date,
   /** The priority of this Greeting */
   val priority: com.example.PriorityLevel,
   /** The author of the Greeting */
   val author: String) extends Serializable {
-  def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
+  private def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
   /** Creation date */
   lazy val created: java.util.Date = _created
   override def equals(o: Any): Boolean = o match {
@@ -892,7 +892,7 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
       val message = unbuilder.readField[String]("message")
       val header = unbuilder.readField[com.example.GreetingHeader]("header")
       unbuilder.endObject()
-      new com.example.SimpleGreeting(message, header)
+      com.example.SimpleGreeting(message, header)
       case None =>
       deserializationError("Expected JsObject but found None")
     }
@@ -965,7 +965,7 @@ implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.Greeting
       val header = unbuilder.readField[com.example.GreetingHeader]("header")
       val attachments = unbuilder.readField[Vector[java.io.File]]("attachments")
       unbuilder.endObject()
-      new com.example.GreetingWithAttachments(message, header, attachments)
+      com.example.GreetingWithAttachments(message, header, attachments)
       case None =>
       deserializationError("Expected JsObject but found None")
     }
@@ -996,7 +996,7 @@ implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] =
       val priority = unbuilder.readField[com.example.PriorityLevel]("priority")
       val author = unbuilder.readField[String]("author")
       unbuilder.endObject()
-      new com.example.GreetingHeader(created, priority, author)
+      com.example.GreetingHeader(created, priority, author)
       case None =>
       deserializationError("Expected JsObject but found None")
     }
