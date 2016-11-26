@@ -120,6 +120,45 @@ abstract class CodeGenerator {
     }
   }
 
+  protected def javaLangBoxedType(tpe: String): String =
+    tpe match {
+      case "boolean" | "Boolean" => "java.lang.Boolean"
+      case "byte" | "Byte"       => "java.lang.Byte"
+      case "char" | "Char"       => "java.lang.Character"
+      case "float" | "Float"     => "java.lang.Float"
+      case "int" | "Int"         => "java.lang.Integer"
+      case "long" | "Long"       => "java.lang.Long"
+      case "short" | "Short"     => "java.lang.Short"
+      case "double" | "Double"   => "java.lang.Double"
+      case other     => other
+    }
+
+  protected def boxedType(tpe: String): String =
+    tpe match {
+      case "boolean" | "Boolean" => "Boolean"
+      case "byte" | "Byte"       => "Byte"
+      case "char" | "Char"       => "Character"
+      case "float" | "Float"     => "Float"
+      case "int" | "Int"         => "Integer"
+      case "long" | "Long"       => "Long"
+      case "short" | "Short"     => "Short"
+      case "double" | "Double"   => "Double"
+      case other     => other
+    }
+
+  protected def unboxedType(tpe: String): String =
+    tpe match {
+      case "boolean" | "Boolean" => "boolean"
+      case "byte" | "Byte"       => "byte"
+      case "char" | "Char"       => "char"
+      case "float" | "Float"     => "float"
+      case "int" | "Int"         => "int"
+      case "long" | "Long"       => "long"
+      case "short" | "Short"     => "short"
+      case "double" | "Double"   => "double"
+      case other     => other
+    }
+
   /** Generate the code corresponding to all definitions in `s`. */
   def generate(s: Document): ListMap[File, String]
 

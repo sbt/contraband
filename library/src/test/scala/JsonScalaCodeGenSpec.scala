@@ -6,15 +6,9 @@ import JsonSchemaExample._
 import parser.JsonParser
 
 class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
-
-  val outputFile = new File("output.scala")
-  val scalaArray = "Vector"
-  val genFileName = (_: Any) => outputFile
-
   override def enumerationGenerateSimple = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
-    val code = gen generate enumeration
+    val code = mkScalaCodeGen generate enumeration
 
     code.head._2.unindent should equalLines (
       """/** Example of simple enumeration */
@@ -29,9 +23,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def interfaceGenerateSimple = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(simpleInterfaceExample)
-    val code = gen generate protocol
+    val code = mkScalaCodeGen generate protocol
 
     code.head._2.unindent should equalLines (
       """/** example of simple interface */
@@ -57,9 +50,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def interfaceGenerateOneChild = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(oneChildInterfaceExample)
-    val code = gen generate protocol
+    val code = mkScalaCodeGen generate protocol
 
     code.head._2.unindent should equalLines (
       """/** example of interface */
@@ -110,9 +102,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def interfaceGenerateNested = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
-    val code = gen generate protocol
+    val code = mkScalaCodeGen generate protocol
 
     code.head._2.unindent should equalLines (
       """/** example of nested protocols */
@@ -151,10 +142,10 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   override def interfaceGenerateMessages = {
     val schema = JsonParser.Document.parse(generateArgDocExample)
-    val code = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = false) generate schema
+    val code = mkScalaCodeGen generate schema
 
     code.head._2.withoutEmptyLines should equalLines (
-      """abstract class generateArgDocExample(
+      """sealed abstract class generateArgDocExample(
         |  /** I'm a field. */
         |  val field: Int) extends Serializable {
         |  /**
@@ -183,9 +174,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGenerateSimple = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
-    val code = gen generate record
+    val code = mkScalaCodeGen generate record
 
     code.head._2.unindent should equalLines (
       """/** Example of simple record */
@@ -216,9 +206,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGrowZeroToOneField = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
-    val code = gen generate record
+    val code = mkScalaCodeGen generate record
 
     code.head._2.unindent should equalLines (
       """final class growableAddOneField(
@@ -249,9 +238,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def recordGrowZeroToOneToTwoFields = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsExample)
-    val code = gen generate record
+    val code = mkScalaCodeGen generate record
 
     code.head._2.unindent should equalLines (
       """final class Foo(
@@ -288,9 +276,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateTypeReferences = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = JsonParser.Document.parse(primitiveTypesExample)
-    val code = gen generate schema
+    val code = mkScalaCodeGen generate schema
     code.head._2.unindent should equalLines (
       """final class primitiveTypesExample(
         |  val simpleInteger: Int,
@@ -350,9 +337,8 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = JsonParser.Document.parse(primitiveTypesNoLazyExample)
-    val code = gen generate schema
+    val code = mkScalaCodeGen generate schema
 
     code.head._2.unindent should equalLines (
       """final class primitiveTypesNoLazyExample(
@@ -390,16 +376,30 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   override def schemaGenerateComplete = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = JsonParser.Document.parse(completeExample)
-    val code = gen generate schema
+    val code = mkScalaCodeGen generate schema
     code.head._2.unindent should equalLines (completeExampleCodeScala.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
-    val gen = new ScalaCodeGen(scalaArray, genFileName, sealProtocols = true)
     val schema = JsonParser.Document.parse(completeExample)
-    val code = gen generate schema
+    val code = mkScalaCodeGen generate schema
     code.head._2.withoutEmptyLines should equalLines (completeExampleCodeScala.withoutEmptyLines)
   }
+
+  def mkScalaCodeGen: ScalaCodeGen =
+    new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName, sealProtocols = true)
+  lazy val instantiateJavaOptional: (String, String) => String =
+    {
+      (tpe: String, e: String) =>
+        e match {
+          case "null" => s"com.example.Maybe.<$tpe>nothing()"
+          case e      => s"com.example.Maybe.<$tpe>just($e)"
+        }
+    }
+  val javaLazy = "com.example.Lazy"
+  val javaOptional = "com.example.Maybe"
+  val outputFile = new File("output.scala")
+  val scalaArray = "Vector"
+  val genFileName = (_: Any) => outputFile
 }

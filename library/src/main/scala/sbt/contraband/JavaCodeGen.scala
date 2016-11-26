@@ -132,32 +132,6 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
   private def isPrimitiveArray(tpe: ast.Type) =
     tpe.isListType && !tpe.isLazyType && tpe.name != boxedType(tpe.name)
 
-  private def boxedType(tpe: String): String =
-    tpe match {
-      case "boolean" | "Boolean" => "Boolean"
-      case "byte" | "Byte"       => "Byte"
-      case "char" | "Char"       => "Character"
-      case "float" | "Float"     => "Float"
-      case "int" | "Int"         => "Integer"
-      case "long" | "Long"       => "Long"
-      case "short" | "Short"     => "Short"
-      case "double" | "Double"   => "Double"
-      case other     => other
-    }
-
-  private def unboxedType(tpe: String): String =
-    tpe match {
-      case "boolean" | "Boolean" => "boolean"
-      case "byte" | "Byte"       => "byte"
-      case "char" | "Char"       => "char"
-      case "float" | "Float"     => "float"
-      case "int" | "Int"         => "int"
-      case "long" | "Long"       => "long"
-      case "short" | "Short"     => "short"
-      case "double" | "Double"   => "double"
-      case other     => other
-    }
-
   private def genRealTpe(tpe: ast.Type): String = tpe match {
     case t: ast.Type if t.isLazyType && t.isListType      => s"$lazyInterface<${unboxedType(t.name)}[]>"
     case t: ast.Type if t.isLazyType && !t.isNotNullType  => s"$lazyInterface<$optionalInterface<${boxedType(t.name)}>>"

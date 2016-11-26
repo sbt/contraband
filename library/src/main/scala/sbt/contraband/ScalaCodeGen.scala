@@ -10,7 +10,8 @@ import AstUtil._
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Boolean) extends CodeGenerator {
+class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
+  scalaArray: String, genFile: Any => File, sealProtocols: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -56,15 +57,16 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     val parents = r.interfaces
     val parentsInSchema = lookupInterfaces(s, parents)
     val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
+    val intfLang = interfaceLanguage(parentsInSchema)
     // println(s"parents: $parents,  parent: $parent")
-    val ctorParameters = genCtorParameters(r, parent) mkString ","
+    val ctorParameters = genCtorParameters(r, parent, intfLang) mkString ","
     val superFields = (parent map { _.fields }).toList.flatten
     val superCtorArguments = superFields map (_.name) mkString ", "
     val extendsCode = genExtendsCode(parent, extraParents, superCtorArguments)
     val extendsCodeCompanion = genExtendsCodeCompanion(toCompanionExtraIntfComment(r))
     val companionExtra: List[String] = toCompanionExtra(r)
     val toStringImpl: List[String] = toToStringImpl(r)
-    val lazyMembers = genLazyMembers(localFields(r, parentsInSchema)) mkString EOL
+    val lazyMembers = genLazyMembers(localFields(r, parentsInSchema), intfLang) mkString EOL
 
     val doc = toDoc(r.comments)
     val extra = toExtra(r)
@@ -74,18 +76,18 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
          |${genDoc(doc)}
          |final class ${r.name}($ctorParameters) $extendsCode {
          |  ${extra mkString EOL}
-         |  ${genAlternativeConstructors(since, allFields) mkString EOL}
+         |  ${genAlternativeConstructors(since, allFields, intfLang) mkString EOL}
          |  ${lazyMembers}
          |  ${genEquals(r)}
          |  ${genHashCode(r)}
          |  ${genToString(r, toStringImpl)}
-         |  ${genCopy(r)}
-         |  ${genWith(r)}
+         |  ${genCopy(r, intfLang)}
+         |  ${genWith(r, intfLang)}
          |}
          |
          |object ${r.name}$extendsCodeCompanion {
          |  ${companionExtra mkString EOL}
-         |  ${genApplyOverloads(r, allFields) mkString EOL}
+         |  ${genApplyOverloads(r, allFields, intfLang) mkString EOL}
          |}""".stripMargin
 
     ListMap(genFile(r) -> code)
@@ -95,10 +97,11 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     val extraParents = toExtraIntf(i)
     val parents = i.interfaces
     val parentsInSchema = lookupInterfaces(s, parents)
+    val intfLang = interfaceLanguage(parentsInSchema)
     val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
     val allFields = i.fields filter { _.arguments.isEmpty }
     val classDef = if (sealProtocols) "sealed abstract class" else "abstract class"
-    val ctorParameters = genCtorParameters(i, parent) mkString ", "
+    val ctorParameters = genCtorParameters(i, parent, intfLang) mkString ", "
     val superCtorArguments =
       parent match {
         case Some(x) => x.fields map (_.name) mkString ", "
@@ -109,10 +112,10 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     val doc = toDoc(i.comments)
     val extra = toExtra(i)
     val since = getSince(i.directives)
-    val alternativeCtors = genAlternativeConstructors(since, allFields) mkString EOL
-    val lazyMembers = genLazyMembers(localFields(i, parentsInSchema)) mkString EOL
+    val alternativeCtors = genAlternativeConstructors(since, allFields, intfLang) mkString EOL
+    val lazyMembers = genLazyMembers(localFields(i, parentsInSchema), intfLang) mkString EOL
     val msgs = i.fields filter { _.arguments.nonEmpty }
-    val messages = genMessages(msgs) mkString EOL
+    val messages = genMessages(msgs, intfLang) mkString EOL
     val toStringImpl: List[String] = toToStringImpl(i)
     val companionExtra: List[String] = toCompanionExtra(i)
 
@@ -136,6 +139,14 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     ListMap(genFile(i) -> code)
   }
 
+  private def interfaceLanguage(parents: List[InterfaceTypeDefinition]): String =
+    if (parents.isEmpty) "Scala"
+    else
+    {
+      if (parents exists { p => toTarget(p.directives) == Some("Java") }) "Java"
+      else "Scala"
+    }
+
   private def genDoc(doc: List[String]) = doc match {
     case Nil      => ""
     case l :: Nil => s"/** $l */"
@@ -158,7 +169,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     if (extendsCodeCompanion == "") "" else s" extends $extendsCodeCompanion"
   }
 
-  private def genParam(f: FieldDefinition): String = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)}"
+  private def genParam(f: FieldDefinition, intfLang: String): String = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)}"
 
   private def lookupTpe(tpe: String): String = tpe match {
     case "boolean" => "Boolean"
@@ -172,15 +183,26 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
     case other     => other
   }
 
-  private def genRealTpe(tpe: ast.Type, isParam: Boolean) = {
-    val scalaTpe = lookupTpe(tpe.name)
-    val base = tpe match {
-      case x if x.isListType      => s"$scalaArray[$scalaTpe]"
-      case x if !x.isNotNullType  => s"Option[$scalaTpe]"
-      case _                      => scalaTpe
+  private def genRealTpe(tpe: ast.Type, isParam: Boolean, intfLang: String) =
+    if (intfLang == "Scala") {
+      val scalaTpe = lookupTpe(tpe.name)
+      val base = tpe match {
+        case x if x.isListType      => s"$scalaArray[$scalaTpe]"
+        case x if !x.isNotNullType  => s"Option[$scalaTpe]"
+        case _                      => scalaTpe
+      }
+      if (tpe.isLazyType && isParam) s"=> $base" else base
+    } else {
+      val scalaTpe = lookupTpe(tpe.name)
+      tpe match {
+        case t: ast.Type if t.isLazyType && t.isListType      => s"$javaLazy[Array[${scalaTpe}]]"
+        case t: ast.Type if t.isLazyType && !t.isNotNullType  => s"$javaLazy[$javaOptional[${javaLangBoxedType(scalaTpe)}]]"
+        case t: ast.Type if t.isLazyType && t.isNotNullType   => s"$javaLazy[${javaLangBoxedType(scalaTpe)}]"
+        case t: ast.Type if !t.isLazyType && t.isListType     => s"Array[$scalaTpe]"
+        case t: ast.Type if !t.isLazyType && !t.isNotNullType => s"$javaOptional[${javaLangBoxedType(scalaTpe)}]"
+        case t: ast.Type if !t.isLazyType && t.isNotNullType  => scalaTpe
+      }
     }
-    if (tpe.isLazyType && isParam) s"=> $base" else base
-  }
 
   private def genEquals(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
@@ -240,44 +262,72 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
       case x: ScalarValue =>
         if (tpe.isListType) "Vector(${x.renderPretty})"
         else if (tpe.isNotNullType) x.renderPretty
-        else s"Some(${x.renderPretty})"
+        else s"Option(${x.renderPretty})"
       case _ => v.renderPretty
     }
 
-  private def renderDefaultValue(f: FieldDefinition): String =
+  private def renderJavaValue(v: Value, tpe: Type): String =
+    v match {
+      case x: NullValue =>
+        if (tpe.isListType) "Array()"
+        else if (!tpe.isNotNullType) mkOptional("null", tpe, "Java")
+        else sys.error(s"Expected $tpe but found $v")
+      case x: ScalarValue =>
+        if (tpe.isListType) "Array(${x.renderPretty})"
+        else if (tpe.isNotNullType) x.renderPretty
+        else mkOptional(x.renderPretty, tpe, "Java")
+      case _ => v.renderPretty
+    }
+
+  private def mkOptional(e: String, tpe: Type, intfLang: String): String =
+    if (intfLang == "Scala") s"Option($e)"
+    else {
+      val x = instantiateJavaOptional(javaLangBoxedType(tpe.name), e)
+      // com.example.Maybe.<Integer>just(number)
+      val JavaGenericMethod = """(.+)<([^>]+)>(\w+)\((.*)\)""".r
+      x match {
+        case JavaGenericMethod(pre, typearg, mtd, arg) => s"$pre$mtd[$typearg]($arg)"
+        case _                                         => x
+      }
+    }
+
+  private def renderDefaultValue(f: FieldDefinition, intfLang: String): String =
     f.defaultValue match {
-      case Some(v) => renderScalaValue(v, f.fieldType)
+      case Some(v) =>
+        if (intfLang == "Scala") renderScalaValue(v, f.fieldType)
+        else renderJavaValue(v, f.fieldType)
       case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
-        renderScalaValue(NullValue(), f.fieldType)
+        if (intfLang == "Scala") renderScalaValue(NullValue(), f.fieldType)
+        else renderJavaValue(NullValue(), f.fieldType)
       case _       => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
-  private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition]): List[String] =
+  private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition], intfLang: String): List[String] =
     if (allFields.isEmpty) { // If there are no fields, we still need an `apply` method with an empty parameter list
       List(s"def apply(): ${r.name} = new ${r.name}()")
     } else {
       val since = getSince(r.directives)
       perVersionNumber(since, allFields) { (provided, byDefault) =>
-        val applyParameters = provided map genParam mkString ", "
+        val applyParameters = provided map { f => genParam(f, intfLang) } mkString ", "
 
         val ctorCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f => renderDefaultValue(f)
+            case f if byDefault contains f => renderDefaultValue(f, intfLang)
           } mkString ", "
 
         s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
       }
     }
 
-  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition]) =
+  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], intfLang: String) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
-        val ctorParameters = provided map genParam mkString ", "
+        val ctorParameters = provided map { f => genParam(f, intfLang) } mkString ", "
         val thisCallArguments =
           allFields map {
             case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f => renderDefaultValue(f)
+            case f if byDefault contains f => renderDefaultValue(f, intfLang)
           } mkString ", "
 
         s"def this($ctorParameters) = this($thisCallArguments)"
@@ -289,7 +339,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
   // parameter. Because val parameters may not be call-by-name, we prefix the parameter with `_`
   // and we will create the actual lazy val as a regular class member.
   // Non-lazy fields that belong to `cl` are made val parameters.
-  private def genCtorParameters(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]): List[String] =
+  private def genCtorParameters(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition], intfLang: String): List[String] =
     {
       val allFields = cl.fields filter { _.arguments.isEmpty }
       val parentFields: List[FieldDefinition] =
@@ -303,25 +353,25 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
       }
       allFields map {
         case f if !inParent(f) && f.fieldType.isLazyType =>
-          EOL + "_" + genParam(f)
+          EOL + "_" + genParam(f, intfLang)
         case f if !inParent(f) =>
           val doc = toDoc(f.comments)
           s"""$EOL${genDoc(doc)}
-             |val ${genParam(f)}""".stripMargin
-        case f => EOL + genParam(f)
+             |val ${genParam(f, intfLang)}""".stripMargin
+        case f => EOL + genParam(f, intfLang)
       }
     }
 
-  private def genLazyMembers(fields: List[FieldDefinition]): List[String] =
+  private def genLazyMembers(fields: List[FieldDefinition], intfLang: String): List[String] =
     fields filter (_.fieldType.isLazyType) map { f =>
         val doc = toDoc(f.comments)
         s"""${genDoc(doc)}
-           |lazy val ${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = false)} = _${f.name}""".stripMargin
+           |lazy val ${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = false, intfLang)} = _${f.name}""".stripMargin
     }
 
-  private def genMessages(messages: List[FieldDefinition]): List[String] =
+  private def genMessages(messages: List[FieldDefinition], intfLang: String): List[String] =
     messages map { case FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) =>
-      val params = arguments map (a => s"${bq(a.name)}: ${genRealTpe(a.valueType, isParam = true)}") mkString ", "
+      val params = arguments map (a => s"${bq(a.name)}: ${genRealTpe(a.valueType, isParam = true, intfLang)}") mkString ", "
       val argsDoc = arguments flatMap { a: InputValueDefinition =>
         toDoc(a.comments) match {
           case Nil        => Nil
@@ -333,7 +383,7 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
       }
       val doc = toDoc(comments)
       s"""${genDoc(doc ++ argsDoc)}
-         |def $name($params): ${genRealTpe(fieldType, isParam = false)}"""
+         |def $name($params): ${genRealTpe(fieldType, isParam = false, intfLang)}"""
     }
 
   private def fullyQualifiedName(d: TypeDefinition): String = {
@@ -343,9 +393,9 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
 
   private def genPackage(d: TypeDefinition): String = d.namespace map (ns => s"package $ns") getOrElse ""
 
-  private def genCopy(r: ObjectTypeDefinition) = {
+  private def genCopy(r: ObjectTypeDefinition, intfLang: String) = {
     val allFields = r.fields filter { _.arguments.isEmpty }
-    def genParam(f: FieldDefinition) = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)} = ${bq(f.name)}"
+    def genParam(f: FieldDefinition) = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)} = ${bq(f.name)}"
     val params = allFields map genParam mkString ", "
     val constructorCall = allFields map (f => bq(f.name)) mkString ", "
     s"""protected[this] def copy($params): ${r.name} = {
@@ -353,16 +403,16 @@ class ScalaCodeGen(scalaArray: String, genFile: Any => File, sealProtocols: Bool
        |}""".stripMargin
   }
 
-  private def genWith(r: ObjectTypeDefinition) = {
+  private def genWith(r: ObjectTypeDefinition, intfLang: String) = {
     def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
     r.fields map { f =>
-      s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true)}): ${r.name} = {
+      s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)}): ${r.name} = {
          |  copy(${bq(f.name)} = ${bq(f.name)})
          |}""".stripMargin +
       ( if (f.fieldType.isListType || f.fieldType.isNotNullType) ""
         else s"""
-                |def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType.notNull, isParam = true)}): ${r.name} = {
-                |  copy(${bq(f.name)} = Option(${bq(f.name)}))
+                |def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType.notNull, isParam = true, intfLang)}): ${r.name} = {
+                |  copy(${bq(f.name)} = ${mkOptional(bq(f.name), f.fieldType, intfLang)})
                 |}""".stripMargin
       )
     } mkString (EOL + EOL)

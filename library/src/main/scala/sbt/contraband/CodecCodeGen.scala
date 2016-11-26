@@ -83,17 +83,20 @@ class CodecCodeGen(codecParents: List[String],
   }
 
   override def generateRecord(s: Document, r: ObjectTypeDefinition): ListMap[File, String] = {
+    val parents = r.interfaces
+    val parentsInSchema = lookupInterfaces(s, parents)
     val targetLang = toTarget(r.directives) match {
       case Some(x) => x
       case _       => sys.error(s"@target is missing for ${r.name}")
     }
+    val intfLanguage = interfaceLanguage(parentsInSchema, targetLang)
     def accessField(f: FieldDefinition) = {
-      if (f.fieldType.isLazyType && targetLang == "Java") scalaifyType(instantiateJavaLazy(f.name))
+      if (f.fieldType.isLazyType && intfLanguage == "Java") scalaifyType(instantiateJavaLazy(f.name))
       else bq(f.name)
     }
     val fqn = fullyQualifiedName(r)
     val allFields = r.fields // superFields ++ r.fields
-    val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.fieldType, targetLang)}]("${f.name}")""") mkString EOL
+    val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.fieldType, intfLanguage)}]("${f.name}")""") mkString EOL
     val reconstruct = s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${bq(f.name)})""") mkString EOL
     val selfType = makeSelfType(s, r)
@@ -130,6 +133,13 @@ class CodecCodeGen(codecParents: List[String],
     val name = i.name
     val fqn = fullyQualifiedName(i)
     val children: List[TypeDefinition] = lookupChildren(s, i)
+    // val parents = i.interfaces
+    // val parentsInSchema = lookupInterfaces(s, parents)
+    // val targetLang: String = toTarget(i.directives) match {
+    //   case Some(x) => x
+    //   case _       => sys.error(s"@target is missing for ${i.name}")
+    // }
+    // val intfLanguage = interfaceLanguage(parentsInSchema, targetLang)
     val code =
       children match {
         case Nil =>
@@ -164,6 +174,14 @@ class CodecCodeGen(codecParents: List[String],
 
     ListMap(genFile(s, i) -> code)
   }
+
+  private def interfaceLanguage(parents: List[InterfaceTypeDefinition], targetLang: String): String =
+    if (parents.isEmpty) targetLang
+    else
+    {
+      if (parents exists { p => toTarget(p.directives) == Some("Java") }) "Java"
+      else targetLang
+    }
 
   override def generate(s: Document): ListMap[File, String] = {
     val codecs: ListMap[File, String] = ((s.definitions collect {
@@ -273,24 +291,11 @@ class CodecCodeGen(codecParents: List[String],
     tpe match {
       case x if x.isListType && targetLang == "Java" => s"Array[${scalaTpe}]"
       case x if x.isListType     => s"$scalaArray[$scalaTpe]"
-      case x if !x.isNotNullType && targetLang == "Java" => s"$javaOption[${boxedType(scalaTpe)}]"
+      case x if !x.isNotNullType && targetLang == "Java" => s"$javaOption[${javaLangBoxedType(scalaTpe)}]"
       case x if !x.isNotNullType => s"Option[$scalaTpe]"
       case _                     => scalaTpe
     }
   }
-
-  private def boxedType(tpe: String): String =
-    tpe match {
-      case "boolean" | "Boolean" => "Boolean"
-      case "byte" | "Byte"       => "Byte"
-      case "char" | "Char"       => "Character"
-      case "float" | "Float"     => "Float"
-      case "int" | "Int"         => "Integer"
-      case "long" | "Long"       => "Long"
-      case "short" | "Short"     => "Short"
-      case "double" | "Double"   => "Double"
-      case other     => other
-    }
 
   private def lookupTpe(tpe: String): String = scalaifyType(tpe) match {
     case "boolean" => "Boolean"

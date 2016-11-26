@@ -484,11 +484,11 @@ object GreetingExtra {
 }
 
 final class GreetingExtraImpl(
-  message: => String,
+  message: com.example.Lazy[String],
   header: com.example.GreetingHeader,
-  extra: Vector[String],
+  extra: Array[String],
   val x: String) extends com.example.GreetingExtra(message, header, extra) with Serializable {
-  def this(message: => String, extra: Vector[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
+  def this(message: com.example.Lazy[String], extra: Array[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
 
   override def equals(o: Any): Boolean = o match {
     case x: GreetingExtraImpl => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
@@ -500,16 +500,16 @@ final class GreetingExtraImpl(
   override def toString: String = {
     return "Welcome, extra implosion!";
   }
-  protected[this] def copy(message: => String = message, header: com.example.GreetingHeader = header, extra: Vector[String] = extra, x: String = x): GreetingExtraImpl = {
+  protected[this] def copy(message: com.example.Lazy[String] = message, header: com.example.GreetingHeader = header, extra: Array[String] = extra, x: String = x): GreetingExtraImpl = {
     new GreetingExtraImpl(message, header, extra, x)
   }
-  def withMessage(message: => String): GreetingExtraImpl = {
+  def withMessage(message: com.example.Lazy[String]): GreetingExtraImpl = {
     copy(message = message)
   }
   def withHeader(header: com.example.GreetingHeader): GreetingExtraImpl = {
     copy(header = header)
   }
-  def withExtra(extra: Vector[String]): GreetingExtraImpl = {
+  def withExtra(extra: Array[String]): GreetingExtraImpl = {
     copy(extra = extra)
   }
   def withX(x: String): GreetingExtraImpl = {
@@ -517,8 +517,8 @@ final class GreetingExtraImpl(
   }
 }
 object GreetingExtraImpl {
-  def apply(message: => String, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
-  def apply(message: => String, header: com.example.GreetingHeader, extra: Vector[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
+  def apply(message: com.example.Lazy[String], extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
+  def apply(message: com.example.Lazy[String], header: com.example.GreetingHeader, extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
 }
 
 /** A Greeting with attachments */

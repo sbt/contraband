@@ -93,4 +93,18 @@ type Foo @target(Scala) {
   y: [Int] @since("0.2.0")
 }
 """.stripMargin
+
+  val mixedExample = """
+package com.example @target(Scala) @codecPackage("generated")
+
+interface Greeting @target(Java) {
+  message: String!
+  number: Int @since("0.1.0")
+}
+
+type SimpleGreeting implements Greeting @target(Scala) {
+  message: String!
+  number: Int @since("0.1.0")
+}
+""".stripMargin
 }
