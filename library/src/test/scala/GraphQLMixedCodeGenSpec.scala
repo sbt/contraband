@@ -40,6 +40,11 @@ public abstract class Greeting implements java.io.Serializable {
         message = _message;
         number = _number;
     }
+    public Greeting(String _message, int _number) {
+        super();
+        message = _message;
+        number = com.example.Maybe.<Integer>just(_number);
+    }
     public String message() {
         return this.message;
     }

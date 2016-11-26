@@ -10,7 +10,8 @@ import AstUtil._
  * Code generator for Java.
  */
 class JavaCodeGen(lazyInterface: String, optionalInterface: String,
-  instantiateJavaOptional: (String, String) => String) extends CodeGenerator {
+  instantiateJavaOptional: (String, String) => String,
+  wrapOption: Boolean) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -221,7 +222,34 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       s"""public ${cl.name}($ctorParameters) {
          |    $superCall
          |    $assignments
-         |}""".stripMargin
+         |}""".stripMargin + {
+        if (!containsStrictOptional(provided) || !wrapOption) ""
+        else {
+          val ctorParameters2 = (provided map { f =>
+            if (f.fieldType.isOptionalType && !f.fieldType.isLazyType) s"${genRealTpe(f.fieldType.notNull)} _${f.name}"
+            else s"${genRealTpe(f.fieldType)} _${f.name}"
+          }).mkString(", ")
+          val superFieldsValues2 = superFields map {
+            case f if (provided contains f) && f.fieldType.isOptionalType && !f.fieldType.isLazyType =>
+              instantiateJavaOptional(boxedType(f.fieldType.name), s"_${f.name}")
+            case f if provided contains f  => s"_${f.name}"
+            case f if byDefault contains f => renderDefaultValue(f)
+          }
+          val superCall2 = superFieldsValues2.mkString("super(", ", ", ");")
+          val assignments2 =
+            (lfs map {
+              case f if (provided contains f) && f.fieldType.isOptionalType && !f.fieldType.isLazyType =>
+                s"${f.name} = " + instantiateJavaOptional(boxedType(f.fieldType.name), s"_${f.name}") + ";"
+              case f if provided contains f  => s"${f.name} = _${f.name};"
+              case f if byDefault contains f => s"${f.name} = ${renderDefaultValue(f)};"
+            }).mkString(EOL)
+
+          (EOL + EOL) + s"""public ${cl.name}($ctorParameters2) {
+             |    $superCall2
+             |    $assignments2
+             |}""".stripMargin
+            }
+      }
     } mkString (EOL + EOL)
 
   private def genWith(r: ObjectTypeDefinition, parents: List[InterfaceTypeDefinition]) = {

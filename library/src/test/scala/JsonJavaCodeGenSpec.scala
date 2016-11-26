@@ -10,7 +10,7 @@ import parser.JsonParser
 class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def enumerationGenerateSimple = {
     val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate enumeration
+    val code = mkJavaCodeGen generate enumeration
 
     code.head._2.unindent should equalLines (
       """/** Example of simple enumeration */
@@ -24,7 +24,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def interfaceGenerateSimple = {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(simpleInterfaceExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate protocol
+    val code = mkJavaCodeGen generate protocol
 
     code.head._2.unindent should equalLines (
       """/** example of simple interface */
@@ -59,7 +59,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def interfaceGenerateOneChild = {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(oneChildInterfaceExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate protocol
+    val code = mkJavaCodeGen generate protocol
     val code1 = code.toList(0)._2.unindent
     val code2 = code.toList(1)._2.unindent
     code1 should equalLines (
@@ -128,7 +128,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def interfaceGenerateNested = {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate protocol
+    val code = mkJavaCodeGen generate protocol
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
@@ -183,7 +183,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def interfaceGenerateMessages = {
     val schema = JsonParser.Document.parse(generateArgDocExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
+    val code = mkJavaCodeGen generate schema
 
     code mapValues (_.withoutEmptyLines) should equalMapLines (
       ListMap(
@@ -228,7 +228,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGenerateSimple = {
     val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate record
+    val code = mkJavaCodeGen generate record
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
@@ -270,7 +270,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGrowZeroToOneField = {
     val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate record
+    val code = mkJavaCodeGen generate record
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
@@ -313,7 +313,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def recordGrowZeroToOneToTwoFields = {
     val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate record
+    val code = mkJavaCodeGen generate record
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
@@ -370,7 +370,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
+    val code = mkJavaCodeGen generate schema
 
     code.head._2.unindent should equalLines (
       """public final class primitiveTypesExample implements java.io.Serializable {
@@ -387,6 +387,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        lazyInteger = _lazyInteger;
         |        arrayInteger = _arrayInteger;
         |        optionInteger = _optionInteger;
+        |        lazyArrayInteger = _lazyArrayInteger;
+        |        lazyOptionInteger = _lazyOptionInteger;
+        |    }
+        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<com.example.MyOption<Integer>> _lazyOptionInteger) {
+        |        super();
+        |        simpleInteger = _simpleInteger;
+        |        lazyInteger = _lazyInteger;
+        |        arrayInteger = _arrayInteger;
+        |        optionInteger = com.example.MyOption.<Integer>just(_optionInteger);
         |        lazyArrayInteger = _lazyArrayInteger;
         |        lazyOptionInteger = _lazyOptionInteger;
         |    }
@@ -446,7 +455,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = JsonParser.Document.parse(primitiveTypesNoLazyExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
+    val code = mkJavaCodeGen generate schema
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
@@ -495,16 +504,19 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
   override def schemaGenerateComplete = {
     val schema = JsonParser.Document.parse(completeExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
+    val code = mkJavaCodeGen generate schema
     code mapValues (_.unindent) should equalMapLines (completeExampleCodeJava mapValues (_.unindent))
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = JsonParser.Document.parse(completeExample)
-    val code = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional) generate schema
+    val code = mkJavaCodeGen generate schema
     code mapValues (_.withoutEmptyLines) should equalMapLines (completeExampleCodeJava mapValues (_.withoutEmptyLines))
   }
 
+  def mkJavaCodeGen: JavaCodeGen =
+    new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional,
+        wrapOption = true)
   lazy val instantiateJavaOptional: (String, String) => String =
     {
       (tpe: String, e: String) =>

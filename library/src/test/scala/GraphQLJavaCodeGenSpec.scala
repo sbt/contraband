@@ -10,8 +10,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   "generate(Enumeration)" should "generate a simple enumeration" in {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
     code.head._2.unindent should equalLines (
       """package com.example;
         |/** Example of an enumeration */
@@ -26,8 +25,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   "generate(Record)" should "generate a record" in {
     val Success(ast) = SchemaParser.parse(recordExample)
     // println(ast)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
     code.head._2.unindent should equalLines(
       """package com.example;
         |/** Example of a type */
@@ -38,6 +36,10 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    public TypeExample(com.example.MyOption<java.net.URL> _field) {
         |        super();
         |        field = _field;
+        |    }
+        |    public TypeExample(java.net.URL _field) {
+        |        super();
+        |        field = com.example.MyOption.<java.net.URL>just(_field);
         |    }
         |    public com.example.MyOption<java.net.URL> field() {
         |        return this.field;
@@ -70,8 +72,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   it should "grow a record from 0 to 1 field" in {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example;
@@ -84,6 +85,10 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    public Growable(com.example.MyOption<Integer> _field) {
         |        super();
         |        field = _field;
+        |    }
+        |    public Growable(int _field) {
+        |        super();
+        |        field = com.example.MyOption.<Integer>just(_field);
         |    }
         |    public com.example.MyOption<Integer> field() {
         |        return this.field;
@@ -116,8 +121,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   it should "grow a record from 0 to 2 field" in {
     val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
     // println(ast)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example;
@@ -134,9 +138,19 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        x = _x;
         |        y = new Array {};
         |    }
+        |    public Foo(int _x) {
+        |        super();
+        |        x = com.example.MyOption.<Integer>just(_x);
+        |        y = new Array {};
+        |    }
         |    public Foo(com.example.MyOption<Integer> _x, int[] _y) {
         |        super();
         |        x = _x;
+        |        y = _y;
+        |    }
+        |    public Foo(int _x, int[] _y) {
+        |        super();
+        |        x = com.example.MyOption.<Integer>just(_x);
         |        y = _y;
         |    }
         |    public com.example.MyOption<Integer> x() {
@@ -175,8 +189,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
 
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
 
     val code1 = code.toList(0)._2.unindent
     val code2 = code.toList(1)._2.unindent
@@ -190,6 +203,10 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    public InterfaceExample(com.example.MyOption<Integer> _field) {
         |        super();
         |        field = _field;
+        |    }
+        |    public InterfaceExample(int _field) {
+        |        super();
+        |        field = com.example.MyOption.<Integer>just(_field);
         |    }
         |    public com.example.MyOption<Integer> field() {
         |        return this.field;
@@ -218,6 +235,10 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    public ChildType(com.example.MyOption<String> _name, com.example.MyOption<Integer> _field) {
         |        super(_field);
         |         name = _name;
+        |    }
+        |    public ChildType(String _name, int _field) {
+        |        super(com.example.MyOption.<Integer>just(_field));
+        |         name = com.example.MyOption.<String>just(_name);
         |    }
         |    public com.example.MyOption<String> name() {
         |        return this.name;
@@ -255,8 +276,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
 
   it should "generate messages" in {
     val Success(ast) = SchemaParser.parse(messageExample)
-    val gen = new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
     code.head._2.unindent should equalLines(
       """package com.example;
         |public abstract class IntfExample implements java.io.Serializable {
@@ -265,6 +285,10 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |    public IntfExample(com.example.MyOption<Integer> _field) {
         |        super();
         |        field = _field;
+        |    }
+        |    public IntfExample(int _field) {
+        |        super();
+        |        field = com.example.MyOption.<Integer>just(_field);
         |    }
         |    public com.example.MyOption<Integer> field() {
         |        return this.field;
@@ -304,4 +328,8 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
           case e      => s"com.example.MyOption.<$tpe>just($e)"
         }
     }
+
+  def mkJavaCodeGen: JavaCodeGen =
+    new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional,
+        wrapOption = true)
 }

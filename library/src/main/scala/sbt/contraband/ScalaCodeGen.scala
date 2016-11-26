@@ -340,9 +340,6 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
       }
     }
 
-  private def containsOptional(fields: List[FieldDefinition]): Boolean =
-    fields exists { f => f.fieldType.isOptionalType }
-
   private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], privateConstructor: Boolean, intfLang: String) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor

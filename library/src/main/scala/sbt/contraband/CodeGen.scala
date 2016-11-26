@@ -159,6 +159,12 @@ abstract class CodeGenerator {
       case other     => other
     }
 
+  protected def containsOptional(fields: List[FieldDefinition]): Boolean =
+    fields exists { f => f.fieldType.isOptionalType }
+
+  protected def containsStrictOptional(fields: List[FieldDefinition]): Boolean =
+    fields exists { f => f.fieldType.isOptionalType && !f.fieldType.isLazyType }
+
   /** Generate the code corresponding to all definitions in `s`. */
   def generate(s: Document): ListMap[File, String]
 
