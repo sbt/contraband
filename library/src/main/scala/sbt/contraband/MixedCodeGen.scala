@@ -10,10 +10,11 @@ import AstUtil._
  */
 class MixedCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
   scalaArray: String, genScalaFileName: Any => File,
-  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean) extends CodeGenerator {
+  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean, wrapOption: Boolean) extends CodeGenerator {
   val javaGen  = new JavaCodeGen(javaLazy, javaOptional, instantiateJavaOptional)
   val scalaGen = new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-    scalaArray, genScalaFileName, scalaSealProtocols, scalaPrivateConstructor)
+    scalaArray, genScalaFileName, scalaSealProtocols, scalaPrivateConstructor,
+    wrapOption)
 
   def generate(s: Document): ListMap[File, String] =
     s.definitions collect {

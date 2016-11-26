@@ -7,7 +7,7 @@ import com.example._
 object Example extends App {
   import generated.CustomProtocol._
   val g0: Greeting = SimpleGreeting("Hello")
-  val g1: Greeting = SimpleGreeting("Hello", Maybe.nothing())
+  val g1: Greeting = SimpleGreeting("Hello", Maybe.nothing[java.lang.Integer]())
   val g21: Greeting = new GreetingWithAttachments("Hello", Array.empty)
   val g3: Greeting = GreetingWithOption("Hello", Maybe.just("foo"))
 

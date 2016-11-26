@@ -12,7 +12,8 @@ import AstUtil._
  */
 class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
   scalaArray: String, genFile: Any => File,
-  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean) extends CodeGenerator {
+  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean,
+  wrapOption: Boolean) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -171,7 +172,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     if (extendsCodeCompanion == "") "" else s" extends $extendsCodeCompanion"
   }
 
-  private def genParam(f: FieldDefinition, intfLang: String): String = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)}"
+  private def genParam(f: FieldDefinition, intfLang: String): String = genParam(f.name, f.fieldType, intfLang)
+  private def genParam(name: String, fieldType: Type, intfLang: String): String = s"${bq(name)}: ${genRealTpe(fieldType, isParam = true, intfLang)}"
 
   private def lookupTpe(tpe: String): String = tpe match {
     case "boolean" => "Boolean"
@@ -317,10 +319,29 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
             case f if provided contains f  => bq(f.name)
             case f if byDefault contains f => renderDefaultValue(f, intfLang)
           } mkString ", "
-
-        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)"
+        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)" +
+        {
+          if (!containsOptional(provided) || !wrapOption) ""
+          else {
+            val applyParameters2 = (provided map { f =>
+              if (f.fieldType.isOptionalType) genParam(f.name, f.fieldType.notNull, intfLang)
+              else genParam(f, intfLang)
+            }).mkString(", ")
+            val ctorCallArguments2 =
+              (allFields map {
+                case f if (provided contains f) && f.fieldType.isOptionalType =>
+                  mkOptional(bq(f.name), f.fieldType, intfLang)
+                case f if provided contains f  => bq(f.name)
+                case f if byDefault contains f => renderDefaultValue(f, intfLang)
+              }).mkString(", ")
+            EOL + s"def apply($applyParameters2): ${r.name} = new ${r.name}($ctorCallArguments2)"
+          }
+        }
       }
     }
+
+  private def containsOptional(fields: List[FieldDefinition]): Boolean =
+    fields exists { f => f.fieldType.isOptionalType }
 
   private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], privateConstructor: Boolean, intfLang: String) =
     perVersionNumber(since, allFields) {

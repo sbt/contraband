@@ -56,6 +56,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |}
         |object TypeExample {
         |  def apply(field: Option[java.net.URL]): TypeExample = new TypeExample(field)
+        |  def apply(field: java.net.URL): TypeExample = new TypeExample(Option(field))
         |}""".stripMargin.unindent)
   }
 
@@ -92,6 +93,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |object Growable {
         |  def apply(): Growable = new Growable(Option(0))
         |  def apply(field: Option[Int]): Growable = new Growable(field)
+        |  def apply(field: Int): Growable = new Growable(Option(field))
         |}
         |""".stripMargin.unindent)
   }
@@ -134,7 +136,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |object Foo {
         |  def apply(): Foo = new Foo(None, Vector())
         |  def apply(x: Option[Int]): Foo = new Foo(x, Vector())
+        |  def apply(x: Int): Foo = new Foo(Option(x), Vector())
         |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
+        |  def apply(x: Int, y: Vector[Int]): Foo = new Foo(Option(x), y)
         |}
         |""".stripMargin.unindent)
   }
@@ -193,6 +197,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |object ChildType {
         |  def apply(name: Option[String], field: Option[Int]): ChildType = new ChildType(name, field)
+        |  def apply(name: String, field: Int): ChildType = new ChildType(Option(name), Option(field))
         |}""".stripMargin.unindent)
   }
 
@@ -260,7 +265,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
   def mkScalaCodeGen: ScalaCodeGen =
     new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName,
-        scalaSealProtocols = true, scalaPrivateConstructor = true)
+        scalaSealProtocols = true, scalaPrivateConstructor = true, wrapOption = true)
   lazy val instantiateJavaOptional: (String, String) => String =
     {
       (tpe: String, e: String) =>

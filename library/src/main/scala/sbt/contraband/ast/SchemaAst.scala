@@ -97,6 +97,9 @@ sealed trait Type extends AstNode {
     loop(this)
   }
 
+  def isOptionalType: Boolean =
+    !isListType && !isNotNullType
+
   def isLazyType: Boolean = {
     @annotation.tailrec
     def loop(tpe: Type): Boolean =

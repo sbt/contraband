@@ -25,6 +25,7 @@ object ContrabandPlugin extends AutoPlugin {
     val contrabandScalaFileNames = settingKey[Any => File]("Mapping from `Definition` to file for Scala generator.")
     val contrabandScalaSealInterface = settingKey[Boolean]("Seal abstract classes representing `interface`s in Scala.")
     val contrabandScalaPrivateConstructor = settingKey[Boolean]("Hide the constructors in Scala.")
+    val contrabandWrapOption = settingKey[Boolean]("Provide constructors that automatically wraps the options.")
     val contrabandCodecParents = settingKey[List[String]]("Parents to add all o of the codec object.")
     val contrabandInstantiateJavaLazy = settingKey[String => String]("Function that instantiate a lazy expression from an expression in Java.")
     val contrabandInstantiateJavaOptional = settingKey[(String, String) => String]("Function that instantiate a optional expression from an expression in Java.")
@@ -50,6 +51,7 @@ object ContrabandPlugin extends AutoPlugin {
       // will create a separate file for every `Definition`.
       contrabandScalaSealInterface in generateContrabands := false,
       contrabandScalaPrivateConstructor in generateContrabands := true,
+      contrabandWrapOption in generateContrabands := true,
       contrabandCodecParents in generateContrabands := List("sjsonnew.BasicJsonProtocol"),
       contrabandInstantiateJavaLazy in generateContrabands := { (e: String) => s"xsbti.SafeLazy($e)" },
       contrabandInstantiateJavaOptional in generateContrabands := { (tpe: String, e: String) =>
@@ -68,6 +70,7 @@ object ContrabandPlugin extends AutoPlugin {
           (contrabandScalaFileNames in generateContrabands).value,
           (contrabandScalaSealInterface in generateContrabands).value,
           (contrabandScalaPrivateConstructor in generateContrabands).value,
+          (contrabandWrapOption in generateContrabands).value,
           (contrabandCodecParents in generateContrabands).value,
           (contrabandInstantiateJavaLazy in generateContrabands).value,
           (contrabandInstantiateJavaOptional in generateContrabands).value,
@@ -113,6 +116,7 @@ object Generate {
     scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     scalaPrivateConstructor: Boolean,
+    wrapOption: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
     instantiateJavaOptional: (String, String) => String,
@@ -131,7 +135,7 @@ object Generate {
         Transform.propateNamespace(ast)
       })
     val generator = new MixedCodeGen(javaLazy, javaOption, instantiateJavaOptional,
-      scalaArray, scalaFileNames, scalaSealInterface, scalaPrivateConstructor)
+      scalaArray, scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption)
     val jsonFormatsGenerator = new CodecCodeGen(codecParents, instantiateJavaLazy,
       javaOption, scalaArray, formatsForType, input)
 
@@ -182,6 +186,7 @@ object Generate {
     scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     scalaPrivateConstructor: Boolean,
+    wrapOption: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
     instantiateJavaOptional: (String, String) => String,
@@ -189,7 +194,7 @@ object Generate {
     s: TaskStreams): Seq[File] = {
     val definitions = IO listFiles base
     def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,
-      scalaFileNames, scalaSealInterface, scalaPrivateConstructor,
+      scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption,
       codecParents, instantiateJavaLazy, instantiateJavaOptional, formatsForType, s.log)
     val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq

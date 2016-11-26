@@ -332,6 +332,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object primitiveTypesExample {
         |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Vector[Int], optionInteger: Option[Int], lazyArrayInteger: => Vector[Int], lazyOptionInteger: => Option[Int]): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger)
+        |  def apply(simpleInteger: Int, lazyInteger: => Int, arrayInteger: Vector[Int], optionInteger: Int, lazyArrayInteger: => Vector[Int], lazyOptionInteger: => Int): primitiveTypesExample = new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, Option(optionInteger), lazyArrayInteger, Option(lazyOptionInteger))
         |}
         |""".stripMargin.unindent)
   }
@@ -389,7 +390,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
   def mkScalaCodeGen: ScalaCodeGen =
     new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName,
-        scalaSealProtocols = true, scalaPrivateConstructor = true)
+        scalaSealProtocols = true, scalaPrivateConstructor = true, wrapOption = true)
   lazy val instantiateJavaOptional: (String, String) => String =
     {
       (tpe: String, e: String) =>

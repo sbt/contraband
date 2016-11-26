@@ -12,7 +12,8 @@ class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     val Success(ast) = SchemaParser.parse(mixedExample)
     // println(ast)
     val gen = new MixedCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-      scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true)
+      scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true,
+      wrapOption = true)
     val code = gen generate Transform.propateNamespace(ast)
 
     code mapValues (_.unindent) should equalMapLines (
@@ -101,6 +102,7 @@ final class SimpleGreeting private (
 object SimpleGreeting {
   def apply(message: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.nothing[java.lang.Integer]())
   def apply(message: String, number: com.example.Maybe[java.lang.Integer]): SimpleGreeting = new SimpleGreeting(message, number)
+  def apply(message: String, number: Int): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[java.lang.Integer](number))
 }
 """.stripMargin.unindent
     ))
