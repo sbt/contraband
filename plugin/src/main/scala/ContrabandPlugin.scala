@@ -132,7 +132,7 @@ object Generate {
       (jsonFiles map { f => JsonParser.Document.parse(IO read f) }) ++
       (cslFiles map { f =>
         val ast = SchemaParser.parse(IO read f).get
-        Transform.propateNamespace(ast)
+        ast
       })
     val generator = new MixedCodeGen(javaLazy, javaOption, instantiateJavaOptional,
       scalaArray, scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption)

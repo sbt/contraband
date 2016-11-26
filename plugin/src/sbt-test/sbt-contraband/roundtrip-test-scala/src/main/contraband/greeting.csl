@@ -1,22 +1,25 @@
-package com.example @codecPackage("generated") @fullCodec("CustomProtocol")
+package com.example
+@codecPackage("generated")
+@fullCodec("CustomProtocol")
+@target(Scala)
 
-interface Greeting @target(Scala) {
+interface Greeting {
   message: String!
   number: Int @since("0.1.0")
 }
 
-type SimpleGreeting implements Greeting @target(Scala) {
+type SimpleGreeting implements Greeting {
   message: String!
   number: Int @since("0.1.0")
 }
 
-type GreetingWithAttachments implements Greeting @target(Scala) {
+type GreetingWithAttachments implements Greeting {
   message: String!
   number: Int @since("0.1.0")
   attachments: [java.io.File]
 }
 
-type GreetingWithOption implements Greeting @target(Scala) {
+type GreetingWithOption implements Greeting {
   message: String!
   number: Int @since("0.1.0")
   opt: String

@@ -10,7 +10,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   "generate(Enumeration)" should "generate a simple enumeration" in {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
     code.head._2.unindent should equalLines (
       """package com.example;
         |/** Example of an enumeration */
@@ -25,7 +25,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   "generate(Record)" should "generate a record" in {
     val Success(ast) = SchemaParser.parse(recordExample)
     // println(ast)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example;
         |/** Example of a type */
@@ -72,7 +72,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   it should "grow a record from 0 to 1 field" in {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example;
@@ -121,7 +121,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
   it should "grow a record from 0 to 2 field" in {
     val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
     // println(ast)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example;
@@ -189,7 +189,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
 
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
 
     val code1 = code.toList(0)._2.unindent
     val code2 = code.toList(1)._2.unindent
@@ -276,7 +276,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
 
   it should "generate messages" in {
     val Success(ast) = SchemaParser.parse(messageExample)
-    val code = mkJavaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkJavaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example;
         |public abstract class IntfExample implements java.io.Serializable {

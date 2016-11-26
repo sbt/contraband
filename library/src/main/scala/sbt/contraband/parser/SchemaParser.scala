@@ -384,6 +384,53 @@ object SchemaParser {
 
   def parse(input: ParserInput): Try[ast.Document] = {
     val parser = new SchemaParser(input)
-    parser.Document.run()
+    parser.Document.run() map { x =>
+      Transform.run(x)
+    }
   }
+}
+
+object Transform {
+  import ast.AstUtil._
+
+  def run(doc: ast.Document): ast.Document =
+    propateNamespace(doc)
+
+  def propateNamespace(doc: ast.Document): ast.Document =
+    {
+      val pkg =
+        doc.packageDecl map { case ast.PackageDecl(nameSegments, _, _, _) =>
+          nameSegments.mkString(".")
+        }
+      val target =
+        doc.packageDecl flatMap { case ast.PackageDecl(_, dirs, _, _) =>
+          toTarget(dirs)
+        }
+      val defns =
+        doc.definitions map {
+          toDefinitions(_, pkg, target)
+        }
+      doc.copy(definitions = defns)
+    }
+
+  def toDefinitions(d: ast.Definition, ns0: Option[String], packageTarget: Option[String]): ast.TypeDefinition =
+    d match {
+      case e: ast.EnumTypeDefinition =>
+        val dirs = e.directives
+        e.copy(namespace = e.namespace orElse ns0, directives = addTarget(dirs, packageTarget))
+      case o: ast.ObjectTypeDefinition =>
+        val dirs = o.directives
+        o.copy(namespace = o.namespace orElse ns0, directives = addTarget(dirs, packageTarget))
+      case i: ast.InterfaceTypeDefinition =>
+        val dirs = i.directives
+        i.copy(namespace = i.namespace orElse ns0, directives = addTarget(dirs, packageTarget))
+    }
+  def addTarget(dirs0: List[ast.Directive], packageTarget: Option[String]): List[ast.Directive] =
+    (toTarget(dirs0), packageTarget) match {
+      case (Some(x), _)       => dirs0
+      case (None, None)       => dirs0
+      case (_, Some("Java"))  => dirs0 ++ List(ast.Directive.targetJava)
+      case (_, Some("Scala")) => dirs0 ++ List(ast.Directive.targetScala)
+      case (_, Some(x))       => sys.error(s"Invalid package target $x")
+    }
 }

@@ -14,7 +14,7 @@ class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     val gen = new MixedCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
       scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true,
       wrapOption = true)
-    val code = gen generate Transform.propateNamespace(ast)
+    val code = gen.generate(ast)
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(

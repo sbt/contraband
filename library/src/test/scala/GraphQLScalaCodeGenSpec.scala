@@ -10,7 +10,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   "generate(Enumeration)" should "generate a simple enumeration" in {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
         |/** Example of an enumeration */
@@ -27,7 +27,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   "generate(Record)" should "generate a record" in {
     val Success(ast) = SchemaParser.parse(recordExample)
     // println(ast)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
         |/** Example of a type */
@@ -63,7 +63,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   it should "grow a record from 0 to 1 field" in {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example
@@ -101,7 +101,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   it should "grow a record from 0 to 2 field" in {
     val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
     // println(ast)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
 
     code.head._2.unindent should equalLines (
       """package com.example
@@ -145,7 +145,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
         |/** Example of an interface */
@@ -203,7 +203,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
   it should "generate messages" in {
     val Success(ast) = SchemaParser.parse(messageExample)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
         |sealed abstract class IntfExample(
@@ -237,7 +237,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
   it should "generate with customization" in {
     val Success(ast) = SchemaParser.parse(customizationExample)
-    val code = mkScalaCodeGen generate Transform.propateNamespace(ast)
+    val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
         |/** Example of an interface */
