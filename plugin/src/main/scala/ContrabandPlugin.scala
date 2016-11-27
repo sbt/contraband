@@ -125,12 +125,12 @@ object Generate {
     val jsonFiles = definitions.toList collect {
       case f: File if f.getName endsWith ".json" => f
     }
-    val cslFiles = definitions.toList collect {
-      case f: File if (f.getName endsWith ".csl") || (f.getName endsWith ".gql") => f
+    val contraFiles = definitions.toList collect {
+      case f: File if (f.getName endsWith ".contra") || (f.getName endsWith ".gql") => f
     }
     val input =
       (jsonFiles map { f => JsonParser.Document.parse(IO read f) }) ++
-      (cslFiles map { f =>
+      (contraFiles map { f =>
         val ast = SchemaParser.parse(IO read f).get
         ast
       })

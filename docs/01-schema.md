@@ -15,6 +15,8 @@ or to implement your own service.
 Since we don't want to rely on a specific programming language syntax,
 to talk about Contraband schemas, we'll extend GraphQL's schema language.
 
+A Contraband schema should be saved with the file extension `*.contra`.
+
 ### Record types and fields
 
 The most basic components of a Contraband schema are record types, which just represent a kind of object you can fetch from your service, and what fields it has. In the Contraband schema language, we might represent it like this:
