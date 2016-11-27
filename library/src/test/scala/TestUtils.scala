@@ -1,4 +1,4 @@
-package sbt.datatype
+package sbt.contraband
 
 import scala.collection.immutable.{ Seq => sciSeq }
 import scala.collection.JavaConverters._

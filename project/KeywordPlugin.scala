@@ -16,7 +16,7 @@ object KeywordPlugin extends AutoPlugin {
     {
       val init = keywords.toList.sortBy(identity).map(tn => '"' + tn + '"').mkString("Set(", ", ", ")")
       val objectName = "ScalaKeywords"
-      val packageName = "sbt.datatype"
+      val packageName = "sbt.contraband"
       val keywordsSrc =
         s"""package $packageName
            |object $objectName {

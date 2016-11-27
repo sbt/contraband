@@ -1,0 +1,7 @@
+> generateContrabands
+
+> compile
+
+$ exists target/scala-2.10/src_managed/main/com/example/codec/CustomJsonProtocol.scala
+
+> run

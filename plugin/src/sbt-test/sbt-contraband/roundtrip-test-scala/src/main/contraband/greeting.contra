@@ -1,0 +1,31 @@
+package com.example
+@codecPackage("com.example.codec")
+@fullCodec("CustomJsonProtocol")
+@target(Scala)
+
+interface Greeting {
+  message: String!
+  number: Int @since("0.1.0")
+}
+
+type SimpleGreeting implements Greeting {
+  message: String!
+  number: Int @since("0.1.0")
+}
+
+type GreetingWithAttachments implements Greeting {
+  message: String!
+  number: Int @since("0.1.0")
+  attachments: [java.io.File]
+}
+
+type GreetingWithOption implements Greeting {
+  message: String!
+  number: Int @since("0.1.0")
+  opt: String
+}
+
+type Person {
+  name: String!
+  age: Int
+}

@@ -1,13 +1,13 @@
-package sbt.datatype
+package sbt.contraband
 
 import sbt._
 import Keys._
 
 object JsonCodecPlugin extends AutoPlugin {
-  override def requires = DatatypePlugin
+  override def requires = ContrabandPlugin
   override def trigger = noTrigger
 
-  import DatatypePlugin.autoImport._
+  import ContrabandPlugin.autoImport._
   override lazy val projectSettings =
     Vector(
       skipGeneration in (Compile, generateJsonCodecs) := false,
