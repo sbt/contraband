@@ -33,35 +33,35 @@ type Character {
 Let's go over it so that we can have a shared vocabulary:
 
 - `com.example` is a package name for this schema. This package name will be used for the generated code.
-- The code generation will target Scala by default.
+- `@target(Scala)` is an annotation for the package. It means that the code generation will target Scala by default.
 - `##` denotes the document comment for the record type.
-- `Character` is a Contraband record type, meaning it's a type with some fields. Most of the types in your schema will be record types.
-- `name` and `appearsIn` are fields on the `Character` type. That means that `name` and `appearsIn` are the only fields that can appear in the JSON data of the `Character` type.
+- `Character` is a Contraband record type, meaning it's a type with some fields. Most of the types in your schema will be record types. In Java and Scala it is encoded as a class.
+- `name` and `appearsIn` are fields on the `Character` type. That means that `name` and `appearsIn` are the only fields that can appear in the JSON object of the `Character` type.
 - `String` is one of the built-in scalar types.
-- `String!` means that the field is required, meaning that the service promises to always give you a value when you query this field. In the type language, we'll represent those with an exclamation mark.
-- `[Episode]!` represents a list of `Episode` objects. Since it is also required, you can always expect an array (with zero or more items) when you query the appearsIn field.
+- `String!` means that the field is required, meaning that the service promises to always give you a value when you query this field. In the schema language, we'll represent those with an exclamation mark.
+- `[Episode]!` represents a list of `Episode` records. Since it is also required, you can always expect a list (with zero or more items) when you query the `appearsIn` field.
 
 Now you know what a Contraband record type looks like, and how to read the basics of the Contraband schema language.
 
-### since directive
+### since annotation
 
 To enable schema evolution,
-fields in a Contraband record can declare when it was added:
+fields in a Contraband record can declare the version in which it was added:
 
 ```
 package com.example
 @target(Scala)
 
 type Greeting {
-  message: String!
+  value: String!
   x: Int @since("0.2.0")
 }
 ```
 
-This means that `message` field has been around since the beginning ("0.0.0") but optional `x` field was added since version `"0.2.0"`.
+This means that `value` field has been around since the beginning (`"0.0.0"`) but optional `x` field was added since version `"0.2.0"`.
 Contraband will generate multiple constructors to maintain the binary compatibility.
 
-Since `Int` is optional, `None` is used as the default value.
+Since `Int` is optional, `None` is used as the default value of `x`.
 To supply some other default value, you can write it as follows:
 
 ```
@@ -69,10 +69,12 @@ package com.example
 @target(Scala)
 
 type Greeting {
-  message: String!
+  value: String!
   x: Int = 0 @since("0.2.0")
 }
 ```
+
+Note that `0` will automatically wrapped with options.
 
 ### Scalar types
 
@@ -137,7 +139,7 @@ Here, we're using a `String` type and marking it as Required by adding an exclam
 
 Lists work in a similar way: We can use a type modifier to mark a
 type as a list, which indicates that this field will
-return an array of that type. In the schema language,
+return a list of that type. In the schema language,
 this is denoted by wrapping the type in square brackets, `[` and `]`.
 
 ### Lazy type
@@ -148,7 +150,7 @@ this is denoted by the keyword `lazy`.
 
 ### Interfaces
 
-Like many type systems, Contraband supports interfaces. An Interface is an abstract type that includes a certain set of fields that a type must include to implement the interface.
+Like many type systems, Contraband supports interfaces. An Interface is an abstract type that includes a certain set of fields that a type must include to *implement* the interface.
 
 For example, you could have an interface `Character` that represents any character in the Star Wars trilogy:
 

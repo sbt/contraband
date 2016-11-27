@@ -2,11 +2,10 @@
 out: json.html
 ---
 
-JSON codec generation
----------------------
+JSON コーデックの生成
+-------------------
 
-
-Adding `JsonCodecPlugin` to the subproject will generate sjson-new JSON codes for the Contraband types.
+`JsonCodecPlugin` をサブプロジェクトに追加することで Contraband 型に対する sjson-new の JSON コーデックが生成される。
 
 ```scala
 lazy val root = (project in file(".")).
@@ -16,9 +15,9 @@ lazy val root = (project in file(".")).
     libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.1" )
 ```
 
-sjson-new is a codec toolkit that lets you define a code that supports Sray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。
 
-The package name for the codecs can be specified using `@codecPackage` directive.
+コーデックのパッケージ名は `@codedPackage` アノテーションによって指定される。
 
 ```
 package com.example
@@ -32,9 +31,10 @@ type Person {
 }
 ```
 
-JsonFormat traits will be generated under `com.example.codec` package, along with a full codec named `CustomJsonProtocol` that mixes in all the traits.
+JsonFormat を実装するトレイトはこの場合 `com.example.codec` パッケージ内に生成され、
+`CustomJsonProtocol` という名前で全てのトレイトをミックスインしたフルコーデックが生成される。
 
-Here's how the generated JSON codec can be used:
+生成された JSON コーデックはこのように使うことができる:
 
 ```scala
 scala> import sjsonnew.support.scalajson.unsafe.{ Converter, CompactPrinter, Parser }

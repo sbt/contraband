@@ -2,17 +2,17 @@
 out: code-generation.html
 ---
 
-Code generation
----------------
+コード生成
+---------
 
-This page describes how the Contraband type system is encoded in Java and Scala.
+このページでは、Contraband の型システムが Java と Scala でどうエンコーディングされるのかを解説する。
 
-### Record types
+### レコード型
 
-Record types are mapped to Java or Scala classes, corresponding to the standard case classes in Scala.
+レコード型は Java や Scala ではクラスとして変換され、Scala に標準の case class に相当する。
 
-While the standard case class is convenient to start, it is not possible to add new fields without breaking binary compatibility.
-The Contraband records (or pseudo case classes) allow you to add new fields without breaking binary compatibility while offering (almost) the same functionalities as plain case classes.
+標準の case class は最初に使い始めるのは便利だが、バイナリ互換性を保ったままフィールドを追加することができない。
+Contraband のレコード (疑似 case class と言うこともできる) は、case class とほぼ同様の機能を提供しつつバイナリ互換性を保ったままフィールドの追加を可能としている。
 
 ```
 package com.example
@@ -24,7 +24,7 @@ type Person {
 }
 ```
 
-This schema will produce the following Scala class:
+このスキーマは以下の Scala コードを生成する:
 
 ```scala
 /**
@@ -65,17 +65,17 @@ object Person {
 }
 ```
 
-Unlike the standard case class the Contraband record does not implement `unapply` or public `copy` method,
-which cannot evolve in a binary compatible way.
+標準の case class と違って、Contraband のレコードは、
+互換性を保ったまま進化できるように `unapply` や public な `copy` メソッドは実装しない。
 
-Instead of `copy` it generates `withX(...)` methods for each field.
+`copy` の代わりにそれぞれのフィールドに対して `withX(...)` メソッドが生成される。
 
 ```scala
 > val x = Person("Alice", 20)
 > x.withAge(21)
 ```
 
-Here's the Java code it generates (after changing the target annotation to `Java`):
+Java のコード生成は以下のようになっている (target アノテーションを Java に変更する):
 
 ```java
 /**
