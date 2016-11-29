@@ -1,5 +1,6 @@
 package com.example
 @codecPackage("com.example.codec")
+@codecTypeField("$type")
 @fullCodec("CustomJsonProtocol")
 @target(Scala)
 

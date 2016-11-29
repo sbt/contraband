@@ -227,6 +227,7 @@ object Directive {
   def since(value: String): Directive = Directive("since", Argument(None, StringValue(value)) :: Nil)
   def codecPackage(value: String): Directive = Directive("codecPackage", Argument(None, StringValue(value)) :: Nil)
   def fullCodec(value: String): Directive = Directive("fullCodec", Argument(None, StringValue(value)) :: Nil)
+  def codecTypeField(value: String): Directive = Directive("codecTypeField", Argument(None, StringValue(value)) :: Nil)
 }
 
 case class Argument(nameOpt: Option[String], value: Value, comments: List[Comment] = Nil, position: Option[Position] = None) extends AstNode with WithComments
@@ -494,6 +495,12 @@ object AstUtil {
       val dirs = d.directives ++ (d.packageDecl map {_.directives}).toList.flatten
       scanSingleStringDirective(dirs, "fullCodec")
     }
+
+  def toCodecTypeField(d: Document): Option[String] =
+    toCodecTypeField(d.directives ++ (d.packageDecl map {_.directives}).toList.flatten)
+
+  def toCodecTypeField(dirs: List[Directive]): Option[String] =
+    scanSingleStringDirective(dirs, "codecTypeField")
 
   def toNamedType(i: InterfaceTypeDefinition, pkg: Option[String]): NamedType =
     {

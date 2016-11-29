@@ -135,13 +135,6 @@ class CodecCodeGen(codecParents: List[String],
     val name = i.name
     val fqn = fullyQualifiedName(i)
     val children: List[TypeDefinition] = lookupChildren(s, i)
-    // val parents = i.interfaces
-    // val parentsInSchema = lookupInterfaces(s, parents)
-    // val targetLang: String = toTarget(i.directives) match {
-    //   case Some(x) => x
-    //   case _       => sys.error(s"@target is missing for ${i.name}")
-    // }
-    // val intfLanguage = interfaceLanguage(parentsInSchema, targetLang)
     val code =
       children match {
         case Nil =>
@@ -159,17 +152,18 @@ class CodecCodeGen(codecParents: List[String],
              |}""".stripMargin
 
         case xs =>
-          val unionFormat = s"unionFormat${xs.length}[$fqn, ${xs map (c => fullyQualifiedName(c)) mkString ", "}]"
           val fmt = fullFormatsName(s, i)
           val rfs = getAllRequiredFormats(s, i).distinct filter { _ != fmt }
           val selfType = rfs match {
             case Nil => ""
             case fms => fms.mkString("self: ", " with ", " =>")
           }
+          val typeFieldName = (toCodecTypeField(i.directives) orElse toCodecTypeField(s)).getOrElse("type")
+          val flatUnionFormat = s"""flatUnionFormat${xs.length}[$fqn, ${xs map (c => fullyQualifiedName(c)) mkString ", "}]("$typeFieldName")"""
           s"""${genPackage(s)}
              |$sjsonImports
              |trait ${name.capitalize}Formats { $selfType
-             |  implicit lazy val ${name}Format: JsonFormat[$fqn] = $unionFormat
+             |  implicit lazy val ${name}Format: JsonFormat[$fqn] = $flatUnionFormat
              |}""".stripMargin
 
       }
