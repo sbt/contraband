@@ -26,6 +26,12 @@ type GreetingWithOption implements Greeting {
   opt: String
 }
 
+type GreetingPerson implements Greeting {
+  message: String!
+  number: Int @since("0.1.0")
+  person: com.example.Person = { name: "Foo", age: 20 } @since("0.1.0")
+}
+
 type Person {
   name: String!
   age: Int

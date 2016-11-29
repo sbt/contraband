@@ -263,11 +263,17 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         if (tpe.isListType) "Vector()"
         else if (!tpe.isNotNullType) "None"
         else sys.error(s"Expected $tpe but found $v")
-      case x: ScalarValue =>
-        if (tpe.isListType) "Vector(${x.renderPretty})"
-        else if (tpe.isNotNullType) x.renderPretty
-        else s"Option(${x.renderPretty})"
-      case _ => v.renderPretty
+      case _ =>
+        val str =
+          v match {
+            case x: ObjectValue =>
+              val args = x.fields map { f => f.value.renderPretty }
+              s"""${tpe.name}(${ args.mkString(", ") })"""
+            case _  => v.renderPretty
+          }
+        if (tpe.isListType) s"Vector($str)"
+        else if (tpe.isNotNullType) str
+        else s"Option($str)"
     }
 
   private def renderJavaValue(v: Value, tpe: Type): String =
@@ -276,11 +282,17 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         if (tpe.isListType) "Array()"
         else if (!tpe.isNotNullType) mkOptional("null", tpe, "Java")
         else sys.error(s"Expected $tpe but found $v")
-      case x: ScalarValue =>
-        if (tpe.isListType) "Array(${x.renderPretty})"
-        else if (tpe.isNotNullType) x.renderPretty
-        else mkOptional(x.renderPretty, tpe, "Java")
-      case _ => v.renderPretty
+      case _ =>
+        val str =
+          v match {
+            case x: ObjectValue =>
+              val args = x.fields map { f => f.value.renderPretty }
+              s"""${tpe.name}(${ args.mkString(", ") })"""
+            case _  => v.renderPretty
+          }
+        if (tpe.isListType) "Array(${str})"
+        else if (tpe.isNotNullType) str
+        else mkOptional(str, tpe, "Java")
     }
 
   private def mkOptional(e: String, tpe: Type, intfLang: String): String =
