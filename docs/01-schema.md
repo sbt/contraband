@@ -73,6 +73,8 @@ package com.example
 type Greeting {
   value: String!
   x: Int = 0 @since("0.2.0")
+  p: Person = { name: "Foo" } @since("0.2.0")
+  z: Person = raw"Person(\"Foo\")"
 }
 ```
 
