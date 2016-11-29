@@ -17,12 +17,13 @@ lazy val root = (project in file(".")).
 
 sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。
 
-コーデックのパッケージ名は `@codedPackage` アノテーションによって指定される。
+コーデックのパッケージ名は `@codecPackage` アノテーションによって指定される。
 
 ```
 package com.example
 @target(Scala)
 @codecPackage("com.example.codec")
+@codecTypeField("type")
 @fullCodec("CustomJsonProtocol")
 
 type Person {

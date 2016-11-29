@@ -874,7 +874,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats =>
-implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = unionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]
+implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = flatUnionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]("type")
 }
 /**
  * This code is generated using sbt-datatype.
@@ -913,7 +913,7 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
 trait GreetingExtraFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.GreetingExtraImplFormats =>
-implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = unionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]
+implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = flatUnionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]("type")
 }
 /**
  * This code is generated using sbt-datatype.

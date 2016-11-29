@@ -89,7 +89,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait OneChildInterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
-        |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = unionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]
+        |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = flatUnionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]("type")
         |}""".stripMargin.unindent)
     code(new File("generated", "childRecordFormats.scala")).unindent should equalLines (
       """/**
@@ -137,7 +137,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
         |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.NestedProtocolFormats =>
-        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = unionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]
+        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = flatUnionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]("type")
         |}""".stripMargin.unindent)
     code(new File("generated", "nestedProtocolFormats.scala")).unindent should equalLines (
       """/**

@@ -40,7 +40,7 @@ object ContrabandPlugin extends AutoPlugin {
     lazy val baseContrabandSettings: Seq[Def.Setting[_]] = Seq(
       skipGeneration in generateContrabands := false,
       skipGeneration in generateJsonCodecs := true,
-      contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % "0.4.2"),
+      contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % "0.5.1"),
       contrabandJavaLazy in generateContrabands := "xsbti.api.Lazy",
       contrabandJavaOption in generateContrabands := "xsbti.Maybe",
       contrabandScalaArray in generateContrabands := "Vector",

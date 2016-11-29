@@ -24,6 +24,7 @@ The package name for the codecs can be specified using `@codecPackage` directive
 package com.example
 @target(Scala)
 @codecPackage("com.example.codec")
+@codecTypeField("type")
 @fullCodec("CustomJsonProtocol")
 
 type Person {
