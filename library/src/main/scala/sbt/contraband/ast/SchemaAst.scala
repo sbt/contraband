@@ -252,7 +252,7 @@ case class BigDecimalValue(value: BigDecimal, comments: List[Comment] = Nil, pos
   def renderPretty: String = value.toString
 }
 case class StringValue(value: String, comments: List[Comment] = Nil, position: Option[Position] = None) extends ScalarValue {
-  def renderPretty: String = value.toString
+  def renderPretty: String = "\"" + value.toString + "\""
 }
 case class BooleanValue(value: Boolean, comments: List[Comment] = Nil, position: Option[Position] = None) extends ScalarValue {
   def renderPretty: String = value.toString

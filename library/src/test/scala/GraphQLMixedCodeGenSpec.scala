@@ -29,27 +29,27 @@ public abstract class Greeting implements java.io.Serializable {
 
 
     private String message;
-    private com.example.Maybe<Integer> number;
+    private com.example.Maybe<String> s;
     public Greeting(String _message) {
         super();
         message = _message;
-        number = com.example.Maybe.<Integer>nothing();
+        s = com.example.Maybe.<String>just("1");
     }
-    public Greeting(String _message, com.example.Maybe<Integer> _number) {
+    public Greeting(String _message, com.example.Maybe<String> _s) {
         super();
         message = _message;
-        number = _number;
+        s = _s;
     }
-    public Greeting(String _message, int _number) {
+    public Greeting(String _message, String _s) {
         super();
         message = _message;
-        number = com.example.Maybe.<Integer>just(_number);
+        s = com.example.Maybe.<String>just(_s);
     }
     public String message() {
         return this.message;
     }
-    public com.example.Maybe<Integer> number() {
-        return this.number;
+    public com.example.Maybe<String> s() {
+        return this.s;
     }
 
     public boolean equals(Object obj) {
@@ -59,14 +59,14 @@ public abstract class Greeting implements java.io.Serializable {
             return false;
         } else {
             Greeting o = (Greeting)obj;
-            return message().equals(o.message()) && number().equals(o.number());
+            return message().equals(o.message()) && s().equals(o.s());
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + message().hashCode()) + number().hashCode());
+        return 37 * (37 * (17 + message().hashCode()) + s().hashCode());
     }
     public String toString() {
-        return "Greeting("  + "message: " + message() + ", " + "number: " + number() + ")";
+        return "Greeting("  + "message: " + message() + ", " + "s: " + s() + ")";
     }
 }
 """.stripMargin.unindent,
@@ -79,35 +79,35 @@ public abstract class Greeting implements java.io.Serializable {
 package com.example
 final class SimpleGreeting private (
   message: String,
-  number: com.example.Maybe[java.lang.Integer]) extends com.example.Greeting(message, number) with Serializable {
-  private def this(message: String) = this(message, com.example.Maybe.nothing[java.lang.Integer]())
+  s: com.example.Maybe[String]) extends com.example.Greeting(message, s) with Serializable {
+  private def this(message: String) = this(message, com.example.Maybe.just[String]("1"))
   override def equals(o: Any): Boolean = o match {
-    case x: SimpleGreeting => (this.message == x.message) && (this.number == x.number)
+    case x: SimpleGreeting => (this.message == x.message) && (this.s == x.s)
     case _ => false
   }
   override def hashCode: Int = {
-    37 * (37 * (17 + message.##) + number.##)
+    37 * (37 * (17 + message.##) + s.##)
   }
   override def toString: String = {
-    "SimpleGreeting(" + message + ", " + number + ")"
+    "SimpleGreeting(" + message + ", " + s + ")"
   }
-  protected[this] def copy(message: String = message, number: com.example.Maybe[java.lang.Integer] = number): SimpleGreeting = {
-    new SimpleGreeting(message, number)
+  protected[this] def copy(message: String = message, s: com.example.Maybe[String] = s): SimpleGreeting = {
+    new SimpleGreeting(message, s)
   }
   def withMessage(message: String): SimpleGreeting = {
     copy(message = message)
   }
-  def withNumber(number: com.example.Maybe[java.lang.Integer]): SimpleGreeting = {
-    copy(number = number)
+  def withS(s: com.example.Maybe[String]): SimpleGreeting = {
+    copy(s = s)
   }
-  def withNumber(number: Int): SimpleGreeting = {
-    copy(number = com.example.Maybe.just[java.lang.Integer](number))
+  def withS(s: String): SimpleGreeting = {
+    copy(s = com.example.Maybe.just[String](s))
   }
 }
 object SimpleGreeting {
-  def apply(message: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.nothing[java.lang.Integer]())
-  def apply(message: String, number: com.example.Maybe[java.lang.Integer]): SimpleGreeting = new SimpleGreeting(message, number)
-  def apply(message: String, number: Int): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[java.lang.Integer](number))
+  def apply(message: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[String]("1"))
+  def apply(message: String, s: com.example.Maybe[String]): SimpleGreeting = new SimpleGreeting(message, s)
+  def apply(message: String, s: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[String](s))
 }
 """.stripMargin.unindent
     ))

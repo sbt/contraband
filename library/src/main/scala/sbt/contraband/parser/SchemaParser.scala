@@ -303,12 +303,13 @@ trait Operations extends PositionTracking { this: Parser with Tokens with Ignore
 trait Values { this: Parser with Tokens with Ignored with Operations ⇒
 
   def ValueConst: Rule1[ast.Value] = rule {
-    NumberValue | StringValue | BooleanValue | NullValue | EnumValue | ListValueConst | ObjectValueConst
+    NumberValue | RawValue | StringValue | BooleanValue | NullValue | EnumValue | ListValueConst | ObjectValueConst
   }
 
   def Value: Rule1[ast.Value] = rule {
     Comments ~ trackPos ~ Variable ~> ((comment, pos, name) ⇒ ast.VariableValue(name, comment, Some(pos))) |
     NumberValue |
+    RawValue |
     StringValue |
     BooleanValue |
     NullValue |
@@ -344,6 +345,7 @@ trait Values { this: Parser with Tokens with Ignored with Operations ⇒
 
   def ObjectField = rule { Comments ~ trackPos ~ Name ~ wsNoComment(':') ~ Value ~> ((comment, pos, name, value) ⇒ ast.ObjectField(name, value, comment, Some(pos))) }
 
+  def RawValue = rule { atomic(Comments ~ trackPos ~ 'r'  ~ 'a' ~ 'w' ~ '"' ~ clearSB() ~ Characters ~ '"' ~ push(sb.toString) ~ IgnoredNoComment.* ~> ((comment, pos, s) ⇒ ast.RawValue(s, comment, Some(pos))))}
 }
 
 trait Directives { this: Parser with Tokens with Operations with Ignored ⇒

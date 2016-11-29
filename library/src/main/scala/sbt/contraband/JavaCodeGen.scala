@@ -185,11 +185,17 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
         if (tpe.isListType) "new Array {}"
         else if (!tpe.isNotNullType) s"""${instantiateJavaOptional(boxedType(tpe.name), "null")}"""
         else sys.error(s"Expected $tpe but found $v")
-      case x: ScalarValue =>
-        if (tpe.isListType) "new Array { ${x.renderPretty} }"
-        else if (tpe.isNotNullType) x.renderPretty
-        else s"${instantiateJavaOptional(boxedType(tpe.name), x.renderPretty)}"
-      case _ => v.renderPretty
+      case _ =>
+        val str =
+          v match {
+            case x: ObjectValue =>
+              val args = x.fields map { f => f.value.renderPretty }
+              s"""new ${tpe.name}(${ args.mkString(", ") })"""
+            case _  => v.renderPretty
+          }
+        if (tpe.isListType) s"new Array { $str }"
+        else if (tpe.isNotNullType) str
+        else s"${instantiateJavaOptional(boxedType(tpe.name), str)}"
     }
 
   private def renderDefaultValue(f: FieldDefinition): String =
