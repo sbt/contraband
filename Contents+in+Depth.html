@@ -3,7 +3,7 @@
       <head>
         <meta charset="utf-8"/>
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
-        <title>Contraband — Contraband</title>
+        <title>Contraband — Contents in Depth</title>
         
         <link rel="stylesheet" href="css/blueprint/screen.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
@@ -30,42 +30,21 @@
         
       </head>
       <body class="color_scheme-github">
-        <a class="page next nav" href="schema.html">
+        <a class="page prev nav" href="json.html">
+            <span class="space">&nbsp;</span>
+            <span class="flip arrow">❧</span>
+          </a><a class="page next nav" href="Combined+Pages.html">
             <span class="space">&nbsp;</span>
             <span class="arrow">❧</span>
           </a>
         <div class="container contentswrapper">
           <div class="span-16 prepend-1 append-1 contents">
-            <h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband is a description language for your datatypes and APIs,
-currently targeting Java and Scala.
-</p><p>You describe the types and fields of your API,
-and Contraband will:
-</p><ul><li>generate either Java classes, or a pseudo case classes in Scala.
-</li><li>generate JSON bindings for the datatypes.
-</li></ul><p>Contraband also enables you to evolve the API over time.
-</p><h3 id="Setup">Setup<a href="#Setup" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>To enable the Contraband plugin for your build, put the following line in <code>project/contraband.sbt</code>:
-</p><pre><code class="">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
-</code></pre><p>Your Contraband schema should be placed in <code>src/main/contraband</code> and <code>src/test/contraband</code>.
-Here’s how your build should be configured:
-</p><pre><code class="">lazy val library = (project in file(&quot;library&quot;)).
-  enablePlugins(ContrabandPlugin).
-  settings(
-    name := &quot;foo library&quot;,
-  )
-</code></pre><h3 id="Note">Note<a href="#Note" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband is NOT supported under the Lightbend subscription.
-</p><div class="bottom nav span-16">
-                        <em>Next Page</em>
-                        <span class="arrow">❧</span>
-                        <a href="schema.html"> Schemas and Types </a>                        
-                        <ul class="language-bar">
-        <li><a href="index.html"><span class="lang-item lang-en">English</span></a></li><li><a href="ja/index.html"><span class="lang-item lang-ja">日本語</span></a></li>
-      </ul>
-                      </div><div class="tocwrapper show">
+            <div class="tocwrapper show">
       <a class="tochead nav" style="display: none" href="#toc">❦</a>
       <a name="toc"></a>
       <h4 class="toctitle">Contents</h4>
       <div class="tocbody">
-      <div class="current">Contraband</div><ol class="toc"> <li><div><a href="schema.html">Schemas and Types</a></div></li><li><div><a href="code-generation.html">Code generation</a></div></li><li><div><a href="json.html">JSON codec generation</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
+      <div><a href="index.html">Contraband</a></div><ul class="outline"> <li> <a href="index.html#Setup">Setup </a> </li><li> <a href="index.html#Note">Note </a> </li> </ul><ol class="toc"> <li><div><a href="schema.html">Schemas and Types</a></div><ul class="outline"> <li> <a href="schema.html#Contraband+schema+language">Contraband schema language </a> </li><li> <a href="schema.html#Record+types+and+fields">Record types and fields </a> </li><li> <a href="schema.html#since+annotation">since annotation </a> </li><li> <a href="schema.html#Scalar+types">Scalar types </a> </li><li> <a href="schema.html#Enumeration+types">Enumeration types </a> </li><li> <a href="schema.html#Required+type">Required type </a> </li><li> <a href="schema.html#List+type">List type </a> </li><li> <a href="schema.html#Lazy+type">Lazy type </a> </li><li> <a href="schema.html#Interfaces">Interfaces </a> </li><li> <a href="schema.html#Messages">Messages </a> </li><li> <a href="schema.html#Extra+code">Extra code </a> </li> </ul></li><li><div><a href="code-generation.html">Code generation</a></div><ul class="outline"> <li> <a href="code-generation.html#Record+types">Record types </a> </li> </ul></li><li><div><a href="json.html">JSON codec generation</a></div></li><li class="generated"><div class="current">Contents in Depth</div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
           </div>
         </div>
         <div class="header">
@@ -73,7 +52,7 @@ Here’s how your build should be configured:
         <div class="span-16 prepend-1 append-1">
           <div class="span-16 top nav">
             <div class="span-16 title">
-              <span>Contraband</span> 
+              <span>Contraband</span> — Contents in Depth
             </div>
           </div>
         </div>

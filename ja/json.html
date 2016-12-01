@@ -1,0 +1,119 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+      <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <title>Contraband — JSON コーデックの生成</title>
+        
+        <link rel="stylesheet" href="../css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/blueprint/print.css" type="text/css" media="print"/> 
+        <!--[if lt IE 8]>
+          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
+        <![endif]-->
+        <link rel="stylesheet" href="../css/pamflet.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamflet-print.css" type="text/css" media="print"/>
+        <link rel="stylesheet" href="../css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-redmond.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-github.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <script type="text/javascript" src="../js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="../js/pamflet.js"></script>
+        <script type="text/javascript">
+          Pamflet.page.language = 'ja';
+        </script>
+        <script type="text/javascript" src="../js/prettify/prettify.js"></script><script type="text/javascript" src="../js/prettify/lang-scala.js"></script><link type="text/css" rel="stylesheet" href="../css/prettify.css"/><script type="text/javascript"><!--
+        window.onload=function() { prettyPrint(); };
+      --></script>
+        <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, projection"/>
+        
+        
+      </head>
+      <body class="color_scheme-github">
+        <a class="page prev nav" href="code-generation.html">
+            <span class="space">&nbsp;</span>
+            <span class="flip arrow">❧</span>
+          </a><a class="page next nav" href="Contents+in+Depth.html">
+            <span class="space">&nbsp;</span>
+            <span class="arrow">❧</span>
+          </a>
+        <div class="container contentswrapper">
+          <div class="span-16 prepend-1 append-1 contents">
+            <h2 id="JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90">JSON コーデックの生成<a href="#JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p><code>JsonCodecPlugin</code> をサブプロジェクトに追加することで Contraband 型に対する sjson-new の JSON コーデックが生成される。
+</p><pre><code class="prettyprint lang-scala">lazy val root = (project in file(&quot;.&quot;)).
+  enablePlugins(ContrabandPlugin, JsonCodecPlugin).
+  settings(
+    scalaVersion := &quot;2.11.8&quot;,
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
+</code></pre><p>sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。
+</p><p>コーデックのパッケージ名は <code>@codecPackage</code> アノテーションによって指定される。
+</p><pre><code class="">package com.example
+@target(Scala)
+@codecPackage(&quot;com.example.codec&quot;)
+@codecTypeField(&quot;type&quot;)
+@fullCodec(&quot;CustomJsonProtocol&quot;)
+
+type Person {
+  name: String!
+  age: Int
+}
+</code></pre><p>JsonFormat を実装するトレイトはこの場合 <code>com.example.codec</code> パッケージ内に生成され、
+<code>CustomJsonProtocol</code> という名前で全てのトレイトをミックスインしたフルコーデックが生成される。
+</p><p>生成された JSON コーデックはこのように使うことができる:
+</p><pre><code class="prettyprint lang-scala">scala&gt; import sjsonnew.support.scalajson.unsafe.{ Converter, CompactPrinter, Parser }
+import sjsonnew.support.scalajson.unsafe.{Converter, CompactPrinter, Parser}
+
+scala&gt; import com.example.codec.CustomJsonProtocol._
+import com.example.codec.CustomJsonProtocol._
+
+scala&gt; import com.example.Person
+import com.example.Person
+
+scala&gt; val p = Person(&quot;Bob&quot;, 20)
+p: com.example.Person = Person(Bob, 20)
+
+scala&gt; val j = Converter.toJsonUnsafe(p)
+j: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@6731ad72)
+
+scala&gt; val s = CompactPrinter(j)
+s: String = {&quot;name&quot;:&quot;Bob&quot;,&quot;age&quot;:20}
+
+scala&gt; val x = Parser.parseUnsafe(s)
+x: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@7331f7f8)
+
+scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
+q: com.example.Person = Person(Bob, 20)
+
+scala&gt; assert(p == q)
+</code></pre><div class="bottom nav end span-16">
+                        <ul class="language-bar">
+        <li><a href="../json.html"><span class="lang-item lang-en">English</span></a></li><li><a href="../ja/json.html"><span class="lang-item lang-ja">日本語</span></a></li>
+      </ul>
+                      </div><div class="tocwrapper show">
+      <a class="tochead nav" style="display: none" href="#toc">❦</a>
+      <a name="toc"></a>
+      <h4 class="toctitle">Contents</h4>
+      <div class="tocbody">
+      <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div><a href="schema.html">スキーマと型</a></div></li><li><div><a href="code-generation.html">コード生成</a></div></li><li><div class="current">JSON コーデックの生成</div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
+          </div>
+        </div>
+        <div class="header">
+          <div class="container">
+        <div class="span-16 prepend-1 append-1">
+          <div class="span-16 top nav">
+            <div class="span-16 title">
+              <span>Contraband</span> — JSON コーデックの生成
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        
+        
+      </body>
+    </html>

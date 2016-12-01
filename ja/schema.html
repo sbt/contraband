@@ -1,0 +1,227 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+      <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <title>Contraband — スキーマと型</title>
+        
+        <link rel="stylesheet" href="../css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/blueprint/print.css" type="text/css" media="print"/> 
+        <!--[if lt IE 8]>
+          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
+        <![endif]-->
+        <link rel="stylesheet" href="../css/pamflet.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamflet-print.css" type="text/css" media="print"/>
+        <link rel="stylesheet" href="../css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-redmond.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-github.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <script type="text/javascript" src="../js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="../js/pamflet.js"></script>
+        <script type="text/javascript">
+          Pamflet.page.language = 'ja';
+        </script>
+        
+        <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, projection"/>
+        
+        
+      </head>
+      <body class="color_scheme-github">
+        <a class="page prev nav" href="index.html">
+            <span class="space">&nbsp;</span>
+            <span class="flip arrow">❧</span>
+          </a><a class="page next nav" href="code-generation.html">
+            <span class="space">&nbsp;</span>
+            <span class="arrow">❧</span>
+          </a>
+        <div class="container contentswrapper">
+          <div class="span-16 prepend-1 append-1 contents">
+            <h2 id="%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型<a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>このページでは GraphQL の型システムに基づいた Contraband の型システムを説明する。
+</p><p>Contraband は、既存の JSON ベースの API をアクセスするのに使ったり、サービスを実装するのに使うことができる。
+</p><h3 id="Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E">Contraband スキーマ言語<a href="#Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband のスキーマを記述するのに特定のプログラミング言語の構文に依存したくないため、
+GraphQL のスキーマ言語を拡張することにした。
+</p><p>Contraband スキーマはファイル拡張子 <code>*.contra</code> を使う。
+</p><h3 id="%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B%E3%81%A8%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">レコード型とフィールド<a href="#%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B%E3%81%A8%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband スキーマの最も基本的なものはレコード型で、
+サービスから取得するオブジェクトとそのフィールドを表す。
+Contraband スキーマ言語では以下のように表現する:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+}
+</code></pre><p>ボキャブラリーを共有できるように、一つ一つみていこう:
+</p><ul><li><code>com.example</code> は、このスキーマのパッケージだ。このパッケージ名は生成されるコードにも使われる。
+</li><li><code>@target(Scala)</code> はこのパッケージに対するアノテーションだ。これは、コード生成がデフォルトで Scala を対象 (target) とすることを意味する。
+</li><li><code>##</code> は、このレコード型に関するドキュメントコメントのための記法だ。
+</li><li><code>Character</code> は Contraband のレコード型で、これは何らかのフィールドを持つ型であることを意味する。Java と Scala ではクラスとしてエンコードされる。
+</li><li><code>name</code> と <code>appearsIn</code> は <code>Character</code> 型のフィールドだ。これは、<code>Character</code> 型の JSON オブジェクトにこれらのフィールドのみを持つことを意味する。
+</li><li><code>String</code> は組み込みのスカラー型だ。
+</li><li><code>String!</code> はフィールドが required (省略不可) であることを意味する。つまり、サービスはこのフィールドを必ず返すということだ。スキーマ言語ではこれを感嘆符 (!) で表す。
+</li><li><code>[Episode]!</code> は <code>Episode</code> レコードのリストを表す。これも required であるため、<code>appearsIn</code> フィールドは必ずリスト (ゼロ個もしくはそれ以上のアイテム) を返すことが保証される。
+</li></ul><p>これで、Contraband のレコード型がどういうものかと、Contraband スキーマ言語の基本が分かったはずだ。
+</p><h3 id="since+%E3%82%A2%E3%83%8E%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">since アノテーション<a href="#since+%E3%82%A2%E3%83%8E%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>スキーマの進化を可能とするため、Contraband のレコード内のフィールドはどのバージョンでそれが追加されたかを宣言できる:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int @since(&quot;0.2.0&quot;)
+}
+</code></pre><p>これは、<code>value</code> フィールドは最初のバージョン (<code>&quot;0.0.0&quot;</code>) から存在したが、<code>x</code> フィールドはバージョン <code>&quot;0.2.0&quot;</code> にて追加されたことを示す。
+Contraband はバイナリ互換性を保つように、この情報を用いて複数のコンストラクタを生成する。
+</p><p><code>Int</code> は optional 型なので、デフォルト値として <code>None</code> が自動的に使われる。
+他にデフォルト値を設定したければ、以下のように書くことができる:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int = 0 @since(&quot;0.2.0&quot;)
+}
+</code></pre><p><code>0</code> が自動的に option でラッピングされることに注目してほしい。
+</p><h3 id="%E3%82%B9%E3%82%AB%E3%83%A9%E3%83%BC%E5%9E%8B">スカラー型<a href="#%E3%82%B9%E3%82%AB%E3%83%A9%E3%83%BC%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband はデフォルトでいくつかの組み込み型を提供する:
+</p><ul><li><code>String</code>
+</li><li><code>Boolean</code>
+</li><li><code>Byte</code>
+</li><li><code>Char</code>
+</li><li><code>Int</code>
+</li><li><code>Long</code>
+</li><li><code>Short</code>
+</li><li><code>Double</code>
+</li></ul><p><code>java.io.File</code> といった Java や Scala のクラス名も使用することができる。
+</p><p>ただし、その場合はその型がどうシリアライズ・デシリアライズされるかの方法も提供する必要がある。
+</p><h3 id="%E5%88%97%E6%8C%99%E5%9E%8B">列挙型<a href="#%E5%88%97%E6%8C%99%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>別名 enum とも呼ばれる列挙型はスカラー型の特殊なもので特定の値の集合に制限されている。これによって
+</p><ol><li>この型を持つ引数が許可された値のうちのどれかであることを検査できる。
+</li><li>型システムを用いて、フィールドは常に有限な値の集合のうちどれか一つの値を取るということを明示できる。
+</li></ol><p>Contraband スキーマ言語では enum の定義は以下のように書ける:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Star Wars trilogy.
+enum Episode {
+  NewHope
+  Empire
+  Jedi
+}
+</code></pre><p>これは、スキーマ内で <code>Episode</code> と書いたとき、<code>NewHope</code>, <code>Empire</code>, <code>Jedi</code>
+のどれかの値を取ることを意味する。
+</p><h3 id="required+%E5%9E%8B">required 型<a href="#required+%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>レコード型と enum は Contraband でユーザが定義することが型だ。
+しかし、型をスキーマ内で使うときには型修飾子を付けて値の検査などを変えることができる。
+具体例で説明しよう。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>ここでは、<code>String</code> 型名の後に感嘆符 (<code>!</code>) を付けて required (省略不可) な型だとマークしている。
+</p><h3 id="%E3%83%AA%E3%82%B9%E3%83%88%E5%9E%8B">リスト型<a href="#%E3%83%AA%E3%82%B9%E3%83%88%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>リストも同様だ。型修飾子を使って型をリストだとマークして、フィールドがその型のリストを返すことを示す。スキーマ言語では、型を角括弧 (<code>[</code> と <code>]</code>) で囲むことで表記する。
+</p><h3 id="lazy+%E5%9E%8B">lazy 型<a href="#lazy+%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>lazy 型は、フィールドの初期化を最初に使われるまで遅延する。
+スキーマ言語では、<code>lazy</code> というキーワードを使ってこれを表す。
+</p><h3 id="%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9">インターフェイス<a href="#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>多くの型システム同様に Contraband もインターフェイスという概念を持つ。
+インターフェイスとは、それを<strong>実装</strong> (implement) する型が持つべきフィールドの集合を指定する抽象型の一種だ。
+</p><p>例えば、Star Wars 三部作に出てくるキャラクターを表す <code>Character</code> というインターフェイスを以下のように定義できる。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+interface Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>これは、<code>Character</code> を<strong>実装</strong> (implement) する全ての型はそれらのフィールドを持つことを意味する。
+</p><p>例えば、<code>Character</code> を実装する型はこういうふうに書ける:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Human implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  starships: [com.example.Starship]
+  totalCredits: Int
+}
+
+type Droid implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  primaryFunction: String
+}
+</code></pre><p>両方の型とも <code>Character</code> インターフェイス内の全てのフィールドを持っていることが分かる。
+さらに、<code>totalCredits</code>、 <code>starships</code>、<code>primaryFunction</code> といったそれぞれのキャラクター型に特定なフィールドも追加している。
+</p><h3 id="%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8">メッセージ<a href="#%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>フィールドの他に、インターフェイスはメッセージを宣言することもできる。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Starship represents the starships in Star Wars.
+interface Starship {
+  name: String!
+  length(unit: com.example.LengthUnit): Double
+}
+</code></pre><p>これは <code>Starship</code> を実装する型は上記のフィールドとメッセージの両方を持っている必要があることを意味する。
+</p><h3 id="extra+%E3%82%B3%E3%83%BC%E3%83%89">extra コード<a href="#extra+%E3%82%B3%E3%83%BC%E3%83%89" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>生成コードに直接 Scala や Java のコードを埋め込むための非常手段として Contraband は特殊なコメント記法を提供する。
+</p><pre><code class="">## Example of an interface
+interface IntfExample {
+  field: Int
+
+  #x // Some extra code
+
+  #xinterface Interface1
+  #xinterface Interface2
+
+  #xtostring return &quot;custom&quot;;
+
+  #xcompanion // Some extra companion code
+
+  #xcompanioninterface CompanionInterface1
+  #xcompanioninterface CompanionInterface2
+}
+</code></pre><ul><li><code>#x</code> は生成されるクラスの本文内にコードを挿入する。
+</li><li><code>#xinterface</code> は親クラスを追加する。
+</li><li><code>#xtostring</code> は <code>toString</code> メソッドのカスタム化に使用する。
+</li><li><code>#xcompanion</code> は、生成されるクラスのコンパニオンオブジェクト内にコードを挿入する。
+</li><li><code>#xcompanioninterface</code> はコンパニオンオブジェクトに親クラスを追加する。
+</li></ul><div class="bottom nav span-16">
+                        <em>Next Page</em>
+                        <span class="arrow">❧</span>
+                        <a href="code-generation.html"> コード生成 </a>                        
+                        <ul class="language-bar">
+        <li><a href="../schema.html"><span class="lang-item lang-en">English</span></a></li><li><a href="../ja/schema.html"><span class="lang-item lang-ja">日本語</span></a></li>
+      </ul>
+                      </div><div class="tocwrapper show">
+      <a class="tochead nav" style="display: none" href="#toc">❦</a>
+      <a name="toc"></a>
+      <h4 class="toctitle">Contents</h4>
+      <div class="tocbody">
+      <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div class="current">スキーマと型</div></li><li><div><a href="code-generation.html">コード生成</a></div></li><li><div><a href="json.html">JSON コーデックの生成</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
+          </div>
+        </div>
+        <div class="header">
+          <div class="container">
+        <div class="span-16 prepend-1 append-1">
+          <div class="span-16 top nav">
+            <div class="span-16 title">
+              <span>Contraband</span> — スキーマと型
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        
+        
+      </body>
+    </html>

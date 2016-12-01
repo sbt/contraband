@@ -1,0 +1,390 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+      <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <title>Contraband — Combined Pages</title>
+        
+        <link rel="stylesheet" href="css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="css/blueprint/print.css" type="text/css" media="print"/> 
+        <!--[if lt IE 8]>
+          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
+        <![endif]-->
+        <link rel="stylesheet" href="css/pamflet.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="css/pamflet-print.css" type="text/css" media="print"/>
+        <link rel="stylesheet" href="css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="css/color_scheme-redmond.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="css/color_scheme-github.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="js/pamflet.js"></script>
+        <script type="text/javascript">
+          Pamflet.page.language = 'en';
+        </script>
+        <script type="text/javascript" src="js/prettify/prettify.js"></script><script type="text/javascript" src="js/prettify/lang-scala.js"></script><link type="text/css" rel="stylesheet" href="css/prettify.css"/><script type="text/javascript"><!--
+        window.onload=function() { prettyPrint(); };
+      --></script>
+        <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen, projection"/>
+        
+        
+      </head>
+      <body class="color_scheme-github">
+        <a class="page prev nav" href="Contents+in+Depth.html">
+            <span class="space">&nbsp;</span>
+            <span class="flip arrow">❧</span>
+          </a>
+        <div class="container contentswrapper">
+          <div class="span-16 prepend-1 append-1 contents">
+            <div class="tocwrapper show">
+      <a class="tochead nav" style="display: none" href="#toc">❦</a>
+      <a name="toc"></a>
+      <h4 class="toctitle">Contents</h4>
+      <div class="tocbody">
+      <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#Schemas+and+Types">Schemas and Types</a></div></li><li><div><a href="#Code+generation">Code generation</a></div></li><li><div><a href="#JSON+codec+generation">JSON codec generation</a></div></li> </ol></div></div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband is a description language for your datatypes and APIs,
+currently targeting Java and Scala.
+</p><p>You describe the types and fields of your API,
+and Contraband will:
+</p><ul><li>generate either Java classes, or a pseudo case classes in Scala.
+</li><li>generate JSON bindings for the datatypes.
+</li></ul><p>Contraband also enables you to evolve the API over time.
+</p><h3 id="Setup">Setup<a href="#Setup" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>To enable the Contraband plugin for your build, put the following line in <code>project/contraband.sbt</code>:
+</p><pre><code class="">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
+</code></pre><p>Your Contraband schema should be placed in <code>src/main/contraband</code> and <code>src/test/contraband</code>.
+Here’s how your build should be configured:
+</p><pre><code class="">lazy val library = (project in file(&quot;library&quot;)).
+  enablePlugins(ContrabandPlugin).
+  settings(
+    name := &quot;foo library&quot;,
+  )
+</code></pre><h3 id="Note">Note<a href="#Note" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband is NOT supported under the Lightbend subscription.
+</p><h2 id="Schemas+and+Types">Schemas and Types<a href="#Schemas+and+Types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This page describes Contraband type system, which is based on GraphQL type system.
+</p><p>Contraband could be used to acess existing JSON-based API,
+or to implement your own service.
+</p><h3 id="Contraband+schema+language">Contraband schema language<a href="#Contraband+schema+language" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Since we don’t want to rely on a specific programming language syntax,
+to talk about Contraband schemas, we’ll extend GraphQL’s schema language.
+</p><p>A Contraband schema should be saved with the file extension <code>*.contra</code>.
+</p><h3 id="Record+types+and+fields">Record types and fields<a href="#Record+types+and+fields" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>The most basic components of a Contraband schema are record types, which just represent a kind of object you can fetch from your service, and what fields it has. In the Contraband schema language, we might represent it like this:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+}
+</code></pre><p>Let’s go over it so that we can have a shared vocabulary:
+</p><ul><li><code>com.example</code> is a package name for this schema. This package name will be used for the generated code.
+</li><li><code>@target(Scala)</code> is an annotation for the package. It means that the code generation will target Scala by default.
+</li><li><code>##</code> denotes the document comment for the record type.
+</li><li><code>Character</code> is a Contraband record type, meaning it’s a type with some fields. Most of the types in your schema will be record types. In Java and Scala it is encoded as a class.
+</li><li><code>name</code> and <code>appearsIn</code> are fields on the <code>Character</code> type. That means that <code>name</code> and <code>appearsIn</code> are the only fields that can appear in the JSON object of the <code>Character</code> type.
+</li><li><code>String</code> is one of the built-in scalar types.
+</li><li><code>String!</code> means that the field is required, meaning that the service promises to always give you a value when you query this field. In the schema language, we’ll represent those with an exclamation mark.
+</li><li><code>[Episode]!</code> represents a list of <code>Episode</code> records. Since it is also required, you can always expect a list (with zero or more items) when you query the <code>appearsIn</code> field.
+</li></ul><p>Now you know what a Contraband record type looks like, and how to read the basics of the Contraband schema language.
+</p><h3 id="since+annotation">since annotation<a href="#since+annotation" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>To enable schema evolution,
+fields in a Contraband record can declare the version in which it was added:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int @since(&quot;0.2.0&quot;)
+}
+</code></pre><p>This means that <code>value</code> field has been around since the beginning (<code>&quot;0.0.0&quot;</code>) but optional <code>x</code> field was added since version <code>&quot;0.2.0&quot;</code>.
+Contraband will generate multiple constructors to maintain the binary compatibility.
+</p><p>Since <code>Int</code> is optional, <code>None</code> is used as the default value of <code>x</code>.
+To supply some other default value, you can write it as follows:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int = 0 @since(&quot;0.2.0&quot;)
+  p: Person = { name: &quot;Foo&quot; } @since(&quot;0.2.0&quot;)
+  z: Person = raw&quot;Person(\&quot;Foo\&quot;)&quot;
+}
+</code></pre><p>Note that <code>0</code> will automatically wrapped with options.
+</p><h3 id="Scalar+types">Scalar types<a href="#Scalar+types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband comes with a set of default scalar types out of the box:
+</p><ul><li><code>String</code>
+</li><li><code>Boolean</code>
+</li><li><code>Byte</code>
+</li><li><code>Char</code>
+</li><li><code>Int</code>
+</li><li><code>Long</code>
+</li><li><code>Short</code>
+</li><li><code>Double</code>
+</li></ul><p>You can also use Java and Scala class names such as ‘java.io.File’.
+</p><p>This case, you would have to also supply how the type should be serialized and deserialized.
+</p><h3 id="Enumeration+types">Enumeration types<a href="#Enumeration+types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Also called Enums, enumeration types are a special kind of scalar that is restricted to a particular set of allowed values. This allows you to:
+</p><ol><li>Validate that any arguments of this type are one of the allowed values.
+</li><li>Communicate through the type system that a field will always be one of a finite set of values.
+</li></ol><p>Here’s what an enum definition might look like in the Contraband schema language:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Star Wars trilogy.
+enum Episode {
+  NewHope
+  Empire
+  Jedi
+}
+</code></pre><p>This means that wherever we use the type <code>Episode</code> in our schema, we expect it to be exactly one of <code>NewHope</code>, <code>Empire</code>, or <code>Jedi</code>.
+</p><h3 id="Required+type">Required type<a href="#Required+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema,
+you can apply additional type modifiers that affect validation of those values. Let’s look at an example:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>Here, we’re using a <code>String</code> type and marking it as Required by adding an exclamation mark, <code>!</code> after the type name.
+</p><h3 id="List+type">List type<a href="#List+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Lists work in a similar way: We can use a type modifier to mark a
+type as a list, which indicates that this field will
+return a list of that type. In the schema language,
+this is denoted by wrapping the type in square brackets, <code>[</code> and <code>]</code>.
+</p><h3 id="Lazy+type">Lazy type<a href="#Lazy+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Lazy types defer the initialization of the field until it is first used.
+In the schema language,
+this is denoted by the keyword <code>lazy</code>.
+</p><h3 id="Interfaces">Interfaces<a href="#Interfaces" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Like many type systems, Contraband supports interfaces. An Interface is an abstract type that includes a certain set of fields that a type must include to <em>implement</em> the interface.
+</p><p>For example, you could have an interface <code>Character</code> that represents any character in the Star Wars trilogy:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+interface Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>This means that any type that <em>implements</em> <code>Character</code> needs to have these exact fields.
+</p><p>For example, here are some types that might implement <code>Character</code>:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Human implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  starships: [com.example.Starship]
+  totalCredits: Int
+}
+
+type Droid implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  primaryFunction: String
+}
+</code></pre><p>You can see that both of these types have all of the fields from the <code>Character</code> interface, but also bring in extra fields, <code>totalCredits</code>, <code>starships</code> and <code>primaryFunction</code>, that are specific to that particular type of character.
+</p><h3 id="Messages">Messages<a href="#Messages" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>In addition to fields, an interface can also declare messages.
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Starship represents the starships in Star Wars.
+interface Starship {
+  name: String!
+  length(unit: com.example.LengthUnit): Double
+}
+</code></pre><p>This means that any type that <em>implements</em> <code>Starship</code> needs to have both exact fields and messages.
+</p><h3 id="Extra+code">Extra code<a href="#Extra+code" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>As an escape hatch to inject Scala or Java code into the generated code
+Contraband provides special comment notations.
+</p><pre><code class="">## Example of an interface
+interface IntfExample {
+  field: Int
+
+  #x // Some extra code
+
+  #xinterface Interface1
+  #xinterface Interface2
+
+  #xtostring return &quot;custom&quot;;
+
+  #xcompanion // Some extra companion code
+
+  #xcompanioninterface CompanionInterface1
+  #xcompanioninterface CompanionInterface2
+}
+</code></pre><ul><li><code>#x</code> injects the code into the main body of the generated class.
+</li><li><code>#xinterface</code> adds additional parent classes.
+</li><li><code>#xtostring</code> is used to provide a custom <code>toString</code> method.
+</li><li><code>#xcompanion</code> injects the code in the companion object of the generated class.
+</li><li><code>#xcompanioninterface</code> add additional parent classes to the companion object.
+</li></ul><h2 id="Code+generation">Code generation<a href="#Code+generation" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This page describes how the Contraband type system is encoded in Java and Scala.
+</p><h3 id="Record+types">Record types<a href="#Record+types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types are mapped to Java or Scala classes, corresponding to the standard case classes in Scala.
+</p><p>While the standard case class is convenient to start, it is not possible to add new fields without breaking binary compatibility.
+The Contraband records (or pseudo case classes) allow you to add new fields without breaking binary compatibility while offering (almost) the same functionalities as plain case classes.
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Person {
+  name: String!
+  age: Int
+}
+</code></pre><p>This schema will produce the following Scala class:
+</p><pre><code class="prettyprint lang-scala">/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
+package com.example
+final class Person private (
+  val name: String,
+  val age: Option[Int]) extends Serializable {
+  override def equals(o: Any): Boolean = o match {
+    case x: Person =&gt; (this.name == x.name) &amp;&amp; (this.age == x.age)
+    case _ =&gt; false
+  }
+  override def hashCode: Int = {
+    37 * (37 * (17 + name.##) + age.##)
+  }
+  override def toString: String = {
+    &quot;Person(&quot; + name + &quot;, &quot; + age + &quot;)&quot;
+  }
+  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+    new Person(name, age)
+  }
+  def withName(name: String): Person = {
+    copy(name = name)
+  }
+  def withAge(age: Option[Int]): Person = {
+    copy(age = age)
+  }
+  def withAge(age: Int): Person = {
+    copy(age = Option(age))
+  }
+}
+object Person {
+  def apply(name: String, age: Option[Int]): Person = new Person(name, age)
+  def apply(name: String, age: Int): Person = new Person(name, Option(age))
+}
+</code></pre><p>Unlike the standard case class the Contraband record does not implement <code>unapply</code> or public <code>copy</code> method,
+which cannot evolve in a binary compatible way.
+</p><p>Instead of <code>copy</code> it generates <code>withX(...)</code> methods for each field.
+</p><pre><code class="prettyprint lang-scala">&gt; val x = Person(&quot;Alice&quot;, 20)
+&gt; x.withAge(21)
+</code></pre><p>Here’s the Java code it generates (after changing the target annotation to <code>Java</code>):
+</p><pre><code class="prettyprint lang-java">/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
+package com.example;
+public final class Person implements java.io.Serializable {
+
+    private String name;
+    private com.example.Maybe&lt;Integer&gt; age;
+    public Person(String _name, com.example.Maybe&lt;Integer&gt; _age) {
+        super();
+        name = _name;
+        age = _age;
+    }
+    public Person(String _name, int _age) {
+        super();
+        name = _name;
+        age = com.example.Maybe.&lt;Integer&gt;just(_age);
+    }
+    public String name() {
+        return this.name;
+    }
+    public com.example.Maybe&lt;Integer&gt; age() {
+        return this.age;
+    }
+    public Person withName(String name) {
+        return new Person(name, age);
+    }
+    public Person withAge(com.example.Maybe&lt;Integer&gt; age) {
+        return new Person(name, age);
+    }
+    public Person withAge(int age) {
+        return new Person(name, com.example.Maybe.&lt;Integer&gt;just(age));
+    }
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (!(obj instanceof Person)) {
+            return false;
+        } else {
+            Person o = (Person)obj;
+            return name().equals(o.name()) &amp;&amp; age().equals(o.age());
+        }
+    }
+    public int hashCode() {
+        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+    }
+    public String toString() {
+        return &quot;Person(&quot;  + &quot;name: &quot; + name() + &quot;, &quot; + &quot;age: &quot; + age() + &quot;)&quot;;
+    }
+}
+</code></pre><h2 id="JSON+codec+generation">JSON codec generation<a href="#JSON+codec+generation" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>Adding <code>JsonCodecPlugin</code> to the subproject will generate sjson-new JSON codes for the Contraband types.
+</p><pre><code class="prettyprint lang-scala">lazy val root = (project in file(&quot;.&quot;)).
+  enablePlugins(ContrabandPlugin, JsonCodecPlugin).
+  settings(
+    scalaVersion := &quot;2.11.8&quot;,
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
+</code></pre><p>sjson-new is a codec toolkit that lets you define a code that supports Sray JSON’s AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+</p><p>The package name for the codecs can be specified using <code>@codecPackage</code> directive.
+</p><pre><code class="">package com.example
+@target(Scala)
+@codecPackage(&quot;com.example.codec&quot;)
+@codecTypeField(&quot;type&quot;)
+@fullCodec(&quot;CustomJsonProtocol&quot;)
+
+type Person {
+  name: String!
+  age: Int
+}
+</code></pre><p>JsonFormat traits will be generated under <code>com.example.codec</code> package, along with a full codec named <code>CustomJsonProtocol</code> that mixes in all the traits.
+</p><p>Here’s how the generated JSON codec can be used:
+</p><pre><code class="prettyprint lang-scala">scala&gt; import sjsonnew.support.scalajson.unsafe.{ Converter, CompactPrinter, Parser }
+import sjsonnew.support.scalajson.unsafe.{Converter, CompactPrinter, Parser}
+
+scala&gt; import com.example.codec.CustomJsonProtocol._
+import com.example.codec.CustomJsonProtocol._
+
+scala&gt; import com.example.Person
+import com.example.Person
+
+scala&gt; val p = Person(&quot;Bob&quot;, 20)
+p: com.example.Person = Person(Bob, 20)
+
+scala&gt; val j = Converter.toJsonUnsafe(p)
+j: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@6731ad72)
+
+scala&gt; val s = CompactPrinter(j)
+s: String = {&quot;name&quot;:&quot;Bob&quot;,&quot;age&quot;:20}
+
+scala&gt; val x = Parser.parseUnsafe(s)
+x: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@7331f7f8)
+
+scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
+q: com.example.Person = Person(Bob, 20)
+
+scala&gt; assert(p == q)
+</code></pre>
+          </div>
+        </div>
+        <div class="header">
+          <div class="container">
+        <div class="span-16 prepend-1 append-1">
+          <div class="span-16 top nav">
+            <div class="span-16 title">
+              <span>Contraband</span> — Combined Pages
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        
+        
+      </body>
+    </html>

@@ -1,0 +1,13 @@
+pre {
+  font-size: 75%;
+}
+
+body {
+  font-family: "Roboto", "Helvetica Neue", "Helvetica", Arial, sans-serif;
+}
+
+@media screen and (min-device-width: 800px), projection {
+  p {
+    width: 45em;
+  }
+}

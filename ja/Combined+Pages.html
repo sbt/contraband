@@ -1,0 +1,386 @@
+<!DOCTYPE html SYSTEM "about:legacy-compat">
+<html>
+      <head>
+        <meta charset="utf-8"/>
+        <meta content="width=device-width, initial-scale=1" name="viewport"/>
+        <title>Contraband — Combined Pages</title>
+        
+        <link rel="stylesheet" href="../css/blueprint/screen.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/blueprint/print.css" type="text/css" media="print"/> 
+        <!--[if lt IE 8]>
+          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
+        <![endif]-->
+        <link rel="stylesheet" href="../css/pamflet.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamflet-print.css" type="text/css" media="print"/>
+        <link rel="stylesheet" href="../css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-redmond.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-github.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
+        <link rel="stylesheet" href="../css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
+        <script type="text/javascript" src="../js/jquery-1.6.2.min.js"></script>
+        <script type="text/javascript" src="../js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="../js/pamflet.js"></script>
+        <script type="text/javascript">
+          Pamflet.page.language = 'ja';
+        </script>
+        <script type="text/javascript" src="../js/prettify/prettify.js"></script><script type="text/javascript" src="../js/prettify/lang-scala.js"></script><link type="text/css" rel="stylesheet" href="../css/prettify.css"/><script type="text/javascript"><!--
+        window.onload=function() { prettyPrint(); };
+      --></script>
+        <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, projection"/>
+        
+        
+      </head>
+      <body class="color_scheme-github">
+        <a class="page prev nav" href="Contents+in+Depth.html">
+            <span class="space">&nbsp;</span>
+            <span class="flip arrow">❧</span>
+          </a>
+        <div class="container contentswrapper">
+          <div class="span-16 prepend-1 append-1 contents">
+            <div class="tocwrapper show">
+      <a class="tochead nav" style="display: none" href="#toc">❦</a>
+      <a name="toc"></a>
+      <h4 class="toctitle">Contents</h4>
+      <div class="tocbody">
+      <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型</a></div></li><li><div><a href="#%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90">コード生成</a></div></li><li><div><a href="#JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90">JSON コーデックの生成</a></div></li> </ol></div></div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband (コントラバンド) は、データ型や API の記述言語で、現在 Scala と Java を対象としている。
+</p><p>API の型やフィールドを記述すると、Contraband は:
+</p><ul><li>Java クラス、もしくは Scala での疑似 case class を生成する。
+</li><li>データ型のための JSON バインディングを生成する。
+</li></ul><p>Contraband によって API を徐々に進化させることも可能だ。
+</p><h3 id="%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97">セットアップ<a href="#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>ビルドに Contraband プラグインを追加するには、以下を <code>project/contraband.sbt</code> に書く:
+</p><pre><code class="">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
+</code></pre><p>次に、Contraband スキーマを <code>src/main/contraband</code> か <code>src/test/contraband</code> 以下に置き、
+ビルドを以下のように設定する:
+</p><pre><code class="">lazy val library = (project in file(&quot;library&quot;)).
+  enablePlugins(ContrabandPlugin).
+  settings(
+    name := &quot;foo library&quot;,
+  )
+</code></pre><h3 id="%E6%B3%A8%E6%84%8F">注意<a href="#%E6%B3%A8%E6%84%8F" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband は Lightbend サブスクリプションにおけるサポートの範囲内ではない。
+</p><h2 id="%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型<a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>このページでは GraphQL の型システムに基づいた Contraband の型システムを説明する。
+</p><p>Contraband は、既存の JSON ベースの API をアクセスするのに使ったり、サービスを実装するのに使うことができる。
+</p><h3 id="Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E">Contraband スキーマ言語<a href="#Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband のスキーマを記述するのに特定のプログラミング言語の構文に依存したくないため、
+GraphQL のスキーマ言語を拡張することにした。
+</p><p>Contraband スキーマはファイル拡張子 <code>*.contra</code> を使う。
+</p><h3 id="%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B%E3%81%A8%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89">レコード型とフィールド<a href="#%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B%E3%81%A8%E3%83%95%E3%82%A3%E3%83%BC%E3%83%AB%E3%83%89" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband スキーマの最も基本的なものはレコード型で、
+サービスから取得するオブジェクトとそのフィールドを表す。
+Contraband スキーマ言語では以下のように表現する:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+}
+</code></pre><p>ボキャブラリーを共有できるように、一つ一つみていこう:
+</p><ul><li><code>com.example</code> は、このスキーマのパッケージだ。このパッケージ名は生成されるコードにも使われる。
+</li><li><code>@target(Scala)</code> はこのパッケージに対するアノテーションだ。これは、コード生成がデフォルトで Scala を対象 (target) とすることを意味する。
+</li><li><code>##</code> は、このレコード型に関するドキュメントコメントのための記法だ。
+</li><li><code>Character</code> は Contraband のレコード型で、これは何らかのフィールドを持つ型であることを意味する。Java と Scala ではクラスとしてエンコードされる。
+</li><li><code>name</code> と <code>appearsIn</code> は <code>Character</code> 型のフィールドだ。これは、<code>Character</code> 型の JSON オブジェクトにこれらのフィールドのみを持つことを意味する。
+</li><li><code>String</code> は組み込みのスカラー型だ。
+</li><li><code>String!</code> はフィールドが required (省略不可) であることを意味する。つまり、サービスはこのフィールドを必ず返すということだ。スキーマ言語ではこれを感嘆符 (!) で表す。
+</li><li><code>[Episode]!</code> は <code>Episode</code> レコードのリストを表す。これも required であるため、<code>appearsIn</code> フィールドは必ずリスト (ゼロ個もしくはそれ以上のアイテム) を返すことが保証される。
+</li></ul><p>これで、Contraband のレコード型がどういうものかと、Contraband スキーマ言語の基本が分かったはずだ。
+</p><h3 id="since+%E3%82%A2%E3%83%8E%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3">since アノテーション<a href="#since+%E3%82%A2%E3%83%8E%E3%83%86%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>スキーマの進化を可能とするため、Contraband のレコード内のフィールドはどのバージョンでそれが追加されたかを宣言できる:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int @since(&quot;0.2.0&quot;)
+}
+</code></pre><p>これは、<code>value</code> フィールドは最初のバージョン (<code>&quot;0.0.0&quot;</code>) から存在したが、<code>x</code> フィールドはバージョン <code>&quot;0.2.0&quot;</code> にて追加されたことを示す。
+Contraband はバイナリ互換性を保つように、この情報を用いて複数のコンストラクタを生成する。
+</p><p><code>Int</code> は optional 型なので、デフォルト値として <code>None</code> が自動的に使われる。
+他にデフォルト値を設定したければ、以下のように書くことができる:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Greeting {
+  value: String!
+  x: Int = 0 @since(&quot;0.2.0&quot;)
+}
+</code></pre><p><code>0</code> が自動的に option でラッピングされることに注目してほしい。
+</p><h3 id="%E3%82%B9%E3%82%AB%E3%83%A9%E3%83%BC%E5%9E%8B">スカラー型<a href="#%E3%82%B9%E3%82%AB%E3%83%A9%E3%83%BC%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband はデフォルトでいくつかの組み込み型を提供する:
+</p><ul><li><code>String</code>
+</li><li><code>Boolean</code>
+</li><li><code>Byte</code>
+</li><li><code>Char</code>
+</li><li><code>Int</code>
+</li><li><code>Long</code>
+</li><li><code>Short</code>
+</li><li><code>Double</code>
+</li></ul><p><code>java.io.File</code> といった Java や Scala のクラス名も使用することができる。
+</p><p>ただし、その場合はその型がどうシリアライズ・デシリアライズされるかの方法も提供する必要がある。
+</p><h3 id="%E5%88%97%E6%8C%99%E5%9E%8B">列挙型<a href="#%E5%88%97%E6%8C%99%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>別名 enum とも呼ばれる列挙型はスカラー型の特殊なもので特定の値の集合に制限されている。これによって
+</p><ol><li>この型を持つ引数が許可された値のうちのどれかであることを検査できる。
+</li><li>型システムを用いて、フィールドは常に有限な値の集合のうちどれか一つの値を取るということを明示できる。
+</li></ol><p>Contraband スキーマ言語では enum の定義は以下のように書ける:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Star Wars trilogy.
+enum Episode {
+  NewHope
+  Empire
+  Jedi
+}
+</code></pre><p>これは、スキーマ内で <code>Episode</code> と書いたとき、<code>NewHope</code>, <code>Empire</code>, <code>Jedi</code>
+のどれかの値を取ることを意味する。
+</p><h3 id="required+%E5%9E%8B">required 型<a href="#required+%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>レコード型と enum は Contraband でユーザが定義することが型だ。
+しかし、型をスキーマ内で使うときには型修飾子を付けて値の検査などを変えることができる。
+具体例で説明しよう。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+type Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>ここでは、<code>String</code> 型名の後に感嘆符 (<code>!</code>) を付けて required (省略不可) な型だとマークしている。
+</p><h3 id="%E3%83%AA%E3%82%B9%E3%83%88%E5%9E%8B">リスト型<a href="#%E3%83%AA%E3%82%B9%E3%83%88%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>リストも同様だ。型修飾子を使って型をリストだとマークして、フィールドがその型のリストを返すことを示す。スキーマ言語では、型を角括弧 (<code>[</code> と <code>]</code>) で囲むことで表記する。
+</p><h3 id="lazy+%E5%9E%8B">lazy 型<a href="#lazy+%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>lazy 型は、フィールドの初期化を最初に使われるまで遅延する。
+スキーマ言語では、<code>lazy</code> というキーワードを使ってこれを表す。
+</p><h3 id="%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9">インターフェイス<a href="#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%95%E3%82%A7%E3%82%A4%E3%82%B9" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>多くの型システム同様に Contraband もインターフェイスという概念を持つ。
+インターフェイスとは、それを<strong>実装</strong> (implement) する型が持つべきフィールドの集合を指定する抽象型の一種だ。
+</p><p>例えば、Star Wars 三部作に出てくるキャラクターを表す <code>Character</code> というインターフェイスを以下のように定義できる。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Character represents the characters in Star Wars.
+interface Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+}
+</code></pre><p>これは、<code>Character</code> を<strong>実装</strong> (implement) する全ての型はそれらのフィールドを持つことを意味する。
+</p><p>例えば、<code>Character</code> を実装する型はこういうふうに書ける:
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Human implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  starships: [com.example.Starship]
+  totalCredits: Int
+}
+
+type Droid implements Character {
+  name: String!
+  appearsIn: [com.example.Episode]!
+  friends: lazy [com.example.Character]
+  primaryFunction: String
+}
+</code></pre><p>両方の型とも <code>Character</code> インターフェイス内の全てのフィールドを持っていることが分かる。
+さらに、<code>totalCredits</code>、 <code>starships</code>、<code>primaryFunction</code> といったそれぞれのキャラクター型に特定なフィールドも追加している。
+</p><h3 id="%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8">メッセージ<a href="#%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>フィールドの他に、インターフェイスはメッセージを宣言することもできる。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+## Starship represents the starships in Star Wars.
+interface Starship {
+  name: String!
+  length(unit: com.example.LengthUnit): Double
+}
+</code></pre><p>これは <code>Starship</code> を実装する型は上記のフィールドとメッセージの両方を持っている必要があることを意味する。
+</p><h3 id="extra+%E3%82%B3%E3%83%BC%E3%83%89">extra コード<a href="#extra+%E3%82%B3%E3%83%BC%E3%83%89" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>生成コードに直接 Scala や Java のコードを埋め込むための非常手段として Contraband は特殊なコメント記法を提供する。
+</p><pre><code class="">## Example of an interface
+interface IntfExample {
+  field: Int
+
+  #x // Some extra code
+
+  #xinterface Interface1
+  #xinterface Interface2
+
+  #xtostring return &quot;custom&quot;;
+
+  #xcompanion // Some extra companion code
+
+  #xcompanioninterface CompanionInterface1
+  #xcompanioninterface CompanionInterface2
+}
+</code></pre><ul><li><code>#x</code> は生成されるクラスの本文内にコードを挿入する。
+</li><li><code>#xinterface</code> は親クラスを追加する。
+</li><li><code>#xtostring</code> は <code>toString</code> メソッドのカスタム化に使用する。
+</li><li><code>#xcompanion</code> は、生成されるクラスのコンパニオンオブジェクト内にコードを挿入する。
+</li><li><code>#xcompanioninterface</code> はコンパニオンオブジェクトに親クラスを追加する。
+</li></ul><h2 id="%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90">コード生成<a href="#%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>このページでは、Contraband の型システムが Java と Scala でどうエンコーディングされるのかを解説する。
+</p><h3 id="%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B">レコード型<a href="#%E3%83%AC%E3%82%B3%E3%83%BC%E3%83%89%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>レコード型は Java や Scala ではクラスとして変換され、Scala に標準の case class に相当する。
+</p><p>標準の case class は最初に使い始めるのは便利だが、バイナリ互換性を保ったままフィールドを追加することができない。
+Contraband のレコード (疑似 case class と言うこともできる) は、case class とほぼ同様の機能を提供しつつバイナリ互換性を保ったままフィールドの追加を可能としている。
+</p><pre><code class="">package com.example
+@target(Scala)
+
+type Person {
+  name: String!
+  age: Int
+}
+</code></pre><p>このスキーマは以下の Scala コードを生成する:
+</p><pre><code class="prettyprint lang-scala">/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
+package com.example
+final class Person private (
+  val name: String,
+  val age: Option[Int]) extends Serializable {
+  override def equals(o: Any): Boolean = o match {
+    case x: Person =&gt; (this.name == x.name) &amp;&amp; (this.age == x.age)
+    case _ =&gt; false
+  }
+  override def hashCode: Int = {
+    37 * (37 * (17 + name.##) + age.##)
+  }
+  override def toString: String = {
+    &quot;Person(&quot; + name + &quot;, &quot; + age + &quot;)&quot;
+  }
+  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+    new Person(name, age)
+  }
+  def withName(name: String): Person = {
+    copy(name = name)
+  }
+  def withAge(age: Option[Int]): Person = {
+    copy(age = age)
+  }
+  def withAge(age: Int): Person = {
+    copy(age = Option(age))
+  }
+}
+object Person {
+  def apply(name: String, age: Option[Int]): Person = new Person(name, age)
+  def apply(name: String, age: Int): Person = new Person(name, Option(age))
+}
+</code></pre><p>標準の case class と違って、Contraband のレコードは、
+互換性を保ったまま進化できるように <code>unapply</code> や public な <code>copy</code> メソッドは実装しない。
+</p><p><code>copy</code> の代わりにそれぞれのフィールドに対して <code>withX(...)</code> メソッドが生成される。
+</p><pre><code class="prettyprint lang-scala">&gt; val x = Person(&quot;Alice&quot;, 20)
+&gt; x.withAge(21)
+</code></pre><p>Java のコード生成は以下のようになっている (target アノテーションを Java に変更する):
+</p><pre><code class="prettyprint lang-java">/**
+ * This code is generated using sbt-datatype.
+ */
+
+// DO NOT EDIT MANUALLY
+package com.example;
+public final class Person implements java.io.Serializable {
+
+    private String name;
+    private com.example.Maybe&lt;Integer&gt; age;
+    public Person(String _name, com.example.Maybe&lt;Integer&gt; _age) {
+        super();
+        name = _name;
+        age = _age;
+    }
+    public Person(String _name, int _age) {
+        super();
+        name = _name;
+        age = com.example.Maybe.&lt;Integer&gt;just(_age);
+    }
+    public String name() {
+        return this.name;
+    }
+    public com.example.Maybe&lt;Integer&gt; age() {
+        return this.age;
+    }
+    public Person withName(String name) {
+        return new Person(name, age);
+    }
+    public Person withAge(com.example.Maybe&lt;Integer&gt; age) {
+        return new Person(name, age);
+    }
+    public Person withAge(int age) {
+        return new Person(name, com.example.Maybe.&lt;Integer&gt;just(age));
+    }
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (!(obj instanceof Person)) {
+            return false;
+        } else {
+            Person o = (Person)obj;
+            return name().equals(o.name()) &amp;&amp; age().equals(o.age());
+        }
+    }
+    public int hashCode() {
+        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+    }
+    public String toString() {
+        return &quot;Person(&quot;  + &quot;name: &quot; + name() + &quot;, &quot; + &quot;age: &quot; + age() + &quot;)&quot;;
+    }
+}
+</code></pre><h2 id="JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90">JSON コーデックの生成<a href="#JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p><code>JsonCodecPlugin</code> をサブプロジェクトに追加することで Contraband 型に対する sjson-new の JSON コーデックが生成される。
+</p><pre><code class="prettyprint lang-scala">lazy val root = (project in file(&quot;.&quot;)).
+  enablePlugins(ContrabandPlugin, JsonCodecPlugin).
+  settings(
+    scalaVersion := &quot;2.11.8&quot;,
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
+</code></pre><p>sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。
+</p><p>コーデックのパッケージ名は <code>@codecPackage</code> アノテーションによって指定される。
+</p><pre><code class="">package com.example
+@target(Scala)
+@codecPackage(&quot;com.example.codec&quot;)
+@codecTypeField(&quot;type&quot;)
+@fullCodec(&quot;CustomJsonProtocol&quot;)
+
+type Person {
+  name: String!
+  age: Int
+}
+</code></pre><p>JsonFormat を実装するトレイトはこの場合 <code>com.example.codec</code> パッケージ内に生成され、
+<code>CustomJsonProtocol</code> という名前で全てのトレイトをミックスインしたフルコーデックが生成される。
+</p><p>生成された JSON コーデックはこのように使うことができる:
+</p><pre><code class="prettyprint lang-scala">scala&gt; import sjsonnew.support.scalajson.unsafe.{ Converter, CompactPrinter, Parser }
+import sjsonnew.support.scalajson.unsafe.{Converter, CompactPrinter, Parser}
+
+scala&gt; import com.example.codec.CustomJsonProtocol._
+import com.example.codec.CustomJsonProtocol._
+
+scala&gt; import com.example.Person
+import com.example.Person
+
+scala&gt; val p = Person(&quot;Bob&quot;, 20)
+p: com.example.Person = Person(Bob, 20)
+
+scala&gt; val j = Converter.toJsonUnsafe(p)
+j: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@6731ad72)
+
+scala&gt; val s = CompactPrinter(j)
+s: String = {&quot;name&quot;:&quot;Bob&quot;,&quot;age&quot;:20}
+
+scala&gt; val x = Parser.parseUnsafe(s)
+x: scala.json.ast.unsafe.JValue = JObject([Lscala.json.ast.unsafe.JField;@7331f7f8)
+
+scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
+q: com.example.Person = Person(Bob, 20)
+
+scala&gt; assert(p == q)
+</code></pre>
+          </div>
+        </div>
+        <div class="header">
+          <div class="container">
+        <div class="span-16 prepend-1 append-1">
+          <div class="span-16 top nav">
+            <div class="span-16 title">
+              <span>Contraband</span> — Combined Pages
+            </div>
+          </div>
+        </div>
+      </div>
+        </div>
+        <div class="footer">
+          
+        </div>
+        
+        
+      </body>
+    </html>
