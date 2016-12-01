@@ -10,7 +10,7 @@ lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
     inThisBuild(List(
-      version := "0.3.0-SNAPSHOT",
+      version := "0.3.0-M1",
       organization := "org.scala-sbt",
       crossScalaVersions := Seq("2.12.0", "2.11.8", "2.10.6"),
       scalaVersion := "2.10.6",
@@ -30,8 +30,9 @@ lazy val root = (project in file(".")).
     name := "contraband root"
   )
 
-lazy val library = project.
+lazy val library = (project in file("library")).
   enablePlugins(KeywordPlugin, SonatypePublish).
+  disablePlugins(BintrayPlugin).
   settings(
     name := "contraband",
     libraryDependencies ++= Seq(parboiled) ++ jsonDependencies ++ Seq(scalaTest % Test, diffutils % Test)
