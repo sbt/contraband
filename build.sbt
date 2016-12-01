@@ -6,7 +6,7 @@ lazy val pluginSettings = Seq(
 )
 
 lazy val root = (project in file(".")).
-  enablePlugins(NoPublish).
+  enablePlugins(NoPublish, TravisSitePlugin).
   aggregate(library, plugin).
   settings(
     inThisBuild(List(
@@ -27,7 +27,9 @@ lazy val root = (project in file(".")).
       ),
       description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
     )),
-    name := "contraband root"
+    name := "contraband root",
+    siteGithubRepo := "sbt/contraband",
+    siteEmail := { "eed3si9n" + "@" + "gmail.com" }
   )
 
 lazy val library = (project in file("library")).
