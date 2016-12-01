@@ -24,7 +24,9 @@
         <script type="text/javascript">
           Pamflet.page.language = 'ja';
         </script>
-        
+        <script type="text/javascript" src="../js/prettify/prettify.js"></script><script type="text/javascript" src="../js/prettify/lang-scala.js"></script><link type="text/css" rel="stylesheet" href="../css/prettify.css"/><script type="text/javascript"><!--
+        window.onload=function() { prettyPrint(); };
+      --></script>
         <link rel="stylesheet" href="../css/custom.css" type="text/css" media="screen, projection"/>
         
         
@@ -42,13 +44,13 @@
 </li><li>データ型のための JSON バインディングを生成する。
 </li></ul><p>Contraband によって API を徐々に進化させることも可能だ。
 </p><h3 id="%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97">セットアップ<a href="#%E3%82%BB%E3%83%83%E3%83%88%E3%82%A2%E3%83%83%E3%83%97" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>ビルドに Contraband プラグインを追加するには、以下を <code>project/contraband.sbt</code> に書く:
-</p><pre><code class="">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
+</p><pre><code class="prettyprint lang-scala">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
 </code></pre><p>次に、Contraband スキーマを <code>src/main/contraband</code> か <code>src/test/contraband</code> 以下に置き、
 ビルドを以下のように設定する:
-</p><pre><code class="">lazy val library = (project in file(&quot;library&quot;)).
+</p><pre><code class="prettyprint lang-scala">lazy val library = (project in file(&quot;library&quot;)).
   enablePlugins(ContrabandPlugin).
   settings(
-    name := &quot;foo library&quot;,
+    name := &quot;foo library&quot;
   )
 </code></pre><h3 id="%E6%B3%A8%E6%84%8F">注意<a href="#%E6%B3%A8%E6%84%8F" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband は Lightbend サブスクリプションにおけるサポートの範囲内ではない。
 </p><div class="bottom nav span-16">

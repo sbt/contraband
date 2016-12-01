@@ -15,18 +15,18 @@ Contraband によって API を徐々に進化させることも可能だ。
 
 ビルドに Contraband プラグインを追加するには、以下を `project/contraband.sbt` に書く:
 
-```
+```scala
 addSbtPlugin("org.scala-sbt" % "sbt-contraband" % "X.Y.Z")
 ```
 
 次に、Contraband スキーマを `src/main/contraband` か `src/test/contraband` 以下に置き、
 ビルドを以下のように設定する:
 
-```
+```scala
 lazy val library = (project in file("library")).
   enablePlugins(ContrabandPlugin).
   settings(
-    name := "foo library",
+    name := "foo library"
   )
 ```
 

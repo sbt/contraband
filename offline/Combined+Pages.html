@@ -51,13 +51,13 @@ and Contraband will:
 </li><li>generate JSON bindings for the datatypes.
 </li></ul><p>Contraband also enables you to evolve the API over time.
 </p><h3 id="Setup">Setup<a href="#Setup" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>To enable the Contraband plugin for your build, put the following line in <code>project/contraband.sbt</code>:
-</p><pre><code class="">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
+</p><pre><code class="prettyprint lang-scala">addSbtPlugin(&quot;org.scala-sbt&quot; % &quot;sbt-contraband&quot; % &quot;X.Y.Z&quot;)
 </code></pre><p>Your Contraband schema should be placed in <code>src/main/contraband</code> and <code>src/test/contraband</code>.
 Here’s how your build should be configured:
-</p><pre><code class="">lazy val library = (project in file(&quot;library&quot;)).
+</p><pre><code class="prettyprint lang-scala">lazy val library = (project in file(&quot;library&quot;)).
   enablePlugins(ContrabandPlugin).
   settings(
-    name := &quot;foo library&quot;,
+    name := &quot;foo library&quot;
   )
 </code></pre><h3 id="Note">Note<a href="#Note" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband is NOT supported under the Lightbend subscription.
 </p><h2 id="Schemas+and+Types">Schemas and Types<a href="#Schemas+and+Types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This page describes Contraband type system, which is based on GraphQL type system.
