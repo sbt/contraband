@@ -99,12 +99,15 @@ class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
     }
   }
   it should "parse nested interfaces" in {
-    val List(x1, x2) = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
+    val List(x1, x2, x3) = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     inside(x1) { case ast.InterfaceTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) =>
       name shouldEqual "nestedProtocolExample"
     }
     inside(x2) { case ast.InterfaceTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) =>
       name shouldEqual "nestedProtocol"
+    }
+    inside(x3) { case ObjectTypeDefinition(name, _, _, _, _, _, _, _) =>
+      name shouldEqual "ChildRecord"
     }
   }
 

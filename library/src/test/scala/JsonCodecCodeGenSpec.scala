@@ -136,8 +136,8 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |// DO NOT EDIT MANUALLY
         |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.NestedProtocolFormats =>
-        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = flatUnionFormat1[_root_.nestedProtocolExample, _root_.nestedProtocol]("type")
+        |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
+        |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = flatUnionFormat1[_root_.nestedProtocolExample, _root_.ChildRecord]("type")
         |}""".stripMargin.unindent)
     code(new File("generated", "nestedProtocolFormats.scala")).unindent should equalLines (
       """/**
@@ -147,15 +147,8 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |// DO NOT EDIT MANUALLY
         |package generated
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait NestedProtocolFormats {
-        |  implicit lazy val nestedProtocolFormat: JsonFormat[_root_.nestedProtocol] = new JsonFormat[_root_.nestedProtocol] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.nestedProtocol = {
-        |      deserializationError("No known implementation of nestedProtocol.")
-        |    }
-        |    override def write[J](obj: _root_.nestedProtocol, builder: Builder[J]): Unit = {
-        |      serializationError("No known implementation of nestedProtocol.")
-        |    }
-        |  }
+        |trait NestedProtocolFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
+        |  implicit lazy val nestedProtocolFormat: JsonFormat[_root_.nestedProtocol] = flatUnionFormat1[_root_.nestedProtocol, _root_.ChildRecord]("type")
         |}""".stripMargin.unindent)
   }
 

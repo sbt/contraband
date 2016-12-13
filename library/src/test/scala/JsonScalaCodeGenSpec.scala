@@ -137,6 +137,25 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |object nestedProtocol {
         |}
+        |
+        |final class ChildRecord private () extends nestedProtocol() with Serializable {
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: ChildRecord => true
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    17
+        |  }
+        |  override def toString: String = {
+        |    "ChildRecord()"
+        |  }
+        |  protected[this] def copy(): ChildRecord = {
+        |    new ChildRecord()
+        |  }
+        |}
+        |object ChildRecord {
+        |  def apply(): ChildRecord = new ChildRecord()
+        |}
         |""".stripMargin.unindent)
   }
 

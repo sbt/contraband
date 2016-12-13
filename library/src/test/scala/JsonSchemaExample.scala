@@ -106,7 +106,14 @@ object JsonSchemaExample {
     {
       "name": "nestedProtocol",
       "target": "Scala",
-      "type": "interface"
+      "type": "interface",
+      "types": [
+        {
+          "name": "ChildRecord",
+          "type": "record",
+          "target": "Scala"
+        }
+      ]
     }
   ]
 }"""
@@ -873,8 +880,8 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
 // DO NOT EDIT MANUALLY
 package generated
 import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats =>
-implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = flatUnionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtra, com.example.GreetingWithAttachments]("type")
+trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingWithAttachmentsFormats =>
+implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = flatUnionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtraImpl, com.example.GreetingWithAttachments]("type")
 }
 /**
  * This code is generated using sbt-datatype.
@@ -1047,7 +1054,7 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 
 // DO NOT EDIT MANUALLY
 package generated
-trait CustomProtocol extends generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingExtraFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingsFormats with java.util.DateFormats with generated.PriorityLevelFormats
+trait CustomProtocol extends generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingWithAttachmentsFormats with generated.GreetingsFormats with generated.GreetingExtraFormats with java.util.DateFormats with generated.PriorityLevelFormats
 object CustomProtocol extends CustomProtocol""".stripMargin
 
   val growableAddOneFieldExample = """{

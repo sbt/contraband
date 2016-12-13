@@ -6,6 +6,7 @@ import com.example._
 
 object Example extends App {
   import codec.CustomJsonProtocol._
+  import codec.FruitJsonProtocol._
   val g0: Greeting = SimpleGreeting("Hello")
   val g1: Greeting = SimpleGreeting("Hello", None)
   val g21: Greeting = GreetingWithAttachments("Hello", Vector.empty)
@@ -26,4 +27,9 @@ object Example extends App {
   assert(json3 == """{"$type":"GreetingWithOption","message":"Hello","opt":"foo"}""")
   println(Converter.fromJson[Greeting](Converter.toJson(g3).get).get)
   assert(Converter.fromJson[Greeting](Converter.toJson(g3).get).get == g3)
+
+  val f0: Fruit = Orange()
+  val json4 = CompactPrinter(Converter.toJson(f0).get)
+  println(json4)
+  assert(Converter.fromJson[Fruit](Converter.toJson(f0).get).get == f0)
 }
