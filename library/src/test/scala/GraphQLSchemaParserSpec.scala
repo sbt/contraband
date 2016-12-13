@@ -162,6 +162,24 @@ class GraphQLSchemaParserSpec extends FlatSpec with Matchers with Inside {
     }
   }
 
+  it should "parse an interface with a parent" in {
+    val Success(ast) = SchemaParser.parse(
+      """interface Fruit {}
+        |
+        |interface Citrus implements Fruit {
+        |}""".stripMargin)
+    // println(ast)
+    inside(ast) { case Document(_, fruit :: citrus :: Nil, _, _, _) =>
+      inside(fruit) { case InterfaceTypeDefinition(name, _, _, _, _, _, _, _) =>
+        name shouldEqual "Fruit"
+      }
+      inside(citrus) { case InterfaceTypeDefinition(name, _, NamedType(parentTypeName :: Nil, _) :: Nil, _, _, _, _, _) =>
+        name shouldEqual "Citrus"
+        parentTypeName shouldEqual "Fruit"
+      }
+    }
+  }
+
   it should "parse an enumueration" in {
     val Success(ast) = SchemaParser.parse(
       """enum Episode {

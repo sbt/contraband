@@ -1,0 +1,17 @@
+package com.example
+@codecPackage("com.example.codec")
+@codecTypeField("$type")
+@fullCodec("FruitJsonProtocol")
+@target(Scala)
+
+interface Fruit {
+}
+
+interface Citrus implements Fruit {
+}
+
+type Apple implements Fruit {
+}
+
+type Orange implements Citrus {
+}

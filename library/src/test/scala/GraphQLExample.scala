@@ -27,6 +27,7 @@ type TypeExample {
 
   val intfExample = """
 package com.example @target(Scala)
+@codecPackage("generated")
 
 ## Example of an interface
 interface InterfaceExample {
@@ -36,6 +37,25 @@ interface InterfaceExample {
 }
 
 type ChildType implements InterfaceExample {
+  name: String
+  field: Int
+}
+"""
+
+  val twoLevelIntfExample = """
+package com.example @target(Scala)
+@codecPackage("generated")
+
+## Example of an interface
+interface InterfaceExample {
+  field: Int
+}
+
+interface MiddleInterface implements InterfaceExample {
+  field: Int
+}
+
+type ChildType implements MiddleInterface {
   name: String
   field: Int
 }

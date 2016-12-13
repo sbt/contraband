@@ -134,7 +134,7 @@ class CodecCodeGen(codecParents: List[String],
   override def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
     val name = i.name
     val fqn = fullyQualifiedName(i)
-    val children: List[TypeDefinition] = lookupChildren(s, i)
+    val children: List[TypeDefinition] = lookupChildLeaves(s, i)
     val code =
       children match {
         case Nil =>
@@ -220,7 +220,7 @@ class CodecCodeGen(codecParents: List[String],
     def getAllDefinitions(d: TypeDefinition): List[TypeDefinition] =
       d match {
         case i: InterfaceTypeDefinition =>
-          i :: (lookupChildren(s, i) flatMap {getAllDefinitions})
+          i :: (lookupChildLeaves(s, i) flatMap {getAllDefinitions})
         case _ => d :: Nil
       }
     val allDefinitions = ds flatMap getAllDefinitions
@@ -228,7 +228,7 @@ class CodecCodeGen(codecParents: List[String],
       val requiredFormats = getRequiredFormats(s, d)
       fullFormatsName(s, d) -> (d match {
         case i: InterfaceTypeDefinition =>
-          lookupChildren(s, i).map( c => fullFormatsName(s, c)) ::: requiredFormats
+          lookupChildLeaves(s, i).map( c => fullFormatsName(s, c)) ::: requiredFormats
         case _  => requiredFormats
       })
     }: _*)

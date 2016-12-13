@@ -194,8 +194,9 @@ trait TypeSystemDefinitions { this: Parser with Tokens with Ignored with Directi
 
   def InterfaceTypeDefinition = rule {
     // Changed FieldDefinition.+ to FieldDefinition.*
-    Comments ~ trackPos ~ interface ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment('{') ~ FieldDefinition.* ~ ExtraComments ~ wsNoComment('}') ~> (
-      (comment, pos, name, dirs, fields, tc) => ast.InterfaceTypeDefinition(name, None, Nil, fields.toList, dirs, comment, tc, Some(pos)))
+    Comments ~ trackPos ~ interface ~ Name ~ (ImplementsInterfaces.? ~> (_ getOrElse Nil)) ~
+      (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment('{') ~ FieldDefinition.* ~ ExtraComments ~ wsNoComment('}') ~> (
+      (comment, pos, name, interfaces, dirs, fields, tc) => ast.InterfaceTypeDefinition(name, None, interfaces, fields.toList, dirs, comment, tc, Some(pos)))
   }
 
   // def UnionTypeDefinition = rule {

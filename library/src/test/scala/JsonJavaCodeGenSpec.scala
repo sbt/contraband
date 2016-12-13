@@ -177,6 +177,29 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public String toString() {
             |        return "nestedProtocol("  + ")";
             |    }
+            |}""".stripMargin.unindent,
+
+        new File("ChildRecord.java") ->
+          """public final class ChildRecord extends nestedProtocol {
+            |    public ChildRecord() {
+            |        super();
+            |    }
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof ChildRecord)) {
+            |            return false;
+            |        } else {
+            |            ChildRecord o = (ChildRecord)obj;
+            |            return true;
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 17;
+            |    }
+            |    public String toString() {
+            |        return "ChildRecord("  + ")";
+            |    }
             |}""".stripMargin.unindent
       ))
   }

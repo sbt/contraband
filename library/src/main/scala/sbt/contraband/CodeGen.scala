@@ -78,6 +78,28 @@ abstract class CodeGenerator {
       }
     }
 
+  protected def lookupChildLeaves(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] =
+    {
+      val pkg =
+        s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
+          nameSegments.mkString(".")
+        }
+      val tpe = toNamedType(interface, pkg)
+      def containsTpe(intfs: List[NamedType]): Boolean =
+        intfs exists { ref =>
+          ref.names.size match {
+            case 0 => sys.error(s"Invalid reference $intfs")
+            case 1 => ref.names.head == tpe.names.last
+            case _ => ref.names == tpe.names
+          }
+        }
+      s.definitions flatMap {
+        case r: ObjectTypeDefinition if containsTpe(r.interfaces)    => List(r)
+        case i: InterfaceTypeDefinition if containsTpe(i.interfaces) => lookupChildLeaves(s, i)
+        case _ => Nil
+      }
+    }
+
   protected def lookupChildren(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] =
     {
       val pkg =
