@@ -262,10 +262,10 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent should equalLines (
       """final class Foo private (
-        |  val x: Int,
-        |  val y: Int) extends Serializable {
-        |  private def this() = this(0, 0)
-        |  private def this(x: Int) = this(x, 0)
+        |  val x: Option[Int],
+        |  val y: Vector[Int]) extends Serializable {
+        |  private def this() = this(Option(0), Vector(0))
+        |  private def this(x: Option[Int]) = this(x, Vector(0))
         |  override def equals(o: Any): Boolean = o match {
         |    case x: Foo => (this.x == x.x) && (this.y == x.y)
         |    case _ => false
@@ -276,20 +276,25 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "Foo(" + x + ", " + y + ")"
         |  }
-        |  protected[this] def copy(x: Int = x, y: Int = y): Foo = {
+        |  protected[this] def copy(x: Option[Int] = x, y: Vector[Int] = y): Foo = {
         |    new Foo(x, y)
         |  }
-        |  def withX(x: Int): Foo = {
+        |  def withX(x: Option[Int]): Foo = {
         |    copy(x = x)
         |  }
-        |  def withY(y: Int): Foo = {
+        |  def withX(x: Int): Foo = {
+        |    copy(x = Option(x))
+        |  }
+        |  def withY(y: Vector[Int]): Foo = {
         |    copy(y = y)
         |  }
         |}
         |object Foo {
-        |  def apply(): Foo = new Foo(0, 0)
-        |  def apply(x: Int): Foo = new Foo(x, 0)
-        |  def apply(x: Int, y: Int): Foo = new Foo(x, y)
+        |  def apply(): Foo = new Foo(Option(0), Vector(0))
+        |  def apply(x: Option[Int]): Foo = new Foo(x, Vector(0))
+        |  def apply(x: Int): Foo = new Foo(Option(x), Vector(0))
+        |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
+        |  def apply(x: Int, y: Vector[Int]): Foo = new Foo(Option(x), y)
         |}
         |""".stripMargin.unindent)
   }

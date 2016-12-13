@@ -16,18 +16,6 @@ object JsonSchemaExample {
   ]
 }"""
 
-  val growableSchema = """{
-  "namespace": "com.example",
-  "protocol": "HelloWorld",
-  "doc": "Protocol Greetings",
-
-  "types": [
-    {"name": "Greeting", "type": "record", "fields": [
-      {"name": "message", "type": "string", "since": "0.1.0"},
-      {"name": "name", "type": "string", "since": "0.2.0", "default": "foo" }]}
-  ]
-}"""
-
   val emptySchemaExample = """{}"""
 
   val emptyInterfaceExample = """{
@@ -1086,15 +1074,35 @@ object CustomProtocol extends CustomProtocol""".stripMargin
   "fields": [
     {
       "name": "x",
-      "type": "int",
+      "type": "int?",
       "since": "0.1.0",
-      "default": "0"
+      "default": "Option(0)"
     },
     {
       "name": "y",
-      "type": "int",
+      "type": "int*",
       "since": "0.2.0",
-      "default": "0"
+      "default": "Vector(0)"
+    }
+  ]
+}""".stripMargin
+
+  val growableZeroToOneToTwoFieldsJavaExample = """{
+  "name": "Foo",
+  "target": "Java",
+  "type": "record",
+  "fields": [
+    {
+      "name": "x",
+      "type": "int?",
+      "since": "0.1.0",
+      "default": "com.example.MyOption.<String>just(0)"
+    },
+    {
+      "name": "y",
+      "type": "int*",
+      "since": "0.2.0",
+      "default": "new Array { 0 }"
     }
   ]
 }""".stripMargin

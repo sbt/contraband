@@ -263,6 +263,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         if (tpe.isListType) "Vector()"
         else if (!tpe.isNotNullType) "None"
         else sys.error(s"Expected $tpe but found $v")
+      case raw: RawValue =>
+        raw.renderPretty
       case _ =>
         val str =
           v match {
@@ -282,6 +284,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         if (tpe.isListType) "Array()"
         else if (!tpe.isNotNullType) mkOptional("null", tpe, "Java")
         else sys.error(s"Expected $tpe but found $v")
+      case raw: RawValue =>
+        raw.renderPretty
       case _ =>
         val str =
           v match {
