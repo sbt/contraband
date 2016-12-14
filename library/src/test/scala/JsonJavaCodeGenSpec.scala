@@ -335,40 +335,53 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
   }
 
   override def recordGrowZeroToOneToTwoFields = {
-    val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsExample)
+    val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsJavaExample)
     val code = mkJavaCodeGen generate record
 
     code mapValues (_.unindent) should equalMapLines (
       ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
-            |    private int x;
-            |    private int y;
+            |    private com.example.MyOption<Integer> x;
+            |    private int[] y;
             |    public Foo() {
             |        super();
-            |        x = 0;
-            |        y = 0;
+            |        x = com.example.MyOption.<String>just(0);
+            |        y = new Array { 0 };
+            |    }
+            |    public Foo(com.example.MyOption<Integer> _x) {
+            |        super();
+            |        x = _x;
+            |        y = new Array { 0 };
             |    }
             |    public Foo(int _x) {
             |        super();
-            |        x = _x;
-            |        y = 0;
+            |        x = com.example.MyOption.<Integer>just(_x);
+            |        y = new Array { 0 };
             |    }
-            |    public Foo(int _x, int _y) {
+            |    public Foo(com.example.MyOption<Integer> _x, int[] _y) {
+            |      super();
+            |      x = _x;
+            |      y = _y;
+            |    }
+            |    public Foo(int _x, int[] _y) {
             |        super();
-            |        x = _x;
+            |        x = com.example.MyOption.<Integer>just(_x);
             |        y = _y;
             |    }
-            |    public int x() {
+            |    public com.example.MyOption<Integer> x() {
             |        return this.x;
             |    }
-            |    public int y() {
+            |    public int[] y() {
             |        return this.y;
             |    }
-            |    public Foo withX(int x) {
+            |    public Foo withX(com.example.MyOption<Integer> x) {
             |        return new Foo(x, y);
             |    }
-            |    public Foo withY(int y) {
+            |    public Foo withX(int x) {
+            |        return new Foo(com.example.MyOption.<Integer>just(x), y);
+            |    }
+            |    public Foo withY(int[] y) {
             |        return new Foo(x, y);
             |    }
             |    public boolean equals(Object obj) {
@@ -378,11 +391,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            Foo o = (Foo)obj;
-            |            return (x() == o.x()) && (y() == o.y());
+            |            return x().equals(o.x()) && java.util.Arrays.equals(y(), o.y());
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + (new Integer(x())).hashCode()) + (new Integer(y())).hashCode());
+            |        return 37 * (37 * (17 + x().hashCode()) + y().hashCode());
             |    }
             |    public String toString() {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";

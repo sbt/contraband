@@ -119,12 +119,12 @@ package com.example @target(Scala) @codecPackage("generated")
 
 interface Greeting @target(Java) {
   message: String!
-  s: String = raw"\"1\"" @since("0.1.0")
+  s: String = raw"com.example.Maybe.<String>just(\"1\")" @since("0.1.0")
 }
 
 type SimpleGreeting implements Greeting @target(Scala) {
   message: String!
-  s: String = raw"\"1\"" @since("0.1.0")
+  s: String = raw"com.example.Maybe.just[String](\"1\")" @since("0.1.0")
 }
 """.stripMargin
 }

@@ -266,8 +266,8 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |      jsOpt match {
         |        case Some(js) =>
         |          unbuilder.beginObject(js)
-        |          val x = unbuilder.readField[Int]("x")
-        |          val y = unbuilder.readField[Int]("y")
+        |          val x = unbuilder.readField[Option[Int]]("x")
+        |          val y = unbuilder.readField[Vector[Int]]("y")
         |          unbuilder.endObject()
         |          _root_.Foo(x, y)
         |        case None =>

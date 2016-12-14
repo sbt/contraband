@@ -185,6 +185,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
         if (tpe.isListType) "new Array {}"
         else if (!tpe.isNotNullType) s"""${instantiateJavaOptional(boxedType(tpe.name), "null")}"""
         else sys.error(s"Expected $tpe but found $v")
+      case raw: RawValue =>
+        raw.renderPretty
       case _ =>
         val str =
           v match {
