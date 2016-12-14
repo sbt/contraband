@@ -191,7 +191,7 @@ abstract class CodeGenerator {
   def generate(s: Document): ListMap[File, String]
 
   /** Generate the code corresponding to `d`. */
-  protected final def generate(s: Document, d: TypeDefinition): ListMap[File, String] =
+  protected def generate(s: Document, d: TypeDefinition): ListMap[File, String] =
     d match {
       case i: InterfaceTypeDefinition => generateInterface(s, i)
       case r: ObjectTypeDefinition    => generateRecord(s, r)

@@ -183,7 +183,8 @@ class CodecCodeGen(codecParents: List[String],
     val codecs: ListMap[File, String] = ((s.definitions collect {
       case td: TypeDefinition => td
     } map { d =>
-      ListMap(generate(s, d).toSeq: _*) }) reduce (_ merge _)) mapV (_.indented)
+      ListMap(generate(s, d).toSeq: _*)
+    }) reduce (_ merge _)) mapV (_.indented)
     val result = toFullCodec(s) match {
       case Some(x) =>
         val full = generateFullCodec(s, x)
@@ -193,6 +194,10 @@ class CodecCodeGen(codecParents: List[String],
     }
     result map { case (k, v) => (k, generateHeader + v) }
   }
+
+  protected override def generate(s: Document, d: TypeDefinition): ListMap[File, String] =
+    if (!getGenerateCodec(d.directives)) ListMap.empty
+    else super.generate(s, d)
 
   private def genFile(s: Document, d: TypeDefinition): File =
     toCodecPackage(s) match {

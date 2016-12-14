@@ -64,3 +64,15 @@ q: com.example.Person = Person(Bob, 20)
 
 scala> assert(p == q)
 ```
+
+### Skipping codec generation
+
+Use the `@generateCodec(false)` annotation to skip the codec generation for some types.
+
+```
+interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
+```

@@ -95,6 +95,7 @@ object JsonSchemaExample {
       "name": "nestedProtocol",
       "target": "Scala",
       "type": "interface",
+      "generateCodec": false,
       "types": [
         {
           "name": "ChildRecord",
