@@ -307,7 +307,7 @@ class CodecCodeGen(codecParents: List[String],
 
   private def generateFullCodec(s: Document, name: String): ListMap[File, String] = {
     val allFormats = getAllRequiredFormats(s).distinct
-    val parents = allFormats.mkString("extends ", " with ", "")
+    val parents = allFormats.mkString("extends ", EOL + "  with ", "")
     val code =
       s"""${genPackage(s)}
          |trait $name $parents
