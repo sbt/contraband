@@ -203,11 +203,10 @@ class CodecCodeGen(codecParents: List[String],
         new File(s"${d.name}Formats.scala")
     }
 
-
-  private def getAllRequiredFormats(s: Document): List[String] =
-    s.definitions collect {
+  private def getAllFormatsForSchema(s: Document): List[String] =
+    getAllRequiredFormats(s, (s.definitions collect {
       case td: TypeDefinition => td
-    } flatMap { getAllRequiredFormats(s, _) }
+    }).toList)
 
   /**
    * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `ds`,
@@ -306,7 +305,7 @@ class CodecCodeGen(codecParents: List[String],
   }
 
   private def generateFullCodec(s: Document, name: String): ListMap[File, String] = {
-    val allFormats = getAllRequiredFormats(s).distinct
+    val allFormats = getAllFormatsForSchema(s).distinct
     val parents = allFormats.mkString("extends ", EOL + "  with ", "")
     val code =
       s"""${genPackage(s)}
