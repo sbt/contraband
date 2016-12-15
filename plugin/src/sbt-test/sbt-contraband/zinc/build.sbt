@@ -4,7 +4,7 @@ lazy val root = (project in file(".")).
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     name := "example",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.5.1",
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.6.0",
     // scalacOptions += "-Xlog-implicits"
     contrabandFormatsForType in (Compile, generateContrabands) := { tpe =>
       val substitutions = Map("Integer" -> "com.foo.IntegerFormats")
