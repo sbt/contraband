@@ -102,6 +102,12 @@ trait JsonParser[T] {
       case _       => None
     }
 
+  def GenerateCodecDirective(json: JValue): Option[ast.Directive] =
+    (json \ "generateCodec").toOption map {
+      case JBool(value) => ast.Directive.generateCodec(value)
+      case json         => sys.error(s"Invalid generateCodec: $json")
+    }
+
   val emptyVersion: VersionNumber = VersionNumber("0.0.0")
 }
 
@@ -177,7 +183,7 @@ object JsonParser {
       ast.EnumTypeDefinition(json -> "name",
         json ->? "namespace",
         (json ->* "symbols") map EnumValueDefinition.parse,
-        TargetDirective(json).toList,
+        TargetDirective(json).toList ++ GenerateCodecDirective(json).toList,
         // json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
         DocComment(json) ++ ExtraComment(json))
   }
@@ -217,11 +223,13 @@ object JsonParser {
           }
         val fs = json ->* "fields" map FieldDefinition.parse
         val intfs = (superIntf map { i => toNamedType(i, None) }).toList
+        val directives = TargetDirective(json).toList ++ SinceDirective(json).toList ++
+          GenerateCodecDirective(json).toList
         ast.ObjectTypeDefinition(json -> "name",
           json ->? "namespace",
           intfs,
           superFields ++ fs,
-          TargetDirective(json).toList ++ SinceDirective(json).toList,
+          directives,
           DocComment(json),
           ExtraComment(json) ++ ExtraIntfComment(json) ++ ToStringImplComment(json) ++
           CompanionExtraIntfComment(json) ++ CompanionExtraComment(json),
@@ -261,7 +269,8 @@ object JsonParser {
           (json ->* "messages" map FieldDefinition.parseMessage)
         val parents = json multiLineOpt "parents" getOrElse Nil
         val intfs = (superIntf map { i => toNamedType(i, None) }).toList
-        val directives = TargetDirective(json).toList ++ SinceDirective(json).toList
+        val directives = TargetDirective(json).toList ++ SinceDirective(json).toList ++
+          GenerateCodecDirective(json).toList
         val intf = ast.InterfaceTypeDefinition(json -> "name",
           json ->? "namespace",
           intfs,

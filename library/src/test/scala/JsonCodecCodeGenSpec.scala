@@ -139,17 +139,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
         |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = flatUnionFormat1[_root_.nestedProtocolExample, _root_.ChildRecord]("type")
         |}""".stripMargin.unindent)
-    code(new File("generated", "nestedProtocolFormats.scala")).unindent should equalLines (
-      """/**
-        | * This code is generated using sbt-datatype.
-        | */
-        |
-        |// DO NOT EDIT MANUALLY
-        |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait NestedProtocolFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
-        |  implicit lazy val nestedProtocolFormat: JsonFormat[_root_.nestedProtocol] = flatUnionFormat1[_root_.nestedProtocol, _root_.ChildRecord]("type")
-        |}""".stripMargin.unindent)
+    code.contains(new File("generated", "nestedProtocolFormats.scala")) shouldEqual false
   }
 
   def interfaceGenerateMessages = {

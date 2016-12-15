@@ -64,3 +64,15 @@ q: com.example.Person = Person(Bob, 20)
 
 scala> assert(p == q)
 ```
+
+### コーデック生成のスキップ
+
+`@generateCodec(false)` アノテーションを使うことで特定の型をコーデック生成から除外することができる。
+
+```
+interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
+```

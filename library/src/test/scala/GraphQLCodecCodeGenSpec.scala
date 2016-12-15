@@ -69,17 +69,7 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |trait InterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
         |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
         |}""".stripMargin.unindent)
-    code(new File("generated", "MiddleInterfaceFormats.scala")).unindent should equalLines (
-      """/**
-        | * This code is generated using sbt-datatype.
-        | */
-        |
-        |// DO NOT EDIT MANUALLY
-        |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
-        |trait MiddleInterfaceFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
-        |  implicit lazy val MiddleInterfaceFormat: JsonFormat[com.example.MiddleInterface] = flatUnionFormat1[com.example.MiddleInterface, com.example.ChildType]("type")
-        |}""".stripMargin.unindent)
+    code.contains(new File("generated", "MiddleInterfaceFormats.scala")) shouldEqual false
     code(new File("generated", "ChildTypeFormats.scala")).unindent should equalLines (
       """/**
         | * This code is generated using sbt-datatype.

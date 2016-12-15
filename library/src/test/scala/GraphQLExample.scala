@@ -51,7 +51,9 @@ interface InterfaceExample {
   field: Int
 }
 
-interface MiddleInterface implements InterfaceExample {
+interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
   field: Int
 }
 

@@ -228,6 +228,7 @@ object Directive {
   def codecPackage(value: String): Directive = Directive("codecPackage", Argument(None, StringValue(value)) :: Nil)
   def fullCodec(value: String): Directive = Directive("fullCodec", Argument(None, StringValue(value)) :: Nil)
   def codecTypeField(value: String): Directive = Directive("codecTypeField", Argument(None, StringValue(value)) :: Nil)
+  def generateCodec(value: Boolean): Directive = Directive("generateCodec", Argument(None, BooleanValue(value)) :: Nil)
 }
 
 case class Argument(nameOpt: Option[String], value: Value, comments: List[Comment] = Nil, position: Option[Position] = None) extends AstNode with WithComments
@@ -448,6 +449,19 @@ object AstUtil {
       }
     }
 
+  def scanSingleBooleanDirective(dirs: List[Directive], name: String): Option[Boolean] =
+    scanSingleDirective(dirs, name) map { d =>
+      val args = d.arguments
+      args.size match {
+        case x if x != 1 => sys.error(s"One argument is expected for @$name!")
+        case 1 =>
+          args.head.value match {
+            case BooleanValue(value, _, _) => value
+            case v => sys.error(s"Unexpected value for @$name: $v")
+          }
+      }
+    }
+
   def scanSingleDirective(dirs: List[Directive], name: String): Option[Directive] =
     {
       val ts = dirs collect { case d@Directive(n, _, _, _) if n == name => d }
@@ -511,4 +525,10 @@ object AstUtil {
         }
       NamedType(ns ++ i.name.split('.').toList, None)
     }
+
+  def toGenerateCodec(dirs: List[Directive]): Option[Boolean] =
+    scanSingleBooleanDirective(dirs, "generateCodec")
+
+  def getGenerateCodec(dirs: List[Directive]): Boolean =
+    toGenerateCodec(dirs).getOrElse(true)
 }
