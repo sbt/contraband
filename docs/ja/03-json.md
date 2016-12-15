@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := "2.11.8",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.1" )
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.6.0" )
 ```
 
 sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。

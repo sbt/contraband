@@ -13,7 +13,7 @@ lazy val root = (project in file(".")).
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := "2.11.8",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.1" )
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.6.0" )
 ```
 
 sjson-new is a codec toolkit that lets you define a code that supports Sray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
