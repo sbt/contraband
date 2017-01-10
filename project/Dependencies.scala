@@ -2,7 +2,6 @@ import sbt._
 
 object Dependencies {
   val jawnVersion = "0.10.4"
-  val sjsonnewCore = "com.eed3si9n" %% "sjson-new-core" % "0.7.0"
 
   private val jsonTuples = Seq(
     ("org.json4s", "json4s-core", "3.5.0"),
