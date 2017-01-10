@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := "2.11.8",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.7.0"
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % contrabandSjsonNewVersion.value
   )
 ```
 

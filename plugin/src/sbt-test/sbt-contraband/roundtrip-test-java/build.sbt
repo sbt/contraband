@@ -18,6 +18,6 @@ lazy val root = (project in file(".")).
       }
     },
     contrabandJavaOption in generateContrabands in Compile := "com.example.Maybe",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.7.0"
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % contrabandSjsonNewVersion.value
     // scalacOptions += "-Xlog-implicits"
   )
