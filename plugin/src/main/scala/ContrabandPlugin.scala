@@ -30,6 +30,7 @@ object ContrabandPlugin extends AutoPlugin {
     val contrabandInstantiateJavaLazy = settingKey[String => String]("Function that instantiate a lazy expression from an expression in Java.")
     val contrabandInstantiateJavaOptional = settingKey[(String, String) => String]("Function that instantiate a optional expression from an expression in Java.")
     val contrabandFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
+    val contrabandSjsonNewVersion = settingKey[String]("The version of sjson-new to use")
 
     sealed trait ContrabandTargetLang
     object ContrabandTargetLang {
@@ -40,7 +41,7 @@ object ContrabandPlugin extends AutoPlugin {
     lazy val baseContrabandSettings: Seq[Def.Setting[_]] = Seq(
       skipGeneration in generateContrabands := false,
       skipGeneration in generateJsonCodecs := true,
-      contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % "0.6.0"),
+      contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
       contrabandJavaLazy in generateContrabands := "xsbti.api.Lazy",
       contrabandJavaOption in generateContrabands := "xsbti.Maybe",
       contrabandScalaArray in generateContrabands := "Vector",
@@ -103,6 +104,10 @@ object ContrabandPlugin extends AutoPlugin {
         inCompile ++ inTest
       }
     )
+
+  override def globalSettings = Seq(
+    contrabandSjsonNewVersion := "0.7.0"
+  )
 }
 
 object Generate {
