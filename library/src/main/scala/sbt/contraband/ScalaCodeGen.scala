@@ -303,7 +303,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     if (intfLang == "Scala") s"Option($e)"
     else {
       val x = instantiateJavaOptional(javaLangBoxedType(tpe.name), e)
-      // com.example.Maybe.<Integer>just(number)
+      // java.util.Optional.<Integer>ofNullable(number)
       val JavaGenericMethod = """(.+)<([^>]+)>(\w+)\((.*)\)""".r
       x match {
         case JavaGenericMethod(pre, typearg, mtd, arg) => s"$pre$mtd[$typearg]($arg)"

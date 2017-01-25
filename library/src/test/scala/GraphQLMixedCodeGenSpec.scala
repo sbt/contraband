@@ -11,7 +11,7 @@ class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
   "generate(Record)" should "handle mixed Java-Scala inheritance" in {
     val Success(ast) = SchemaParser.parse(mixedExample)
     // println(ast)
-    val gen = new MixedCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
+    val gen = new MixedCodeGen(javaLazy, CodeGen.javaOptional, CodeGen.instantiateJavaOptional,
       scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true,
       wrapOption = true)
     val code = gen.generate(ast)
@@ -29,13 +29,13 @@ public abstract class Greeting implements java.io.Serializable {
 
 
     private String message;
-    private com.example.Maybe<String> s;
+    private java.util.Optional<String> s;
     public Greeting(String _message) {
         super();
         message = _message;
-        s = com.example.Maybe.<String>just("1");
+        s = java.util.Optional.<String>ofNullable("1");
     }
-    public Greeting(String _message, com.example.Maybe<String> _s) {
+    public Greeting(String _message, java.util.Optional<String> _s) {
         super();
         message = _message;
         s = _s;
@@ -43,12 +43,12 @@ public abstract class Greeting implements java.io.Serializable {
     public Greeting(String _message, String _s) {
         super();
         message = _message;
-        s = com.example.Maybe.<String>just(_s);
+        s = java.util.Optional.<String>ofNullable(_s);
     }
     public String message() {
         return this.message;
     }
-    public com.example.Maybe<String> s() {
+    public java.util.Optional<String> s() {
         return this.s;
     }
 
@@ -79,8 +79,8 @@ public abstract class Greeting implements java.io.Serializable {
 package com.example
 final class SimpleGreeting private (
   message: String,
-  s: com.example.Maybe[String]) extends com.example.Greeting(message, s) with Serializable {
-  private def this(message: String) = this(message, com.example.Maybe.just[String]("1"))
+  s: java.util.Optional[String]) extends com.example.Greeting(message, s) with Serializable {
+  private def this(message: String) = this(message, java.util.Optional.ofNullable[String]("1"))
   override def equals(o: Any): Boolean = o match {
     case x: SimpleGreeting => (this.message == x.message) && (this.s == x.s)
     case _ => false
@@ -91,38 +91,29 @@ final class SimpleGreeting private (
   override def toString: String = {
     "SimpleGreeting(" + message + ", " + s + ")"
   }
-  protected[this] def copy(message: String = message, s: com.example.Maybe[String] = s): SimpleGreeting = {
+  protected[this] def copy(message: String = message, s: java.util.Optional[String] = s): SimpleGreeting = {
     new SimpleGreeting(message, s)
   }
   def withMessage(message: String): SimpleGreeting = {
     copy(message = message)
   }
-  def withS(s: com.example.Maybe[String]): SimpleGreeting = {
+  def withS(s: java.util.Optional[String]): SimpleGreeting = {
     copy(s = s)
   }
   def withS(s: String): SimpleGreeting = {
-    copy(s = com.example.Maybe.just[String](s))
+    copy(s = java.util.Optional.ofNullable[String](s))
   }
 }
 object SimpleGreeting {
-  def apply(message: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[String]("1"))
-  def apply(message: String, s: com.example.Maybe[String]): SimpleGreeting = new SimpleGreeting(message, s)
-  def apply(message: String, s: String): SimpleGreeting = new SimpleGreeting(message, com.example.Maybe.just[String](s))
+  def apply(message: String): SimpleGreeting = new SimpleGreeting(message, java.util.Optional.ofNullable[String]("1"))
+  def apply(message: String, s: java.util.Optional[String]): SimpleGreeting = new SimpleGreeting(message, s)
+  def apply(message: String, s: String): SimpleGreeting = new SimpleGreeting(message, java.util.Optional.ofNullable[String](s))
 }
 """.stripMargin.unindent
     ))
   }
 
-  lazy val instantiateJavaOptional: (String, String) => String =
-    {
-      (tpe: String, e: String) =>
-        e match {
-          case "null" => s"com.example.Maybe.<$tpe>nothing()"
-          case e      => s"com.example.Maybe.<$tpe>just($e)"
-        }
-    }
   val javaLazy = "com.example.Lazy"
-  val javaOptional = "com.example.Maybe"
   val outputFile = new File("output.scala")
   val scalaArray = "Vector"
   val genFileName = (_: Any) => outputFile

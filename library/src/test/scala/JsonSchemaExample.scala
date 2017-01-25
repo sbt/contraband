@@ -1097,7 +1097,7 @@ object CustomProtocol extends CustomProtocol""".stripMargin
       "name": "x",
       "type": "int?",
       "since": "0.1.0",
-      "default": "com.example.MyOption.<String>just(0)"
+      "default": "java.util.Optional.<String>ofNullable(0)"
     },
     {
       "name": "y",
