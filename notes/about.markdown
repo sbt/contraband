@@ -1,1 +1,1 @@
-[sbt-datatype](http://www.scala-sbt.org/0.13/docs/Datatype.html) is an sbt plug-in that creates growable datatypes.
+[Contraband](http://www.scala-sbt.org/contraband/) is a description language for your datatypes and APIs, currently targeting Java and Scala.

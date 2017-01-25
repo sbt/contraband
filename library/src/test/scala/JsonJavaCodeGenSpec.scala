@@ -342,44 +342,44 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
-            |    private com.example.MyOption<Integer> x;
+            |    private java.util.Optional<Integer> x;
             |    private int[] y;
             |    public Foo() {
             |        super();
-            |        x = com.example.MyOption.<String>just(0);
+            |        x = java.util.Optional.<String>ofNullable(0);
             |        y = new Array { 0 };
             |    }
-            |    public Foo(com.example.MyOption<Integer> _x) {
+            |    public Foo(java.util.Optional<Integer> _x) {
             |        super();
             |        x = _x;
             |        y = new Array { 0 };
             |    }
             |    public Foo(int _x) {
             |        super();
-            |        x = com.example.MyOption.<Integer>just(_x);
+            |        x = java.util.Optional.<Integer>ofNullable(_x);
             |        y = new Array { 0 };
             |    }
-            |    public Foo(com.example.MyOption<Integer> _x, int[] _y) {
+            |    public Foo(java.util.Optional<Integer> _x, int[] _y) {
             |      super();
             |      x = _x;
             |      y = _y;
             |    }
             |    public Foo(int _x, int[] _y) {
             |        super();
-            |        x = com.example.MyOption.<Integer>just(_x);
+            |        x = java.util.Optional.<Integer>ofNullable(_x);
             |        y = _y;
             |    }
-            |    public com.example.MyOption<Integer> x() {
+            |    public java.util.Optional<Integer> x() {
             |        return this.x;
             |    }
             |    public int[] y() {
             |        return this.y;
             |    }
-            |    public Foo withX(com.example.MyOption<Integer> x) {
+            |    public Foo withX(java.util.Optional<Integer> x) {
             |        return new Foo(x, y);
             |    }
             |    public Foo withX(int x) {
-            |        return new Foo(com.example.MyOption.<Integer>just(x), y);
+            |        return new Foo(java.util.Optional.<Integer>ofNullable(x), y);
             |    }
             |    public Foo withY(int[] y) {
             |        return new Foo(x, y);
@@ -414,10 +414,10 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    private int simpleInteger;
         |    private com.example.MyLazy<Integer> lazyInteger;
         |    private int[] arrayInteger;
-        |    private com.example.MyOption<Integer> optionInteger;
+        |    private java.util.Optional<Integer> optionInteger;
         |    private com.example.MyLazy<int[]> lazyArrayInteger;
-        |    private com.example.MyLazy<com.example.MyOption<Integer>> lazyOptionInteger;
-        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, com.example.MyOption<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<com.example.MyOption<Integer>> _lazyOptionInteger) {
+        |    private com.example.MyLazy<java.util.Optional<Integer>> lazyOptionInteger;
+        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, java.util.Optional<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
         |        super();
         |        simpleInteger = _simpleInteger;
         |        lazyInteger = _lazyInteger;
@@ -426,12 +426,12 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        lazyArrayInteger = _lazyArrayInteger;
         |        lazyOptionInteger = _lazyOptionInteger;
         |    }
-        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<com.example.MyOption<Integer>> _lazyOptionInteger) {
+        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
         |        super();
         |        simpleInteger = _simpleInteger;
         |        lazyInteger = _lazyInteger;
         |        arrayInteger = _arrayInteger;
-        |        optionInteger = com.example.MyOption.<Integer>just(_optionInteger);
+        |        optionInteger = java.util.Optional.<Integer>ofNullable(_optionInteger);
         |        lazyArrayInteger = _lazyArrayInteger;
         |        lazyOptionInteger = _lazyOptionInteger;
         |    }
@@ -444,13 +444,13 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public int[] arrayInteger() {
         |        return this.arrayInteger;
         |    }
-        |    public com.example.MyOption<Integer> optionInteger() {
+        |    public java.util.Optional<Integer> optionInteger() {
         |        return this.optionInteger;
         |    }
         |    public int[] lazyArrayInteger() {
         |        return this.lazyArrayInteger.get();
         |    }
-        |    public com.example.MyOption<Integer> lazyOptionInteger() {
+        |    public java.util.Optional<Integer> lazyOptionInteger() {
         |        return this.lazyOptionInteger.get();
         |    }
         |    public primitiveTypesExample withSimpleInteger(int simpleInteger) {
@@ -462,20 +462,20 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public primitiveTypesExample withArrayInteger(int[] arrayInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
-        |    public primitiveTypesExample withOptionInteger(com.example.MyOption<Integer> optionInteger) {
+        |    public primitiveTypesExample withOptionInteger(java.util.Optional<Integer> optionInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
         |    public primitiveTypesExample withOptionInteger(int optionInteger) {
-        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, com.example.MyOption.<Integer>just(optionInteger), lazyArrayInteger, lazyOptionInteger);
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, java.util.Optional.<Integer>ofNullable(optionInteger), lazyArrayInteger, lazyOptionInteger);
         |    }
         |    public primitiveTypesExample withLazyArrayInteger(com.example.MyLazy<int[]> lazyArrayInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
-        |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<com.example.MyOption<Integer>> lazyOptionInteger) {
+        |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<java.util.Optional<Integer>> lazyOptionInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, lazyOptionInteger);
         |    }
         |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<Integer> lazyOptionInteger) {
-        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, com.example.MyOption.<Integer>just(lazyOptionInteger));
+        |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, java.util.Optional.<Integer>ofNullable(lazyOptionInteger));
         |    }
         |    public boolean equals(Object obj) {
         |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
@@ -551,14 +551,6 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
   }
 
   def mkJavaCodeGen: JavaCodeGen =
-    new JavaCodeGen("com.example.MyLazy", "com.example.MyOption", instantiateJavaOptional,
+    new JavaCodeGen("com.example.MyLazy", CodeGen.javaOptional, CodeGen.instantiateJavaOptional,
         wrapOption = true)
-  lazy val instantiateJavaOptional: (String, String) => String =
-    {
-      (tpe: String, e: String) =>
-        e match {
-          case "null" => s"com.example.MyOption.<$tpe>nothing()"
-          case e      => s"com.example.MyOption.<$tpe>just($e)"
-        }
-    }
 }

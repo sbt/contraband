@@ -209,7 +209,7 @@ abstract class CodeGenerator {
 
   protected def generateHeader: String =
     """/**
-      | * This code is generated using sbt-datatype.
+      | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
       | */
       |
       |// DO NOT EDIT MANUALLY
@@ -218,4 +218,11 @@ abstract class CodeGenerator {
 
 object CodeGen {
   def bq(id: String): String = if (ScalaKeywords.values(id)) s"`$id`" else id
+
+  val javaOptional: String = "java.util.Optional"
+  val instantiateJavaOptional: (String, String) => (String) =
+    (tpe: String, e: String) => {
+      if (e == "null") s"java.util.Optional.<$tpe>empty()"
+      else s"java.util.Optional.<$tpe>ofNullable($e)"
+    }
 }

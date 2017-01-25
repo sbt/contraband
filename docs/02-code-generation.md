@@ -28,7 +28,7 @@ This schema will produce the following Scala class:
 
 ```scala
 /**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -79,7 +79,7 @@ Here's the Java code it generates (after changing the target annotation to `Java
 
 ```java
 /**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY

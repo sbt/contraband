@@ -43,7 +43,7 @@ object ContrabandPlugin extends AutoPlugin {
       skipGeneration in generateJsonCodecs := true,
       contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
       contrabandJavaLazy in generateContrabands := "xsbti.api.Lazy",
-      contrabandJavaOption in generateContrabands := "xsbti.Maybe",
+      contrabandJavaOption in generateContrabands := "java.util.Optional",
       contrabandScalaArray in generateContrabands := "Vector",
       contrabandSource in generateContrabands := Defaults.configSrcSub(sourceDirectory).value / "contraband",
       sourceManaged in generateContrabands := sourceManaged.value,
@@ -55,10 +55,7 @@ object ContrabandPlugin extends AutoPlugin {
       contrabandWrapOption in generateContrabands := true,
       contrabandCodecParents in generateContrabands := List("sjsonnew.BasicJsonProtocol"),
       contrabandInstantiateJavaLazy in generateContrabands := { (e: String) => s"xsbti.SafeLazy($e)" },
-      contrabandInstantiateJavaOptional in generateContrabands := { (tpe: String, e: String) =>
-        if (e == "null") s"xsbti.Maybe.<$tpe>nothing()"
-        else s"xsbti.Maybe.<$tpe>just($e)"
-      },
+      contrabandInstantiateJavaOptional in generateContrabands := CodeGen.instantiateJavaOptional,
       contrabandFormatsForType in generateContrabands := CodecCodeGen.formatsForType,
       generateContrabands := {
         Generate((contrabandSource in generateContrabands).value,
@@ -106,7 +103,7 @@ object ContrabandPlugin extends AutoPlugin {
     )
 
   override def globalSettings = Seq(
-    contrabandSjsonNewVersion := "0.7.0"
+    contrabandSjsonNewVersion := "0.7.1"
   )
 }
 

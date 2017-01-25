@@ -413,18 +413,9 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
   }
 
   def mkScalaCodeGen: ScalaCodeGen =
-    new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, scalaArray, genFileName,
+    new ScalaCodeGen(javaLazy, CodeGen.javaOptional, CodeGen.instantiateJavaOptional, scalaArray, genFileName,
         scalaSealProtocols = true, scalaPrivateConstructor = true, wrapOption = true)
-  lazy val instantiateJavaOptional: (String, String) => String =
-    {
-      (tpe: String, e: String) =>
-        e match {
-          case "null" => s"com.example.Maybe.<$tpe>nothing()"
-          case e      => s"com.example.Maybe.<$tpe>just($e)"
-        }
-    }
   val javaLazy = "com.example.Lazy"
-  val javaOptional = "com.example.Maybe"
   val outputFile = new File("output.scala")
   val scalaArray = "Vector"
   val genFileName = (_: Any) => outputFile
