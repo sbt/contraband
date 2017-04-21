@@ -43,6 +43,7 @@ lazy val library = (project in file("library")).
 lazy val plugin = (project in file("plugin")).
   enablePlugins(BintrayPublish).
   settings(
+    // crossBuildingSettings,
     pluginSettings,
     name := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
