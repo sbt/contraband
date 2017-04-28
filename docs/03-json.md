@@ -17,7 +17,7 @@ lazy val root = (project in file(".")).
   )
 ```
 
-sjson-new is a codec toolkit that lets you define a code that supports Sray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+sjson-new is a codec toolkit that lets you define a code that supports Spray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
 
 The package name for the codecs can be specified using `@codecPackage` directive.
 
