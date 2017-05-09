@@ -306,6 +306,7 @@ class CodecCodeGen(codecParents: List[String],
     case "long"    => "Long"
     case "short"   => "Short"
     case "double"  => "Double"
+    case "StringStringMap" => "scala.collection.immutable.Map[String, String]"
     case other     => other
   }
 
@@ -372,6 +373,7 @@ object CodecCodeGen {
       case "Boolean" | "Byte" | "Char" | "Float" | "Int" | "Long" | "Short" | "Double" => Nil
       case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger"
         | "java.math.BigDecimal" | "java.io.File" => Nil
+      case "StringStringMap" => Nil
       case _ => forOthers(tpe)
     }
   }

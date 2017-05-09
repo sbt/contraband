@@ -60,6 +60,37 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |}""".stripMargin.unindent)
   }
 
+  it should "generate Map[String, String] from StringStringMap" in {
+    val Success(ast) = SchemaParser.parse(stringStringMapExample)
+    // println(ast)
+    val code = mkScalaCodeGen.generate(ast)
+    code.head._2.unindent should equalLines(
+      """package com.example
+        |/** Example of a type */
+        |final class TypeExample private (
+        |val field: scala.collection.immutable.Map[String, String]) extends Serializable {
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: TypeExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (17 + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "TypeExample(" + field + ")"
+        |  }
+        |  protected[this] def copy(field: scala.collection.immutable.Map[String, String] = field): TypeExample = {
+        |    new TypeExample(field)
+        |  }
+        |  def withField(field: scala.collection.immutable.Map[String, String]): TypeExample = {
+        |    copy(field = field)
+        |  }
+        |}
+        |object TypeExample {
+        |  def apply(field: scala.collection.immutable.Map[String, String]): TypeExample = new TypeExample(field)
+        |}""".stripMargin.unindent)
+  }
+
   it should "grow a record from 0 to 1 field" in {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)

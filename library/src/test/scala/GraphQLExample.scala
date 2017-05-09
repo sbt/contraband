@@ -25,6 +25,14 @@ type TypeExample {
   #x // Some extra code
 }"""
 
+  val stringStringMapExample = """
+package com.example @target(Scala)
+
+## Example of a type
+type TypeExample {
+  field: StringStringMap!
+}"""
+
   val intfExample = """
 package com.example @target(Scala)
 @codecPackage("generated")
