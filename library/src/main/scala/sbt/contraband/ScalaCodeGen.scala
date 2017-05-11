@@ -184,6 +184,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     case "long"    => "Long"
     case "short"   => "Short"
     case "double"  => "Double"
+    case "StringStringMap" => "scala.collection.immutable.Map[String, String]"
     case other     => other
   }
 

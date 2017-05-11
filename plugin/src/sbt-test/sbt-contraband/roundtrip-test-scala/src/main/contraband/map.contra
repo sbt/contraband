@@ -1,0 +1,9 @@
+package com.example
+@codecPackage("com.example.codec")
+@codecTypeField("$type")
+@fullCodec("MapJsonProtocol")
+@target(Scala)
+
+type Foo {
+  field: StringStringMap!
+}
