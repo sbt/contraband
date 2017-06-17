@@ -18,7 +18,9 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.JsonFormat
+        |
         |trait InterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
         |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
         |}""".stripMargin.unindent)
@@ -29,7 +31,9 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait ChildTypeFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val ChildTypeFormat: JsonFormat[com.example.ChildType] = new JsonFormat[com.example.ChildType] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {
@@ -65,7 +69,9 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.JsonFormat
+        |
         |trait InterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
         |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
         |}""".stripMargin.unindent)
@@ -77,7 +83,9 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait ChildTypeFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val ChildTypeFormat: JsonFormat[com.example.ChildType] = new JsonFormat[com.example.ChildType] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {

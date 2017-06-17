@@ -24,7 +24,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait SimpleEnumerationExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[_root_.simpleEnumerationExample] = new JsonFormat[_root_.simpleEnumerationExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleEnumerationExample = {
@@ -62,7 +64,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
+        |
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
         |trait SimpleInterfaceExampleFormats {
         |  implicit lazy val simpleInterfaceExampleFormat: JsonFormat[_root_.simpleInterfaceExample] = new JsonFormat[_root_.simpleInterfaceExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleInterfaceExample = {
@@ -87,7 +91,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.JsonFormat
+        |
         |trait OneChildInterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
         |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = flatUnionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]("type")
         |}""".stripMargin.unindent)
@@ -98,7 +104,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait ChildRecordFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val childRecordFormat: JsonFormat[_root_.childRecord] = new JsonFormat[_root_.childRecord] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.childRecord = {
@@ -135,7 +143,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.JsonFormat
+        |
         |trait NestedProtocolExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
         |  implicit lazy val nestedProtocolExampleFormat: JsonFormat[_root_.nestedProtocolExample] = flatUnionFormat1[_root_.nestedProtocolExample, _root_.ChildRecord]("type")
         |}""".stripMargin.unindent)
@@ -154,7 +164,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
+        |
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
         |trait GenerateArgDocExampleFormats {
         |  implicit lazy val generateArgDocExampleFormat: JsonFormat[_root_.generateArgDocExample] = new JsonFormat[_root_.generateArgDocExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.generateArgDocExample = {
@@ -179,7 +191,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait SimpleRecordExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleRecordExampleFormat: JsonFormat[_root_.simpleRecordExample] = new JsonFormat[_root_.simpleRecordExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleRecordExample = {
@@ -214,7 +228,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait GrowableAddOneFieldFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val growableAddOneFieldFormat: JsonFormat[_root_.growableAddOneField] = new JsonFormat[_root_.growableAddOneField] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.growableAddOneField = {
@@ -249,7 +265,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |// DO NOT EDIT MANUALLY
         |package generated
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait FooFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val FooFormat: JsonFormat[_root_.Foo] = new JsonFormat[_root_.Foo] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Foo = {
@@ -285,7 +303,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         | */
         |
         |// DO NOT EDIT MANUALLY
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait PrimitiveTypesExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[_root_.primitiveTypesExample] = new JsonFormat[_root_.primitiveTypesExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample = {
@@ -330,7 +350,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         | */
         |
         |// DO NOT EDIT MANUALLY
-        |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        |
+        |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+        |
         |trait PrimitiveTypesNoLazyExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[_root_.primitiveTypesNoLazyExample] = new JsonFormat[_root_.primitiveTypesNoLazyExample] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesNoLazyExample = {
@@ -389,7 +411,9 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         | */
         |
         |// DO NOT EDIT MANUALLY
+        |
         |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }
+        | 
         |trait GreetingFormats {
         |  implicit lazy val GreetingFormat: JsonFormat[_root_.Greeting] = new JsonFormat[_root_.Greeting] {
         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Greeting = {
