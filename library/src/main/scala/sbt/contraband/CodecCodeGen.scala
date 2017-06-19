@@ -56,7 +56,9 @@ class CodecCodeGen(codecParents: List[String],
 
     val code =
       s"""${genPackage(s)}
-         |$sjsonImports
+         |
+         |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError } 
+         |
          |trait ${e.name.capitalize}Formats { $selfType
          |  implicit lazy val ${e.name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
          |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
@@ -105,7 +107,9 @@ class CodecCodeGen(codecParents: List[String],
 
     val code =
       s"""${genPackage(s)}
-         |$sjsonImports
+         |
+         |import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError } 
+         |
          |trait ${r.name.capitalize}Formats { $selfType
          |  implicit lazy val ${r.name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
          |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
@@ -139,7 +143,9 @@ class CodecCodeGen(codecParents: List[String],
       children match {
         case Nil =>
           s"""${genPackage(s)}
-             |$sjsonImports
+             |
+             |import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder } 
+             |
              |trait ${name.capitalize}Formats {
              |  implicit lazy val ${name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
              |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
@@ -161,7 +167,9 @@ class CodecCodeGen(codecParents: List[String],
           val typeFieldName = (toCodecTypeField(i.directives) orElse toCodecTypeField(s)).getOrElse("type")
           val flatUnionFormat = s"""flatUnionFormat${xs.length}[$fqn, ${xs map (c => fullyQualifiedName(c)) mkString ", "}]("$typeFieldName")"""
           s"""${genPackage(s)}
-             |$sjsonImports
+             | 
+             |import _root_.sjsonnew.JsonFormat 
+             |
              |trait ${name.capitalize}Formats { $selfType
              |  implicit lazy val ${name}Format: JsonFormat[$fqn] = $flatUnionFormat
              |}""".stripMargin
@@ -281,8 +289,6 @@ class CodecCodeGen(codecParents: List[String],
 
   private def genPackage(s: Document): String =
     toCodecPackage(s) map (p => s"package $p") getOrElse ""
-
-  private val sjsonImports: String = "import _root_.sjsonnew.{ deserializationError, serializationError, Builder, JsonFormat, Unbuilder }"
 
   private def scalaifyType(t: String) = t.replace("<", "[").replace(">", "]")
 
