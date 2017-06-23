@@ -49,7 +49,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (17 + field().hashCode());
+        |        return 37 * (37 * (17 + "simpleInterfaceExample".hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "custom";
@@ -85,7 +85,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (17 + (new Integer(field())).hashCode());
+        |        return 37 * (37 * (17 + "oneChildInterfaceExample".hashCode()) + (new Integer(field())).hashCode());
         |    }
         |    public String toString() {
         |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
@@ -118,7 +118,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + (new Integer(field())).hashCode()) + (new Integer(x())).hashCode());
+        |        return 37 * (37 * (37 * (17 + "childRecord".hashCode()) + (new Integer(field())).hashCode()) + (new Integer(x())).hashCode());
         |    }
         |    public String toString() {
         |        return "childRecord("  + "field: " + field() + ", " + "x: " + x() + ")";
@@ -149,7 +149,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 17;
+            |        return 37 * (17 + "nestedProtocolExample".hashCode());
             |    }
             |    public String toString() {
             |        return "nestedProtocolExample("  + ")";
@@ -172,7 +172,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 17;
+            |        return 37 * (17 + "nestedProtocol".hashCode());
             |    }
             |    public String toString() {
             |        return "nestedProtocol("  + ")";
@@ -195,7 +195,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 17;
+            |        return 37 * (17 + "ChildRecord".hashCode());
             |    }
             |    public String toString() {
             |        return "ChildRecord("  + ")";
@@ -240,7 +240,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (17 + (new Integer(field())).hashCode());
+            |        return 37 * (37 * (17 + "generateArgDocExample".hashCode()) + (new Integer(field())).hashCode());
             |    }
             |    public String toString() {
             |        return "generateArgDocExample("  + "field: " + field() + ")";
@@ -282,7 +282,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (17 + field().hashCode());
+            |        return 37 * (37 * (17 + "simpleRecordExample".hashCode()) + field().hashCode());
             |    }
             |    public String toString() {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
@@ -325,7 +325,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (17 + (new Integer(field())).hashCode());
+            |        return 37 * (37 * (17 + "growableAddOneField".hashCode()) + (new Integer(field())).hashCode());
             |    }
             |    public String toString() {
             |        return "growableAddOneField("  + "field: " + field() + ")";
@@ -395,7 +395,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + x().hashCode()) + y().hashCode());
+            |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + y().hashCode());
             |    }
             |    public String toString() {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
@@ -529,7 +529,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
+            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
             |    }
             |    public String toString() {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";

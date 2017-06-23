@@ -228,11 +228,12 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
 
   private def genHashCode(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
+    val seed = s"""37 * (17 + "${cl.name}".##)"""
     val computationCode =
       if (allFields exists (_.fieldType.isLazyType)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
-        (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
+        (seed /: allFields) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
       }
 
     s"""override def hashCode: Int = {

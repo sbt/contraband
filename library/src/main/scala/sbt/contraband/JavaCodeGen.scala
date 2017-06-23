@@ -331,11 +331,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
   private def genHashCode(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
+    val seed = s"""37 * (17 + "${cl.name}".hashCode())"""
     val body =
       if (allFields exists { f => f.fieldType.isLazyType }) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
-        val computation = (allFields foldLeft ("17")) { (acc, f) => s"37 * ($acc + ${hashCode(f)})" }
+        val computation = (seed /: allFields) { (acc, f) => s"37 * ($acc + ${hashCode(f)})" }
         s"return $computation;"
       }
 
