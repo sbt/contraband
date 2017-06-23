@@ -39,7 +39,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "TypeExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "TypeExample(" + field + ")"
@@ -74,7 +74,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "TypeExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "TypeExample(" + field + ")"
@@ -106,7 +106,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "Growable".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "Growable(" + field + ")"
@@ -146,7 +146,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (37 * (17 + x.##) + y.##)
+        |    37 * (37 * (37 * (17 + "Foo".##) + x.##) + y.##)
         |  }
         |  override def toString: String = {
         |    "Foo(" + x + ", " + y + ")"
@@ -188,7 +188,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "InterfaceExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "InterfaceExample(" + field + ")"
@@ -204,7 +204,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (37 * (17 + name.##) + field.##)
+        |    37 * (37 * (37 * (17 + "ChildType".##) + name.##) + field.##)
         |  }
         |  override def toString: String = {
         |    "ChildType(" + name + ", " + field + ")"
@@ -253,7 +253,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "IntfExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "IntfExample(" + field + ")"
@@ -280,7 +280,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "IntfExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    return "custom";

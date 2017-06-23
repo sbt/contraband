@@ -63,7 +63,7 @@ public abstract class Greeting implements java.io.Serializable {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + message().hashCode()) + s().hashCode());
+        return 37 * (37 * (37 * (17 + "Greeting".hashCode()) + message().hashCode()) + s().hashCode());
     }
     public String toString() {
         return "Greeting("  + "message: " + message() + ", " + "s: " + s() + ")";
@@ -86,7 +86,7 @@ final class SimpleGreeting private (
     case _ => false
   }
   override def hashCode: Int = {
-    37 * (37 * (17 + message.##) + s.##)
+    37 * (37 * (37 * (17 + "SimpleGreeting".##) + message.##) + s.##)
   }
   override def toString: String = {
     "SimpleGreeting(" + message + ", " + s + ")"

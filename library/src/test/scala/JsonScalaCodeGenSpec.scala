@@ -36,7 +36,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "simpleInterfaceExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    return "custom";
@@ -62,7 +62,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "oneChildInterfaceExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "oneChildInterfaceExample(" + field + ")"
@@ -79,7 +79,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (37 * (17 + field.##) + x.##)
+        |    37 * (37 * (37 * (17 + "childRecord".##) + field.##) + x.##)
         |  }
         |  override def toString: String = {
         |    "childRecord(" + field + ", " + x + ")"
@@ -113,7 +113,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (17 + "nestedProtocolExample".##)
         |  }
         |  override def toString: String = {
         |    "nestedProtocolExample()"
@@ -128,7 +128,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (17 + "nestedProtocol".##)
         |  }
         |  override def toString: String = {
         |    "nestedProtocol()"
@@ -144,7 +144,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    17
+        |    37 * (17 + "ChildRecord".##)
         |  }
         |  override def toString: String = {
         |    "ChildRecord()"
@@ -180,7 +180,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "generateArgDocExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "generateArgDocExample(" + field + ")"
@@ -206,7 +206,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "simpleRecordExample".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "simpleRecordExample(" + field + ")"
@@ -237,7 +237,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (17 + field.##)
+        |    37 * (37 * (17 + "growableAddOneField".##) + field.##)
         |  }
         |  override def toString: String = {
         |    "growableAddOneField(" + field + ")"
@@ -271,7 +271,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (37 * (17 + x.##) + y.##)
+        |    37 * (37 * (37 * (17 + "Foo".##) + x.##) + y.##)
         |  }
         |  override def toString: String = {
         |    "Foo(" + x + ", " + y + ")"
@@ -378,7 +378,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
-        |    37 * (37 * (17 + simpleInteger.##) + arrayInteger.##)
+        |    37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".##) + simpleInteger.##) + arrayInteger.##)
         |  }
         |  override def toString: String = {
         |    "primitiveTypesNoLazyExample(" + simpleInteger + ", " + arrayInteger + ")"
