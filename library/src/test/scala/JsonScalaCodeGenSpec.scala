@@ -299,6 +299,43 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |""".stripMargin.unindent)
   }
 
+  override def recordPrimitives: Unit = {
+    val record = JsonParser.ObjectTypeDefinition.parse(primitiveTypesExample2)
+    val code = mkScalaCodeGen generate record
+
+    code.head._2.unindent should equalLines (
+      """final class primitiveTypesExample2 private (
+  val smallBoolean: Boolean,
+  val bigBoolean: Boolean) extends Serializable {
+
+
+
+  override def equals(o: Any): Boolean = o match {
+    case x: primitiveTypesExample2 => (this.smallBoolean == x.smallBoolean) && (this.bigBoolean == x.bigBoolean)
+    case _ => false
+  }
+  override def hashCode: Int = {
+    37 * (37 * (37 * (17 + "primitiveTypesExample2".##) + smallBoolean.##) + bigBoolean.##)
+  }
+  override def toString: String = {
+    "primitiveTypesExample2(" + smallBoolean + ", " + bigBoolean + ")"
+  }
+  protected[this] def copy(smallBoolean: Boolean = smallBoolean, bigBoolean: Boolean = bigBoolean): primitiveTypesExample2 = {
+    new primitiveTypesExample2(smallBoolean, bigBoolean)
+  }
+  def withSmallBoolean(smallBoolean: Boolean): primitiveTypesExample2 = {
+    copy(smallBoolean = smallBoolean)
+  }
+  def withBigBoolean(bigBoolean: Boolean): primitiveTypesExample2 = {
+    copy(bigBoolean = bigBoolean)
+  }
+}
+object primitiveTypesExample2 {
+
+  def apply(smallBoolean: Boolean, bigBoolean: Boolean): primitiveTypesExample2 = new primitiveTypesExample2(smallBoolean, bigBoolean)
+}""".stripMargin.unindent)
+  }
+ 
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val code = mkScalaCodeGen generate schema

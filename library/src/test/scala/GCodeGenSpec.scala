@@ -19,6 +19,7 @@ abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers wit
   "generate(Record)" should "generate a simple record" in recordGenerateSimple
   it should "grow a record from 0 to 1 field" in recordGrowZeroToOneField
   it should "grow a record from 0 to 1 to 2 fields" in recordGrowZeroToOneToTwoFields
+  it should "generate correct types" in recordPrimitives
 
   "generate(Schema)" should "generate a complete schema" in schemaGenerateComplete
   it should "generate and indent a complete schema" in schemaGenerateCompletePlusIndent
@@ -35,6 +36,7 @@ abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers wit
   def recordGenerateSimple: Unit
   def recordGrowZeroToOneField: Unit
   def recordGrowZeroToOneToTwoFields: Unit
+  def recordPrimitives: Unit
 
   def schemaGenerateComplete: Unit
   def schemaGenerateCompletePlusIndent: Unit

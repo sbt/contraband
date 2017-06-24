@@ -219,6 +219,22 @@ object JsonSchemaExample {
   ]
 }"""
 
+  val primitiveTypesExample2 = """{
+  "name": "primitiveTypesExample2",
+  "target": "Scala",
+  "type": "record",
+  "fields": [
+    {
+      "name": "smallBoolean",
+      "type": "boolean"
+    },
+    {
+      "name": "bigBoolean",
+      "type": "Boolean"
+    }
+  ]
+}"""
+
   val generateArgDocExample = """{
   "codecNamespace": "generated",
   "types": [

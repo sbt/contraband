@@ -129,9 +129,9 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
        |private ${genRealTpe(f.fieldType)} ${f.name};""".stripMargin
 
   private def isPrimitive(tpe: ast.Type) =
-    !tpe.isListType && !tpe.isLazyType && tpe.isNotNullType && tpe.name != boxedType(tpe.name)
+    !tpe.isListType && !tpe.isLazyType && tpe.isNotNullType && primitiveType(tpe.name)
   private def isPrimitiveArray(tpe: ast.Type) =
-    tpe.isListType && !tpe.isLazyType && tpe.name != boxedType(tpe.name)
+    tpe.isListType && !tpe.isLazyType && primitiveType(tpe.name)
 
   private def genRealTpe(tpe: ast.Type): String = tpe match {
     case t: ast.Type if t.isLazyType && t.isListType      => s"$lazyInterface<${unboxedType(t.name)}[]>"
