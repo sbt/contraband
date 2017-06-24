@@ -404,6 +404,55 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ))
   }
 
+  override def recordPrimitives: Unit = {
+    val record = JsonParser.ObjectTypeDefinition.parse(primitiveTypesExample2)
+    val code = mkJavaCodeGen generate record
+
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
+        new File("primitiveTypesExample2.java") ->
+          """public final class primitiveTypesExample2 implements java.io.Serializable {
+
+
+    private boolean smallBoolean;
+    private boolean bigBoolean;
+    public primitiveTypesExample2(boolean _smallBoolean, boolean _bigBoolean) {
+        super();
+        smallBoolean = _smallBoolean;
+        bigBoolean = _bigBoolean;
+    }
+    public boolean smallBoolean() {
+        return this.smallBoolean;
+    }
+    public boolean bigBoolean() {
+        return this.bigBoolean;
+    }
+    public primitiveTypesExample2 withSmallBoolean(boolean smallBoolean) {
+        return new primitiveTypesExample2(smallBoolean, bigBoolean);
+    }
+    public primitiveTypesExample2 withBigBoolean(boolean bigBoolean) {
+        return new primitiveTypesExample2(smallBoolean, bigBoolean);
+    }
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (!(obj instanceof primitiveTypesExample2)) {
+            return false;
+        } else {
+            primitiveTypesExample2 o = (primitiveTypesExample2)obj;
+            return (smallBoolean() == o.smallBoolean()) && (bigBoolean() == o.bigBoolean());
+        }
+    }
+    public int hashCode() {
+        return 37 * (37 * (37 * (17 + "primitiveTypesExample2".hashCode()) + (new Boolean(smallBoolean())).hashCode()) + (new Boolean(bigBoolean())).hashCode());
+    }
+    public String toString() {
+        return "primitiveTypesExample2("  + "smallBoolean: " + smallBoolean() + ", " + "bigBoolean: " + bigBoolean() + ")";
+    }
+}""".stripMargin.unindent
+      ))
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val code = mkJavaCodeGen generate schema

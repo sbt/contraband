@@ -292,6 +292,45 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent)
   }
 
+  override def recordPrimitives: Unit = {
+    val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
+    val record = JsonParser.ObjectTypeDefinition.parse(primitiveTypesExample2)
+    val code = gen generate record
+
+    // println(code)
+
+    code.head._2.unindent should equalLines (
+      """/**
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ */
+
+// DO NOT EDIT MANUALLY
+package generated
+import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
+trait PrimitiveTypesExample2Formats { self: sjsonnew.BasicJsonProtocol =>
+implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypesExample2] = new JsonFormat[_root_.primitiveTypesExample2] {
+  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample2 = {
+    jsOpt match {
+      case Some(js) =>
+      unbuilder.beginObject(js)
+      val smallBoolean = unbuilder.readField[Boolean]("smallBoolean")
+      val bigBoolean = unbuilder.readField[Boolean]("bigBoolean")
+      unbuilder.endObject()
+      _root_.primitiveTypesExample2(smallBoolean, bigBoolean)
+      case None =>
+      deserializationError("Expected JsObject but found None")
+    }
+  }
+  override def write[J](obj: _root_.primitiveTypesExample2, builder: Builder[J]): Unit = {
+    builder.beginObject()
+    builder.addField("smallBoolean", obj.smallBoolean)
+    builder.addField("bigBoolean", obj.bigBoolean)
+    builder.endObject()
+  }
+}
+}""".stripMargin.unindent)
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)

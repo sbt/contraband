@@ -181,6 +181,19 @@ abstract class CodeGenerator {
       case other     => other
     }
 
+  protected def primitiveType(tpe: String): Boolean =
+    tpe match {
+      case "boolean" | "Boolean" => true
+      case "byte" | "Byte"       => true
+      case "char" | "Char"       => true
+      case "float" | "Float"     => true
+      case "int" | "Int"         => true
+      case "long" | "Long"       => true
+      case "short" | "Short"     => true
+      case "double" | "Double"   => true
+      case other     => false
+    }
+
   protected def containsOptional(fields: List[FieldDefinition]): Boolean =
     fields exists { f => f.fieldType.isOptionalType }
 
