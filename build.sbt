@@ -49,7 +49,7 @@ lazy val plugin = (project in file("plugin")).
     description := "sbt plugin to generate growable datatypes.",
     ScriptedPlugin.scriptedSettings,
     scriptedLaunchOpts := { scriptedLaunchOpts.value ++
-      Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+      Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
     publishLocal := (publishLocal dependsOn (publishLocal in library)).value
   ).
