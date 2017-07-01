@@ -380,6 +380,7 @@ object CodecCodeGen {
       case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger"
         | "java.math.BigDecimal" | "java.io.File" => Nil
       case "StringStringMap" => Nil
+      case "Throwable" | "java.lang.Throwable" => Nil
       case _ => forOthers(tpe)
     }
   }

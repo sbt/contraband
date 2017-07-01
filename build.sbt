@@ -37,7 +37,7 @@ lazy val library = (project in file("library")).
   disablePlugins(BintrayPlugin).
   settings(
     name := "contraband",
-    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies ++ Seq(scalaTest % Test, diffutils % Test)
+    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies.value ++ Seq(scalaTest % Test, diffutils % Test)
   )
 
 lazy val plugin = (project in file("plugin")).
