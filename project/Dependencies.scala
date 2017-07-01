@@ -4,7 +4,8 @@ object Dependencies {
   val jawnVersion = "0.10.4"
 
   private val jsonTuples = Seq(
-    ("org.json4s", "json4s-core", "3.5.0"),
+    // Keep json4s with this version.
+    ("org.json4s", "json4s-core", "3.2.10"),
     ("org.spire-math", "jawn-parser", jawnVersion),
     ("org.spire-math", "jawn-json4s", jawnVersion)
   )
