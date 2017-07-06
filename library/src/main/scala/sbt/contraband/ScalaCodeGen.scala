@@ -228,7 +228,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
 
   private def genHashCode(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
-    val seed = s"""37 * (17 + "${cl.name}".##)"""
+    val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
+    val seed = s"""37 * (17 + "$fqcn".##)"""
     val computationCode =
       if (allFields exists (_.fieldType.isLazyType)) {
         s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
