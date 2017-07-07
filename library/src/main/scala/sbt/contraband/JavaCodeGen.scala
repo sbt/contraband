@@ -331,7 +331,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
   private def genHashCode(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
-    val seed = s"""37 * (17 + "${cl.name}".hashCode())"""
+    val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
+    val seed = s"""37 * (17 + "$fqcn".hashCode())"""
     val body =
       if (allFields exists { f => f.fieldType.isLazyType }) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."

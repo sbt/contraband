@@ -61,7 +61,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + "TypeExample".hashCode()) + field().hashCode());
+        |        return 37 * (37 * (17 + "com.example.TypeExample".hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "TypeExample("  + "field: " + field() + ")";
@@ -110,7 +110,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + "Growable".hashCode()) + field().hashCode());
+        |        return 37 * (37 * (17 + "com.example.Growable".hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "Growable("  + "field: " + field() + ")";
@@ -179,7 +179,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + y().hashCode());
+        |        return 37 * (37 * (37 * (17 + "com.example.Foo".hashCode()) + x().hashCode()) + y().hashCode());
         |    }
         |    public String toString() {
         |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
@@ -222,7 +222,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + "InterfaceExample".hashCode()) + field().hashCode());
+        |        return 37 * (37 * (17 + "com.example.InterfaceExample".hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "InterfaceExample("  + "field: " + field() + ")";
@@ -266,7 +266,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (37 * (17 + "ChildType".hashCode()) + name().hashCode()) + field().hashCode());
+        |        return 37 * (37 * (37 * (17 + "com.example.ChildType".hashCode()) + name().hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "ChildType("  + "name: " + name() + ", " + "field: " + field() + ")";
@@ -312,7 +312,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + "IntfExample".hashCode()) + field().hashCode());
+        |        return 37 * (37 * (17 + "com.example.IntfExample".hashCode()) + field().hashCode());
         |    }
         |    public String toString() {
         |        return "IntfExample("  + "field: " + field() + ")";
