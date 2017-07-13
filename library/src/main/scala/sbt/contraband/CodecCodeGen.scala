@@ -99,9 +99,10 @@ class CodecCodeGen(codecParents: List[String],
     val fqn = fullyQualifiedName(r)
     val allFields = r.fields // superFields ++ r.fields
     val getFields = allFields map (f => s"""val ${bq(f.name)} = unbuilder.readField[${genRealTpe(f.fieldType, intfLanguage)}]("${f.name}")""") mkString EOL
+    val factoryMethodName = "make"
     val reconstruct =
       if (targetLang == "Scala") s"$fqn(" + allFields.map(accessField).mkString(", ") + ")"
-      else s"new $fqn(" + allFields.map(accessField).mkString(", ") + ")"
+      else s"$fqn.$factoryMethodName(" + allFields.map(accessField).mkString(", ") + ")"
     val writeFields = allFields map (f => s"""builder.addField("${f.name}", obj.${bq(f.name)})""") mkString EOL
     val selfType = makeSelfType(s, r)
 
