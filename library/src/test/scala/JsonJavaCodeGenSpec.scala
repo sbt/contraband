@@ -31,7 +31,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |public abstract class simpleInterfaceExample implements java.io.Serializable {
         |    // Some extra code...
         |    private type field;
-        |    public simpleInterfaceExample(type _field) {
+        |    protected simpleInterfaceExample(type _field) {
         |        super();
         |        field = _field;
         |    }
@@ -67,7 +67,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |public abstract class oneChildInterfaceExample implements java.io.Serializable {
         |
         |    private int field;
-        |    public oneChildInterfaceExample(int _field) {
+        |    protected oneChildInterfaceExample(int _field) {
         |        super();
         |        field = _field;
         |    }
@@ -93,8 +93,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |}""".stripMargin.unindent)
     code2 should equalLines (
       """public final class childRecord extends oneChildInterfaceExample {
+        |    public static childRecord make(int _field, int _x) {
+        |        return new childRecord(_field, _x);
+        |    }
         |    private int x;
-        |    public childRecord(int _field, int _x) {
+        |    protected childRecord(int _field, int _x) {
         |        super(_field);
         |         x = _x;
         |    }
@@ -135,7 +138,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
             |public abstract class nestedProtocolExample implements java.io.Serializable {
-            |    public nestedProtocolExample() {
+            |    protected nestedProtocolExample() {
             |        super();
             |    }
             |    public boolean equals(Object obj) {
@@ -158,7 +161,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
         new File("nestedProtocol.java") ->
           """public abstract class nestedProtocol extends nestedProtocolExample {
-            |    public nestedProtocol() {
+            |    protected nestedProtocol() {
             |        super();
             |    }
             |    public boolean equals(Object obj) {
@@ -181,7 +184,10 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
 
         new File("ChildRecord.java") ->
           """public final class ChildRecord extends nestedProtocol {
-            |    public ChildRecord() {
+            |    public static ChildRecord make() {
+            |        return new ChildRecord();
+            |    }
+            |    protected ChildRecord() {
             |        super();
             |    }
             |    public boolean equals(Object obj) {
@@ -214,7 +220,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
           """public abstract class generateArgDocExample implements java.io.Serializable {
             |    /** I'm a field. */
             |    private int field;
-            |    public generateArgDocExample(int _field) {
+            |    protected generateArgDocExample(int _field) {
             |        super();
             |        field = _field;
             |    }
@@ -260,8 +266,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |public final class simpleRecordExample implements java.io.Serializable {
             |    // Some extra code...
             |
+            |    public static simpleRecordExample make(java.net.URL _field) {
+            |        return new simpleRecordExample(_field);
+            |    }
             |    private java.net.URL field;
-            |    public simpleRecordExample(java.net.URL _field) {
+            |    protected simpleRecordExample(java.net.URL _field) {
             |        super();
             |        field = _field;
             |    }
@@ -299,12 +308,18 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ListMap(
         new File("growableAddOneField.java") ->
           """public final class growableAddOneField implements java.io.Serializable {
+            |    public static growableAddOneField make() {
+            |        return new growableAddOneField();
+            |    }
+            |    public static growableAddOneField make(int _field) {
+            |        return new growableAddOneField(_field);
+            |    }
             |    private int field;
-            |    public growableAddOneField() {
+            |    protected growableAddOneField() {
             |        super();
             |        field = 0;
             |    }
-            |    public growableAddOneField(int _field) {
+            |    protected growableAddOneField(int _field) {
             |        super();
             |        field = _field;
             |    }
@@ -342,29 +357,44 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
+            |    public static Foo make() {
+            |        return new Foo();
+            |    }
+            |    public static Foo make(java.util.Optional<Integer> _x) {
+            |        return new Foo(_x);
+            |    }
+            |    public static Foo make(int _x) {
+            |        return new Foo(_x);
+            |    }
+            |    public static Foo make(java.util.Optional<Integer> _x, int[] _y) {
+            |        return new Foo(_x, _y);
+            |    }
+            |    public static Foo make(int _x, int[] _y) {
+            |        return new Foo(_x, _y);
+            |    }
             |    private java.util.Optional<Integer> x;
             |    private int[] y;
-            |    public Foo() {
+            |    protected Foo() {
             |        super();
             |        x = java.util.Optional.<String>ofNullable(0);
             |        y = new Array { 0 };
             |    }
-            |    public Foo(java.util.Optional<Integer> _x) {
+            |    protected Foo(java.util.Optional<Integer> _x) {
             |        super();
             |        x = _x;
             |        y = new Array { 0 };
             |    }
-            |    public Foo(int _x) {
+            |    protected Foo(int _x) {
             |        super();
             |        x = java.util.Optional.<Integer>ofNullable(_x);
             |        y = new Array { 0 };
             |    }
-            |    public Foo(java.util.Optional<Integer> _x, int[] _y) {
+            |    protected Foo(java.util.Optional<Integer> _x, int[] _y) {
             |      super();
             |      x = _x;
             |      y = _y;
             |    }
-            |    public Foo(int _x, int[] _y) {
+            |    protected Foo(int _x, int[] _y) {
             |        super();
             |        x = java.util.Optional.<Integer>ofNullable(_x);
             |        y = _y;
@@ -414,9 +444,12 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
           """public final class primitiveTypesExample2 implements java.io.Serializable {
 
 
+    public static primitiveTypesExample2 make(boolean _smallBoolean, boolean _bigBoolean) {
+        return new primitiveTypesExample2(_smallBoolean, _bigBoolean);
+    }
     private boolean smallBoolean;
     private boolean bigBoolean;
-    public primitiveTypesExample2(boolean _smallBoolean, boolean _bigBoolean) {
+    protected primitiveTypesExample2(boolean _smallBoolean, boolean _bigBoolean) {
         super();
         smallBoolean = _smallBoolean;
         bigBoolean = _bigBoolean;
@@ -460,13 +493,19 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     code.head._2.unindent should equalLines (
       """public final class primitiveTypesExample implements java.io.Serializable {
         |
+        |    public static primitiveTypesExample make(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, java.util.Optional<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
+        |        return new primitiveTypesExample(_simpleInteger, _lazyInteger, _arrayInteger, _optionInteger, _lazyArrayInteger, _lazyOptionInteger);
+        |    }
+        |    public static primitiveTypesExample make(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
+        |        return new primitiveTypesExample(_simpleInteger, _lazyInteger, _arrayInteger, _optionInteger, _lazyArrayInteger, _lazyOptionInteger);
+        |    }
         |    private int simpleInteger;
         |    private com.example.MyLazy<Integer> lazyInteger;
         |    private int[] arrayInteger;
         |    private java.util.Optional<Integer> optionInteger;
         |    private com.example.MyLazy<int[]> lazyArrayInteger;
         |    private com.example.MyLazy<java.util.Optional<Integer>> lazyOptionInteger;
-        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, java.util.Optional<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
+        |    protected primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, java.util.Optional<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
         |        super();
         |        simpleInteger = _simpleInteger;
         |        lazyInteger = _lazyInteger;
@@ -475,7 +514,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        lazyArrayInteger = _lazyArrayInteger;
         |        lazyOptionInteger = _lazyOptionInteger;
         |    }
-        |    public primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
+        |    protected primitiveTypesExample(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, int _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
         |        super();
         |        simpleInteger = _simpleInteger;
         |        lazyInteger = _lazyInteger;
@@ -547,10 +586,13 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         new File("primitiveTypesNoLazyExample.java") ->
           """public final class primitiveTypesNoLazyExample implements java.io.Serializable {
             |
+            |    public static primitiveTypesNoLazyExample make(int _simpleInteger, int[] _arrayInteger) {
+            |        return new primitiveTypesNoLazyExample(_simpleInteger, _arrayInteger);
+            |    }
             |    private int simpleInteger;
             |
             |    private int[] arrayInteger;
-            |    public primitiveTypesNoLazyExample(int _simpleInteger, int[] _arrayInteger) {
+            |    protected primitiveTypesNoLazyExample(int _simpleInteger, int[] _arrayInteger) {
             |        super();
             |        simpleInteger = _simpleInteger;
             |        arrayInteger = _arrayInteger;

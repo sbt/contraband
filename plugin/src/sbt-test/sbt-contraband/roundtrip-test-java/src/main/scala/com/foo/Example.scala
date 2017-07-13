@@ -7,10 +7,10 @@ import com.example._
 
 object Example extends App {
   import generated.CustomProtocol._
-  val g0: Greeting = new SimpleGreeting("Hello")
-  val g1: Greeting = new SimpleGreeting("Hello", Optional.empty[Integer]())
-  val g21: Greeting = new GreetingWithAttachments("Hello", Array.empty)
-  val g3: Greeting = new GreetingWithOption("Hello", Optional.ofNullable("foo"))
+  val g0: Greeting = SimpleGreeting.make("Hello")
+  val g1: Greeting = SimpleGreeting.make("Hello", Optional.empty[Integer]())
+  val g21: Greeting = GreetingWithAttachments.make("Hello", Array.empty)
+  val g3: Greeting = GreetingWithOption.make("Hello", Optional.ofNullable("foo"))
 
   println(CompactPrinter(Converter.toJson(g0).get))
   println(Converter.fromJson[Greeting](Converter.toJson(g0).get).get)

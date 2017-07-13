@@ -32,12 +32,18 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |public final class TypeExample implements java.io.Serializable {
         |    // Some extra code
         |
+        |    public static TypeExample make(java.util.Optional<java.net.URL> _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample make(java.net.URL _field) {
+        |        return new TypeExample(_field);
+        |    }
         |    private java.util.Optional<java.net.URL> field;
-        |    public TypeExample(java.util.Optional<java.net.URL> _field) {
+        |    protected TypeExample(java.util.Optional<java.net.URL> _field) {
         |        super();
         |        field = _field;
         |    }
-        |    public TypeExample(java.net.URL _field) {
+        |    protected TypeExample(java.net.URL _field) {
         |        super();
         |        field = java.util.Optional.<java.net.URL>ofNullable(_field);
         |    }
@@ -77,16 +83,25 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code.head._2.unindent should equalLines (
       """package com.example;
         |public final class Growable implements java.io.Serializable {
+        |    public static Growable make() {
+        |        return new Growable();
+        |    }
+        |    public static Growable make(java.util.Optional<Integer> _field) {
+        |        return new Growable(_field);
+        |    }
+        |    public static Growable make(int _field) {
+        |        return new Growable(_field);
+        |    }
         |    private java.util.Optional<Integer> field;
-        |    public Growable() {
+        |    protected Growable() {
         |        super();
         |        field = java.util.Optional.<Integer>ofNullable(0);
         |    }
-        |    public Growable(java.util.Optional<Integer> _field) {
+        |    protected Growable(java.util.Optional<Integer> _field) {
         |        super();
         |        field = _field;
         |    }
-        |    public Growable(int _field) {
+        |    protected Growable(int _field) {
         |        super();
         |        field = java.util.Optional.<Integer>ofNullable(_field);
         |    }
@@ -126,29 +141,44 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code.head._2.unindent should equalLines (
       """package com.example;
         |public final class Foo implements java.io.Serializable {
+        |    public static Foo make() {
+        |        return new Foo();
+        |    }
+        |    public static Foo make(java.util.Optional<Integer> _x) {
+        |        return new Foo(_x);
+        |    }
+        |    public static Foo make(int _x) {
+        |        return new Foo(_x);
+        |    }
+        |    public static Foo make(java.util.Optional<Integer> _x, int[] _y) {
+        |        return new Foo(_x, _y);
+        |    }
+        |    public static Foo make(int _x, int[] _y) {
+        |        return new Foo(_x, _y);
+        |    }
         |    private java.util.Optional<Integer> x;
         |    private int[] y;
-        |    public Foo() {
+        |    protected Foo() {
         |        super();
         |        x = java.util.Optional.<Integer>empty();
         |        y = new Array {};
         |    }
-        |    public Foo(java.util.Optional<Integer> _x) {
+        |    protected Foo(java.util.Optional<Integer> _x) {
         |        super();
         |        x = _x;
         |        y = new Array {};
         |    }
-        |    public Foo(int _x) {
+        |    protected Foo(int _x) {
         |        super();
         |        x = java.util.Optional.<Integer>ofNullable(_x);
         |        y = new Array {};
         |    }
-        |    public Foo(java.util.Optional<Integer> _x, int[] _y) {
+        |    protected Foo(java.util.Optional<Integer> _x, int[] _y) {
         |        super();
         |        x = _x;
         |        y = _y;
         |    }
-        |    public Foo(int _x, int[] _y) {
+        |    protected Foo(int _x, int[] _y) {
         |        super();
         |        x = java.util.Optional.<Integer>ofNullable(_x);
         |        y = _y;
@@ -200,11 +230,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |
         |    // Some extra code
         |    private java.util.Optional<Integer> field;
-        |    public InterfaceExample(java.util.Optional<Integer> _field) {
+        |    protected InterfaceExample(java.util.Optional<Integer> _field) {
         |        super();
         |        field = _field;
         |    }
-        |    public InterfaceExample(int _field) {
+        |    protected InterfaceExample(int _field) {
         |        super();
         |        field = java.util.Optional.<Integer>ofNullable(_field);
         |    }
@@ -231,12 +261,18 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code2 should equalLines (
       """package com.example;
         |public final class ChildType extends com.example.InterfaceExample {
+        |    public static ChildType make(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
+        |        return new ChildType(_name, _field);
+        |    }
+        |    public static ChildType make(String _name, int _field) {
+        |        return new ChildType(_name, _field);
+        |    }
         |    private java.util.Optional<String> name;
-        |    public ChildType(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
+        |    protected ChildType(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
         |        super(_field);
         |         name = _name;
         |    }
-        |    public ChildType(String _name, int _field) {
+        |    protected ChildType(String _name, int _field) {
         |        super(java.util.Optional.<Integer>ofNullable(_field));
         |         name = java.util.Optional.<String>ofNullable(_name);
         |    }
@@ -282,11 +318,11 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |public abstract class IntfExample implements java.io.Serializable {
         |    /** I'm a field. */
         |    private java.util.Optional<Integer> field;
-        |    public IntfExample(java.util.Optional<Integer> _field) {
+        |    protected IntfExample(java.util.Optional<Integer> _field) {
         |        super();
         |        field = _field;
         |    }
-        |    public IntfExample(int _field) {
+        |    protected IntfExample(int _field) {
         |        super();
         |        field = java.util.Optional.<Integer>ofNullable(_field);
         |    }

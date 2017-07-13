@@ -30,17 +30,17 @@ public abstract class Greeting implements java.io.Serializable {
 
     private String message;
     private java.util.Optional<String> s;
-    public Greeting(String _message) {
+    protected Greeting(String _message) {
         super();
         message = _message;
         s = java.util.Optional.<String>ofNullable("1");
     }
-    public Greeting(String _message, java.util.Optional<String> _s) {
+    protected Greeting(String _message, java.util.Optional<String> _s) {
         super();
         message = _message;
         s = _s;
     }
-    public Greeting(String _message, String _s) {
+    protected Greeting(String _message, String _s) {
         super();
         message = _message;
         s = java.util.Optional.<String>ofNullable(_s);

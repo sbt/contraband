@@ -625,6 +625,12 @@ object PriorityLevel {
           |/** Meta information of a Greeting */
           |public final class GreetingHeader implements java.io.Serializable {
           |
+          |    public static GreetingHeader make(com.example.MyLazy<java.util.Date> _created, String _author) {
+          |        return new GreetingHeader(_created, _author);
+          |    }
+          |    public static GreetingHeader make(com.example.MyLazy<java.util.Date> _created, com.example.PriorityLevel _priority, String _author) {
+          |        return new GreetingHeader(_created, _priority, _author);
+          |    }
           |    /** Creation date */
           |    private com.example.MyLazy<java.util.Date> created;
           |    /** The priority of this Greeting */
@@ -632,14 +638,14 @@ object PriorityLevel {
           |    /** The author of the Greeting */
           |    private String author;
           |
-          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, String _author) {
+          |    protected GreetingHeader(com.example.MyLazy<java.util.Date> _created, String _author) {
           |        super();
           |        created = _created;
           |        priority = com.example.PriorityLevel.Medium;
           |        author = _author;
           |    }
           |
-          |    public GreetingHeader(com.example.MyLazy<java.util.Date> _created, com.example.PriorityLevel _priority, String _author) {
+          |    protected GreetingHeader(com.example.MyLazy<java.util.Date> _created, com.example.PriorityLevel _priority, String _author) {
           |        super();
           |        created = _created;
           |        priority = _priority;
@@ -697,13 +703,19 @@ object PriorityLevel {
         """package com.example;
           |/** A Greeting with attachments */
           |public final class GreetingWithAttachments extends com.example.Greetings {
+          |    public static GreetingWithAttachments make(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
+          |        return new GreetingWithAttachments(_message, _attachments);
+          |    }
+          |    public static GreetingWithAttachments make(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, java.io.File[] _attachments) {
+          |        return new GreetingWithAttachments(_message, _header, _attachments);
+          |    }
           |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
-          |    public GreetingWithAttachments(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
+          |    protected GreetingWithAttachments(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
           |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
           |        attachments = _attachments;
           |    }
-          |    public GreetingWithAttachments(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, java.io.File[] _attachments) {
+          |    protected GreetingWithAttachments(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, java.io.File[] _attachments) {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
@@ -735,11 +747,11 @@ object PriorityLevel {
 public abstract class GreetingExtra extends com.example.Greetings {
 
     private String[] extra;
-    public GreetingExtra(com.example.MyLazy<String> _message, String[] _extra) {
+    protected GreetingExtra(com.example.MyLazy<String> _message, String[] _extra) {
         super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
         extra = _extra;
     }
-    public GreetingExtra(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, String[] _extra) {
+    protected GreetingExtra(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, String[] _extra) {
         super(_message, _header);
         extra = _extra;
     }
@@ -762,12 +774,18 @@ public abstract class GreetingExtra extends com.example.Greetings {
         """package com.example;
 public final class GreetingExtraImpl extends com.example.GreetingExtra {
 
+    public static GreetingExtraImpl make(com.example.MyLazy<String> _message, String[] _extra, String _x) {
+        return new GreetingExtraImpl(_message, _extra, _x);
+    }
+    public static GreetingExtraImpl make(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, String[] _extra, String _x) {
+        return new GreetingExtraImpl(_message, _header, _extra, _x);
+    }
     private String x;
-    public GreetingExtraImpl(com.example.MyLazy<String> _message, String[] _extra, String _x) {
+    protected GreetingExtraImpl(com.example.MyLazy<String> _message, String[] _extra, String _x) {
         super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), _extra);
         x = _x;
     }
-    public GreetingExtraImpl(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, String[] _extra, String _x) {
+    protected GreetingExtraImpl(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, String[] _extra, String _x) {
         super(_message, _header, _extra);
         x = _x;
     }
@@ -810,13 +828,13 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |    /** The header of the Greeting */
           |    private com.example.GreetingHeader header;
           |
-          |    public Greetings(com.example.MyLazy<String> _message) {
+          |    protected Greetings(com.example.MyLazy<String> _message) {
           |        super();
           |        message = _message;
           |        header = new com.example.GreetingHeader(new java.util.Date(), "Unknown");
           |    }
           |
-          |    public Greetings(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
+          |    protected Greetings(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
           |        super();
           |        message = _message;
           |        header = _header;
@@ -847,12 +865,17 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
         """package com.example;
           |/** A Greeting in its simplest form */
           |public final class SimpleGreeting extends com.example.Greetings {
-          |
-          |    public SimpleGreeting(com.example.MyLazy<String> _message) {
+          |    public static SimpleGreeting make(com.example.MyLazy<String> _message) {
+          |        return new SimpleGreeting(_message);
+          |    }
+          |    public static SimpleGreeting make(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
+          |        return new SimpleGreeting(_message, _header);
+          |    }
+          |    protected SimpleGreeting(com.example.MyLazy<String> _message) {
           |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
           |    }
           |
-          |    public SimpleGreeting(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
+          |    protected SimpleGreeting(com.example.MyLazy<String> _message, com.example.GreetingHeader _header) {
           |        super(_message, _header);
           |    }
           |
@@ -953,7 +976,7 @@ implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraI
       val extra = unbuilder.readField[Array[String]]("extra")
       val x = unbuilder.readField[String]("x")
       unbuilder.endObject()
-      new com.example.GreetingExtraImpl(mkLazy(message), header, extra, x)
+      com.example.GreetingExtraImpl.make(mkLazy(message), header, extra, x)
       case None =>
       deserializationError("Expected JsObject but found None")
     }

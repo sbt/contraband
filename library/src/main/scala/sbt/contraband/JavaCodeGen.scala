@@ -74,6 +74,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
          |${genDoc(doc)}
          |public final class $name $extendsCode {
          |    ${extra mkString EOL}
+         |    ${genFactoryMethods(r, parent)}
          |    ${genFields(lfs)}
          |    ${genConstructors(r, parent)}
          |    ${genAccessors(lfs)}
@@ -208,6 +209,30 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       case _       => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
+  private def genFactoryMethods(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
+    perVersionNumber(getSince(cl.directives), cl.fields filter { _.arguments.isEmpty }) { (provided, byDefault) =>
+      val lfs = localFields(cl, parent.toList)
+      val ctorParameters = provided map (f => s"${genRealTpe(f.fieldType)} _${f.name}") mkString ", "
+      val args = provided map (f => s"_${f.name}") mkString ", "
+
+      val factoryMethodName = "make"
+      s"""public static ${cl.name} ${factoryMethodName}($ctorParameters) {
+         |  return new ${cl.name}(${args});
+         |}""".stripMargin + {
+        if (!containsStrictOptional(provided) || !wrapOption) ""
+        else {
+          val ctorParameters2 = (provided map { f =>
+            if (f.fieldType.isOptionalType && !f.fieldType.isLazyType) s"${genRealTpe(f.fieldType.notNull)} _${f.name}"
+            else s"${genRealTpe(f.fieldType)} _${f.name}"
+          }).mkString(", ")
+          
+          (EOL + EOL) + s"""public static ${cl.name} ${factoryMethodName}($ctorParameters2) {
+             |  return new ${cl.name}(${args});
+             |}""".stripMargin
+            }
+      }
+    } mkString (EOL + EOL)
+
   private def genConstructors(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
     perVersionNumber(getSince(cl.directives), cl.fields filter { _.arguments.isEmpty }) { (provided, byDefault) =>
       val lfs = localFields(cl, parent.toList)
@@ -227,7 +252,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
         case f if byDefault contains f => s"${f.name} = ${renderDefaultValue(f)};"
       } mkString EOL
 
-      s"""public ${cl.name}($ctorParameters) {
+      s"""protected ${cl.name}($ctorParameters) {
          |    $superCall
          |    $assignments
          |}""".stripMargin + {
@@ -252,7 +277,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
               case f if byDefault contains f => s"${f.name} = ${renderDefaultValue(f)};"
             }).mkString(EOL)
 
-          (EOL + EOL) + s"""public ${cl.name}($ctorParameters2) {
+          (EOL + EOL) + s"""protected ${cl.name}($ctorParameters2) {
              |    $superCall2
              |    $assignments2
              |}""".stripMargin
