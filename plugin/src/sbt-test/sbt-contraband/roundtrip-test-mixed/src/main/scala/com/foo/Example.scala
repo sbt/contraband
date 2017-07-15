@@ -9,7 +9,7 @@ object Example extends App {
   import generated.CustomProtocol._
   val g0: Greeting = SimpleGreeting("Hello")
   val g1: Greeting = SimpleGreeting("Hello", Optional.empty[java.lang.Integer]())
-  val g21: Greeting = GreetingWithAttachments.make("Hello", Array.empty)
+  val g21: Greeting = GreetingWithAttachments.of("Hello", Array.empty)
   val g3: Greeting = GreetingWithOption("Hello", Optional.ofNullable("foo"))
 
   println(CompactPrinter(Converter.toJson(g0).get))

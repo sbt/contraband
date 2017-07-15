@@ -32,10 +32,16 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |public final class TypeExample implements java.io.Serializable {
         |    // Some extra code
         |
-        |    public static TypeExample make(java.util.Optional<java.net.URL> _field) {
+        |    public static TypeExample create(java.util.Optional<java.net.URL> _field) {
         |        return new TypeExample(_field);
         |    }
-        |    public static TypeExample make(java.net.URL _field) {
+        |    public static TypeExample of(java.util.Optional<java.net.URL> _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample create(java.net.URL _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample of(java.net.URL _field) {
         |        return new TypeExample(_field);
         |    }
         |    private java.util.Optional<java.net.URL> field;
@@ -83,13 +89,22 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code.head._2.unindent should equalLines (
       """package com.example;
         |public final class Growable implements java.io.Serializable {
-        |    public static Growable make() {
+        |    public static Growable create() {
         |        return new Growable();
         |    }
-        |    public static Growable make(java.util.Optional<Integer> _field) {
+        |    public static Growable of() {
+        |        return new Growable();
+        |    }
+        |    public static Growable create(java.util.Optional<Integer> _field) {
         |        return new Growable(_field);
         |    }
-        |    public static Growable make(int _field) {
+        |    public static Growable of(java.util.Optional<Integer> _field) {
+        |        return new Growable(_field);
+        |    }
+        |    public static Growable create(int _field) {
+        |        return new Growable(_field);
+        |    }
+        |    public static Growable of(int _field) {
         |        return new Growable(_field);
         |    }
         |    private java.util.Optional<Integer> field;
@@ -141,19 +156,34 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code.head._2.unindent should equalLines (
       """package com.example;
         |public final class Foo implements java.io.Serializable {
-        |    public static Foo make() {
+        |    public static Foo create() {
         |        return new Foo();
         |    }
-        |    public static Foo make(java.util.Optional<Integer> _x) {
+        |    public static Foo of() {
+        |        return new Foo();
+        |    }
+        |    public static Foo create(java.util.Optional<Integer> _x) {
         |        return new Foo(_x);
         |    }
-        |    public static Foo make(int _x) {
+        |    public static Foo of(java.util.Optional<Integer> _x) {
         |        return new Foo(_x);
         |    }
-        |    public static Foo make(java.util.Optional<Integer> _x, int[] _y) {
+        |    public static Foo create(int _x) {
+        |        return new Foo(_x);
+        |    }
+        |    public static Foo of(int _x) {
+        |        return new Foo(_x);
+        |    }
+        |    public static Foo create(java.util.Optional<Integer> _x, int[] _y) {
         |        return new Foo(_x, _y);
         |    }
-        |    public static Foo make(int _x, int[] _y) {
+        |    public static Foo of(java.util.Optional<Integer> _x, int[] _y) {
+        |        return new Foo(_x, _y);
+        |    }
+        |    public static Foo create(int _x, int[] _y) {
+        |        return new Foo(_x, _y);
+        |    }
+        |    public static Foo of(int _x, int[] _y) {
         |        return new Foo(_x, _y);
         |    }
         |    private java.util.Optional<Integer> x;
@@ -261,10 +291,16 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code2 should equalLines (
       """package com.example;
         |public final class ChildType extends com.example.InterfaceExample {
-        |    public static ChildType make(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
+        |    public static ChildType create(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
         |        return new ChildType(_name, _field);
         |    }
-        |    public static ChildType make(String _name, int _field) {
+        |    public static ChildType of(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
+        |        return new ChildType(_name, _field);
+        |    }
+        |    public static ChildType create(String _name, int _field) {
+        |        return new ChildType(_name, _field);
+        |    }
+        |    public static ChildType of(String _name, int _field) {
         |        return new ChildType(_name, _field);
         |    }
         |    private java.util.Optional<String> name;

@@ -212,26 +212,29 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
   private def genFactoryMethods(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
     perVersionNumber(getSince(cl.directives), cl.fields filter { _.arguments.isEmpty }) { (provided, byDefault) =>
       val lfs = localFields(cl, parent.toList)
-      val ctorParameters = provided map (f => s"${genRealTpe(f.fieldType)} _${f.name}") mkString ", "
-      val args = provided map (f => s"_${f.name}") mkString ", "
+      val ctorParameters = provided map (f => s"${genRealTpe(f.fieldType)} _${f.name}")
+      val args = provided map (f => s"_${f.name}")
 
-      val factoryMethodName = "make"
-      s"""public static ${cl.name} ${factoryMethodName}($ctorParameters) {
-         |  return new ${cl.name}(${args});
-         |}""".stripMargin + {
+      val factoryMethodNames = List("create", "of")
+      val methods = factoryMethodNames map { factory => genStaticFactoryMethod(cl, factory, ctorParameters, args) }
+      methods.mkString(EOL + EOL) +
+      {
         if (!containsStrictOptional(provided) || !wrapOption) ""
         else {
-          val ctorParameters2 = (provided map { f =>
+          val ctorParameters2 = provided map { f =>
             if (f.fieldType.isOptionalType && !f.fieldType.isLazyType) s"${genRealTpe(f.fieldType.notNull)} _${f.name}"
             else s"${genRealTpe(f.fieldType)} _${f.name}"
-          }).mkString(", ")
-          
-          (EOL + EOL) + s"""public static ${cl.name} ${factoryMethodName}($ctorParameters2) {
-             |  return new ${cl.name}(${args});
-             |}""".stripMargin
-            }
+          }
+          val methods2 = factoryMethodNames map { factory => genStaticFactoryMethod(cl, factory, ctorParameters2, args) }
+          EOL + EOL + methods2.mkString(EOL + EOL)
+        }
       }
     } mkString (EOL + EOL)
+  
+  private def genStaticFactoryMethod(cl: RecordLikeDefinition, methodName: String, params: List[String], args: List[String]): String =
+    s"""public static ${cl.name} ${methodName}(${params.mkString(", ")}) {
+       |  return new ${cl.name}(${args.mkString(", ")});
+       |}""".stripMargin
 
   private def genConstructors(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
     perVersionNumber(getSince(cl.directives), cl.fields filter { _.arguments.isEmpty }) { (provided, byDefault) =>
