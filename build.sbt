@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       version := "0.3.0-SNAPSHOT",
       organization := "org.scala-sbt",
-      crossScalaVersions := Seq("2.12.2", "2.11.11", "2.10.6"),
+      crossScalaVersions := Seq("2.12.3", "2.11.11", "2.10.6"),
       scalaVersion := "2.10.6",
       organizationName := "sbt",
       organizationHomepage := Some(url("http://scala-sbt.org/")),
