@@ -1,8 +1,0 @@
-### enhancements
-
-- Adds a 'contrabandSjsonNewVersion' setting key, used to make sure the same version of `sjson-new-core` and
-    `sjson-new-scalajson` are used. [#70][]/[#71][] by [@dwijnand][]
-
-  [#70]: https://github.com/sbt/contraband/issues/70
-  [#71]: https://github.com/sbt/contraband/pull/71
-  [@dwijnand]: http://github.com/dwijnand
