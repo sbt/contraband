@@ -103,7 +103,7 @@ object ContrabandPlugin extends AutoPlugin {
     )
 
   override def globalSettings = Seq(
-    contrabandSjsonNewVersion := "0.8.0"
+    contrabandSjsonNewVersion := "0.8.1"
   )
 }
 
