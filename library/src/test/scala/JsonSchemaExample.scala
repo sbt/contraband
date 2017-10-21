@@ -429,7 +429,7 @@ sealed abstract class Greetings(
   lazy val message: String = _message
 
   override def equals(o: Any): Boolean = o match {
-    case x: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {
@@ -450,7 +450,7 @@ final class SimpleGreeting private (
   private def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
 
   override def equals(o: Any): Boolean = o match {
-    case x: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {
@@ -482,7 +482,7 @@ sealed abstract class GreetingExtra(
 
 
   override def equals(o: Any): Boolean = o match {
-    case x: GreetingExtra => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: GreetingExtra => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {
@@ -503,7 +503,7 @@ final class GreetingExtraImpl private (
   private def this(message: com.example.Lazy[String], extra: Array[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
 
   override def equals(o: Any): Boolean = o match {
-    case x: GreetingExtraImpl => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: GreetingExtraImpl => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {
@@ -542,7 +542,7 @@ final class GreetingWithAttachments private (
   private def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
 
   override def equals(o: Any): Boolean = o match {
-    case x: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {
@@ -580,7 +580,7 @@ final class GreetingHeader private (
   /** Creation date */
   lazy val created: java.util.Date = _created
   override def equals(o: Any): Boolean = o match {
-    case x: GreetingHeader => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+    case _: GreetingHeader => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
   override def hashCode: Int = {

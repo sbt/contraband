@@ -109,7 +109,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** example of nested protocols */
         |sealed abstract class nestedProtocolExample() extends Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: nestedProtocolExample => true
+        |    case _: nestedProtocolExample => true
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
@@ -124,7 +124,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() with Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: nestedProtocol => true
+        |    case _: nestedProtocol => true
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
@@ -140,7 +140,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |
         |final class ChildRecord private () extends nestedProtocol() with Serializable {
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: ChildRecord => true
+        |    case _: ChildRecord => true
         |    case _ => false
         |  }
         |  override def hashCode: Int = {
@@ -353,7 +353,7 @@ object primitiveTypesExample2 {
         |  lazy val lazyArrayInteger: Vector[Int] = _lazyArrayInteger
         |  lazy val lazyOptionInteger: Option[Int] = _lazyOptionInteger
         |  override def equals(o: Any): Boolean = o match {
-        |    case x: primitiveTypesExample => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
+        |    case _: primitiveTypesExample => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
         |    case _ => false
         |  }
         |  override def hashCode: Int = {

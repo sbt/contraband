@@ -211,17 +211,16 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
 
   private def genEquals(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
-    val comparisonCode =
-      if (allFields exists (_.fieldType.isLazyType)) {
-        "super.equals(o) // We have lazy members, so use object identity to avoid circularity."
-      } else if (allFields.isEmpty) {
-        "true"
-      } else {
-        allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && "
-      }
+    val (x, comparisonCode) =
+      if (allFields exists (_.fieldType.isLazyType))
+        ("_", "super.equals(o) // We have lazy members, so use object identity to avoid circularity.")
+      else if (allFields.isEmpty)
+        ("_", "true")
+      else
+        ("x", allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && ")
 
     s"""override def equals(o: Any): Boolean = o match {
-       |  case x: ${cl.name} => $comparisonCode
+       |  case $x: ${cl.name} => $comparisonCode
        |  case _ => false
        |}""".stripMargin
   }
