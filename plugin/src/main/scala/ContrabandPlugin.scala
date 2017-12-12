@@ -148,7 +148,7 @@ object Generate {
             case (file, code) =>
               val outputFile = new File(target, "/" + file.toString)
               IO.write(outputFile, code)
-              log.info(s"sbt-contraband created $outputFile")
+              log.debug(s"sbt-contraband created $outputFile")
               // println(code)
               // println("---------")
               outputFile
@@ -167,7 +167,7 @@ object Generate {
               // println("---------")
               val outputFile = new File(target, "/" + file.toString)
               IO.write(outputFile, code)
-              log.info(s"sbt-contraband created $outputFile")
+              log.debug(s"sbt-contraband created $outputFile")
 
               outputFile
           }.toList
