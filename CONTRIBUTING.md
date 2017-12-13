@@ -11,8 +11,8 @@ $ sbt
 ```
 $ jenv shell 1.8
 $ sbt
-> ++2.12.3
-> ^^1.0.0
+> ++2.12.4
+> ^^1.0.4
 > clean
 > publishSigned
 ```
