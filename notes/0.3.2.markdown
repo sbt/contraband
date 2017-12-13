@@ -1,0 +1,9 @@
+
+### bug fixes
+
+- Fixes "pattern var x in method equals is never used" warning in generated code. #108 by @razvan-panda
+
+### enhancement
+
+- Log the path of every file created at debug level. #110 by @dwijnand
+- Use sjson-new 0.8.2. #111 by @eed3si9n
