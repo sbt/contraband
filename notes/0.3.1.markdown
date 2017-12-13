@@ -1,0 +1,5 @@
+
+### enhancements
+
+- Updates to sjson-new 0.8.1.
+
