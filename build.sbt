@@ -10,10 +10,10 @@ lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
     inThisBuild(List(
-      version := "0.3.2-SNAPSHOT",
+      version := "0.3.3-SNAPSHOT",
       organization := "org.scala-sbt",
-      crossScalaVersions := Seq("2.12.3", "2.11.11", "2.10.6"),
-      scalaVersion := "2.10.6",
+      crossScalaVersions := Seq("2.12.4", "2.11.12", "2.10.7"),
+      scalaVersion := "2.10.7",
       organizationName := "sbt",
       organizationHomepage := Some(url("http://scala-sbt.org/")),
       homepage := Some(url("http://scala-sbt.org/contraband")),
