@@ -85,33 +85,46 @@ Here's the Java code it generates (after changing the target annotation to `Java
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-
+    
+    public static Person create(String _name, java.util.Optional<Integer> _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, java.util.Optional<Integer> _age) {
+        return new Person(_name, _age);
+    }
+    public static Person create(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    
     private String name;
-    private com.example.Maybe<Integer> age;
-    public Person(String _name, com.example.Maybe<Integer> _age) {
+    private java.util.Optional<Integer> age;
+    protected Person(String _name, java.util.Optional<Integer> _age) {
         super();
         name = _name;
         age = _age;
     }
-    public Person(String _name, int _age) {
+    protected Person(String _name, int _age) {
         super();
         name = _name;
-        age = com.example.Maybe.<Integer>just(_age);
+        age = java.util.Optional.<Integer>ofNullable(_age);
     }
     public String name() {
         return this.name;
     }
-    public com.example.Maybe<Integer> age() {
+    public java.util.Optional<Integer> age() {
         return this.age;
     }
     public Person withName(String name) {
         return new Person(name, age);
     }
-    public Person withAge(com.example.Maybe<Integer> age) {
+    public Person withAge(java.util.Optional<Integer> age) {
         return new Person(name, age);
     }
     public Person withAge(int age) {
-        return new Person(name, com.example.Maybe.<Integer>just(age));
+        return new Person(name, java.util.Optional.<Integer>ofNullable(age));
     }
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -124,7 +137,7 @@ public final class Person implements java.io.Serializable {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+        return 37 * (37 * (37 * (17 + "com.example.Person".hashCode()) + name().hashCode()) + age().hashCode());
     }
     public String toString() {
         return "Person("  + "name: " + name() + ", " + "age: " + age() + ")";
