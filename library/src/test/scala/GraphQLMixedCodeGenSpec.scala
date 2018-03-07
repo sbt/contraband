@@ -105,7 +105,7 @@ final class SimpleGreeting private (
   }
 }
 object SimpleGreeting {
-  def apply(message: String): SimpleGreeting = new SimpleGreeting(message, java.util.Optional.ofNullable[String]("1"))
+  def apply(message: String): SimpleGreeting = new SimpleGreeting(message)
   def apply(message: String, s: java.util.Optional[String]): SimpleGreeting = new SimpleGreeting(message, s)
   def apply(message: String, s: String): SimpleGreeting = new SimpleGreeting(message, java.util.Optional.ofNullable[String](s))
 }
