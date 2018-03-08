@@ -26,3 +26,4 @@ $ sbt
 * release the repository in https://oss.sonatype.org/#stagingRepositories
 * publish the package in https://bintray.com/sbt/sbt-plugin-releases/sbt-contraband
 * push the commits & tag: `git push --follow-tags`
+* make a GitHub release in https://github.com/sbt/contraband/releases
