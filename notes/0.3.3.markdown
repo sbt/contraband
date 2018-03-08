@@ -1,0 +1,7 @@
+
+### bug fixes
+
+- Fixes the apply overloads codegen to use their respective constructor to ensure they continue to be public in
+    the bytecode. #117 by @dwijnand
+
+https://github.com/sbt/contraband/compare/v0.3.2...v0.3.3
