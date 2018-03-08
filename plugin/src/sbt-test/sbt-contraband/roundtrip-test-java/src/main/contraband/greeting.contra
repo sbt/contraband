@@ -35,3 +35,7 @@ type Person {
   name: String!
   age: Int
 }
+
+type GreetingList {
+  greetings: [com.example.Greeting]!
+}

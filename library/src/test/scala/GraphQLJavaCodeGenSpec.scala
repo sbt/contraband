@@ -239,7 +239,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (37 * (17 + "com.example.Foo".hashCode()) + x().hashCode()) + y().hashCode());
+        |        return 37 * (37 * (37 * (17 + "com.example.Foo".hashCode()) + x().hashCode()) + java.util.Arrays.hashCode(y()));
         |    }
         |    public String toString() {
         |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";

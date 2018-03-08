@@ -355,6 +355,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
   private def hashCode(f: FieldDefinition): String =
     if (isPrimitive(f.fieldType)) s"(new ${boxedType(f.fieldType.name)}(${f.name}())).hashCode()"
+    else if (isPrimitiveArray(f.fieldType)) s"java.util.Arrays.hashCode(${f.name}())"
+    else if (f.fieldType.isListType) s"java.util.Arrays.deepHashCode(${f.name}())"
     else s"${f.name}().hashCode()"
 
   private def genHashCode(cl: RecordLikeDefinition) = {

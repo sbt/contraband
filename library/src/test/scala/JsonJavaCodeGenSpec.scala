@@ -455,7 +455,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + y().hashCode());
+            |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + java.util.Arrays.hashCode(y()));
             |    }
             |    public String toString() {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
@@ -662,7 +662,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
+            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + java.util.Arrays.hashCode(arrayInteger()));
             |    }
             |    public String toString() {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
