@@ -219,8 +219,8 @@ class CodecCodeGen(codecParents: List[String],
 
   private def getAllFormatsForSchema(s: Document): List[String] =
     getAllRequiredFormats(s, (s.definitions collect {
-      case td: TypeDefinition => td
-    }).toList)
+      case td: TypeDefinition if getGenerateCodec(td.directives) => td
+    }))
 
   /**
    * Returns the list of fully qualified codec names that we (transitively) need to generate a codec for `ds`,
