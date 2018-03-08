@@ -250,7 +250,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |object growableAddOneField {
-        |  def apply(): growableAddOneField = new growableAddOneField(0)
+        |  def apply(): growableAddOneField = new growableAddOneField()
         |  def apply(field: Int): growableAddOneField = new growableAddOneField(field)
         |}
         |""".stripMargin.unindent)
@@ -290,9 +290,9 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  }
         |}
         |object Foo {
-        |  def apply(): Foo = new Foo(Option(0), Vector(0))
-        |  def apply(x: Option[Int]): Foo = new Foo(x, Vector(0))
-        |  def apply(x: Int): Foo = new Foo(Option(x), Vector(0))
+        |  def apply(): Foo = new Foo()
+        |  def apply(x: Option[Int]): Foo = new Foo(x)
+        |  def apply(x: Int): Foo = new Foo(Option(x))
         |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
         |  def apply(x: Int, y: Vector[Int]): Foo = new Foo(Option(x), y)
         |}

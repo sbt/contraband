@@ -329,14 +329,10 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
       List(s"def apply(): ${r.name} = new ${r.name}()")
     } else {
       val since = getSince(r.directives)
-      perVersionNumber(since, allFields) { (provided, byDefault) =>
+      perVersionNumber(since, allFields) { (provided, _) =>
         val applyParameters = provided map { f => genParam(f, intfLang) } mkString ", "
 
-        val ctorCallArguments =
-          allFields map {
-            case f if provided contains f  => bq(f.name)
-            case f if byDefault contains f => renderDefaultValue(f, intfLang)
-          } mkString ", "
+        val ctorCallArguments = provided map (f => bq(f.name)) mkString ", "
         s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)" +
         {
           if (!containsOptional(provided) || !wrapOption) ""
@@ -346,12 +342,12 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
               else genParam(f, intfLang)
             }).mkString(", ")
             val ctorCallArguments2 =
-              (allFields map {
-                case f if (provided contains f) && f.fieldType.isOptionalType =>
+              provided.map { f =>
+                if (f.fieldType.isOptionalType)
                   mkOptional(bq(f.name), f.fieldType, intfLang)
-                case f if provided contains f  => bq(f.name)
-                case f if byDefault contains f => renderDefaultValue(f, intfLang)
-              }).mkString(", ")
+                else
+                  bq(f.name)
+              }.mkString(", ")
             EOL + s"def apply($applyParameters2): ${r.name} = new ${r.name}($ctorCallArguments2)"
           }
         }

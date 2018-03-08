@@ -1,7 +1,7 @@
 package sbt.contraband
 
 import org.scalatest._
-import ast.{ Definition => _ , _ }
+import sbt.contraband.ast._
 
 abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers with EqualLines {
   implicit def typeDefinitions2Document(ds: List[TypeDefinition]): Document =

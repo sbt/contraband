@@ -122,7 +122,7 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  }
         |}
         |object Growable {
-        |  def apply(): Growable = new Growable(Option(0))
+        |  def apply(): Growable = new Growable()
         |  def apply(field: Option[Int]): Growable = new Growable(field)
         |  def apply(field: Int): Growable = new Growable(Option(field))
         |}
@@ -165,9 +165,9 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |  }
         |}
         |object Foo {
-        |  def apply(): Foo = new Foo(None, Vector())
-        |  def apply(x: Option[Int]): Foo = new Foo(x, Vector())
-        |  def apply(x: Int): Foo = new Foo(Option(x), Vector())
+        |  def apply(): Foo = new Foo()
+        |  def apply(x: Option[Int]): Foo = new Foo(x)
+        |  def apply(x: Int): Foo = new Foo(Option(x))
         |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
         |  def apply(x: Int, y: Vector[Int]): Foo = new Foo(Option(x), y)
         |}

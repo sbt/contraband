@@ -470,7 +470,7 @@ final class SimpleGreeting private (
   }
 }
 object SimpleGreeting {
-  def apply(message: => String): SimpleGreeting = new SimpleGreeting(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
+  def apply(message: => String): SimpleGreeting = new SimpleGreeting(message)
   def apply(message: => String, header: com.example.GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
 }
 
@@ -529,7 +529,7 @@ final class GreetingExtraImpl private (
   }
 }
 object GreetingExtraImpl {
-  def apply(message: com.example.Lazy[String], extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
+  def apply(message: com.example.Lazy[String], extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, extra, x)
   def apply(message: com.example.Lazy[String], header: com.example.GreetingHeader, extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
 }
 
@@ -565,7 +565,7 @@ final class GreetingWithAttachments private (
   }
 }
 object GreetingWithAttachments {
-  def apply(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
+  def apply(message: => String, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, attachments)
   def apply(message: => String, header: com.example.GreetingHeader, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
 }
 
@@ -605,7 +605,7 @@ final class GreetingHeader private (
 object GreetingHeader {
   val default: GreetingHeader =
   new GreetingHeader(new java.util.Date(), com.example.PriorityLevel.Medium, scala.sys.props("user.name")
-  def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, com.example.PriorityLevel.Medium, author)
+  def apply(created: => java.util.Date, author: String): GreetingHeader = new GreetingHeader(created, author)
   def apply(created: => java.util.Date, priority: com.example.PriorityLevel, author: String): GreetingHeader = new GreetingHeader(created, priority, author)
 }
 
