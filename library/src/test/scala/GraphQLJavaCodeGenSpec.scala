@@ -69,7 +69,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            TypeExample o = (TypeExample)obj;
-        |            return field().equals(o.field());
+        |            return this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -136,7 +136,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            Growable o = (Growable)obj;
-        |            return field().equals(o.field());
+        |            return this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -235,7 +235,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            Foo o = (Foo)obj;
-        |            return x().equals(o.x()) && java.util.Arrays.equals(y(), o.y());
+        |            return this.x().equals(o.x()) && java.util.Arrays.equals(this.y(), o.y());
         |        }
         |    }
         |    public int hashCode() {
@@ -278,7 +278,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            InterfaceExample o = (InterfaceExample)obj;
-        |            return field().equals(o.field());
+        |            return this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -334,7 +334,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            ChildType o = (ChildType)obj;
-        |            return name().equals(o.name()) && field().equals(o.field());
+        |            return this.name().equals(o.name()) && this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -380,7 +380,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |            return false;
         |        } else {
         |            IntfExample o = (IntfExample)obj;
-        |            return field().equals(o.field());
+        |            return this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {

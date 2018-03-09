@@ -194,11 +194,38 @@ abstract class CodeGenerator {
       case other     => false
     }
 
+  protected def isPrimitive(tpe: ast.Type) =
+    !tpe.isListType && !tpe.isLazyType && tpe.isNotNullType && primitiveType(tpe.name)
+
+  protected def isPrimitiveArray(tpe: ast.Type) =
+    tpe.isListType && !tpe.isLazyType && primitiveType(tpe.name)
+
   protected def containsOptional(fields: List[FieldDefinition]): Boolean =
     fields exists { f => f.fieldType.isOptionalType }
 
   protected def containsStrictOptional(fields: List[FieldDefinition]): Boolean =
     fields exists { f => f.fieldType.isOptionalType && !f.fieldType.isLazyType }
+
+  protected def genJavaEquals(lhs: String, rhs: String, f0: FieldDefinition,
+      fieldName: String, isJava: Boolean): String =
+    f0 match {
+      case f if isPrimitive(f.fieldType)      => s"($lhs.$fieldName == $rhs.$fieldName)"
+      case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.equals($lhs.$fieldName, $rhs.$fieldName)"
+      case f if f.fieldType.isListType        =>
+        if (isJava) s"java.util.Arrays.deepEquals($lhs.$fieldName, $rhs.$fieldName)"
+        else s"java.util.Arrays.deepEquals($lhs.$fieldName.asInstanceOf[Array[Object]], $rhs.$fieldName.asInstanceOf[Array[Object]])"
+      case f                                  => s"$lhs.$fieldName.equals($rhs.$fieldName)"
+    }
+
+  protected def genJavaHashCode(f0: FieldDefinition, fieldName: String, isJava: Boolean): String =
+    f0 match {
+      case f if isPrimitive(f.fieldType)      => s"(new ${boxedType(f.fieldType.name)}($fieldName)).hashCode()"
+      case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.hashCode($fieldName)"
+      case f if f.fieldType.isListType        =>
+        if (isJava) s"java.util.Arrays.deepHashCode($fieldName)"
+        else s"java.util.Arrays.deepHashCode($fieldName.asInstanceOf[Array[Object]])"
+      case f                                  => s"$fieldName.hashCode()"
+    }
 
   /** Generate the code corresponding to all definitions in `s`. */
   def generate(s: Document): ListMap[File, String]

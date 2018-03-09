@@ -11,6 +11,8 @@ object Example extends App {
   val g1: Greeting = SimpleGreeting("Hello", None)
   val g21: Greeting = GreetingWithAttachments("Hello", Vector.empty)
   val g3: Greeting = GreetingWithOption("Hello", Option("foo"))
+  val gl1: GreetingList = GreetingList(Vector(g0))
+  val gl2: GreetingList = GreetingList(Vector(g0))
 
   val json = CompactPrinter(Converter.toJson(g0).get)
   println(json)
@@ -32,4 +34,7 @@ object Example extends App {
   val json4 = CompactPrinter(Converter.toJson(f0).get)
   println(json4)
   assert(Converter.fromJson[Fruit](Converter.toJson(f0).get).get == f0)
+
+  assert(gl1 == gl2)
+  assert(gl1.## == gl2.##)
 }

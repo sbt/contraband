@@ -59,7 +59,7 @@ public abstract class Greeting implements java.io.Serializable {
             return false;
         } else {
             Greeting o = (Greeting)obj;
-            return message().equals(o.message()) && s().equals(o.s());
+            return this.message().equals(o.message()) && this.s().equals(o.s());
         }
     }
     public int hashCode() {
@@ -82,11 +82,11 @@ final class SimpleGreeting private (
   s: java.util.Optional[String]) extends com.example.Greeting(message, s) with Serializable {
   private def this(message: String) = this(message, java.util.Optional.ofNullable[String]("1"))
   override def equals(o: Any): Boolean = o match {
-    case x: SimpleGreeting => (this.message == x.message) && (this.s == x.s)
+    case x: SimpleGreeting => this.message.equals(x.message) && this.s.equals(x.s)
     case _ => false
   }
   override def hashCode: Int = {
-    37 * (37 * (37 * (17 + "com.example.SimpleGreeting".##) + message.##) + s.##)
+    37 * (37 * (37 * (17 + "com.example.SimpleGreeting".##) +  message.hashCode()) +  s.hashCode())
   }
   override def toString: String = {
     "SimpleGreeting(" + message + ", " + s + ")"

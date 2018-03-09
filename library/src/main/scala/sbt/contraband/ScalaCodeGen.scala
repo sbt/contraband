@@ -81,8 +81,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
          |  ${extra mkString EOL}
          |  ${genAlternativeConstructors(since, allFields, scalaPrivateConstructor, intfLang) mkString EOL}
          |  ${lazyMembers}
-         |  ${genEquals(r)}
-         |  ${genHashCode(r)}
+         |  ${genEquals(r, intfLang)}
+         |  ${genHashCode(r, intfLang)}
          |  ${genToString(r, toStringImpl)}
          |  ${genCopy(r, intfLang)}
          |  ${genWith(r, intfLang)}
@@ -130,8 +130,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
          |  $alternativeCtors
          |  $lazyMembers
          |  $messages
-         |  ${genEquals(i)}
-         |  ${genHashCode(i)}
+         |  ${genEquals(i, intfLang)}
+         |  ${genHashCode(i, intfLang)}
          |  ${genToString(i, toStringImpl)}
          |}
          |
@@ -209,15 +209,22 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
       }
     }
 
-  private def genEquals(cl: RecordLikeDefinition) = {
+  private def genEquals(cl: RecordLikeDefinition, intfLang: String) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
+
     val (x, comparisonCode) =
-      if (allFields exists (_.fieldType.isLazyType))
-        ("_", "super.equals(o) // We have lazy members, so use object identity to avoid circularity.")
-      else if (allFields.isEmpty)
-        ("_", "true")
-      else
-        ("x", allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && ")
+      intfLang match {
+        case _ if allFields exists (_.fieldType.isLazyType) =>
+          ("_", "super.equals(o) // We have lazy members, so use object identity to avoid circularity.")
+        case _ if allFields.isEmpty =>
+          ("_", "true")
+        case "Scala" =>
+          ("x", allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && ")
+        case _ =>
+          ("x", (allFields map { f =>
+            genJavaEquals("this", "x", f, s"${bq(f.name)}", false)
+          }).mkString(" && "))
+      }
 
     s"""override def equals(o: Any): Boolean = o match {
        |  case $x: ${cl.name} => $comparisonCode
@@ -225,15 +232,18 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
        |}""".stripMargin
   }
 
-  private def genHashCode(cl: RecordLikeDefinition) = {
+  private def genHashCode(cl: RecordLikeDefinition, intfLang: String) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
     val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
     val seed = s"""37 * (17 + "$fqcn".##)"""
     val computationCode =
-      if (allFields exists (_.fieldType.isLazyType)) {
-        s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
-      } else {
-        (seed /: allFields) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
+      intfLang match {
+        case _ if allFields exists (_.fieldType.isLazyType) =>
+          s"super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity."
+        case "Scala" =>
+          (seed /: allFields) { (acc, f) => s"37 * ($acc + ${bq(f.name)}.##)" }
+        case _ =>
+          (seed /: allFields) { (acc, f) => s"37 * ($acc +  ${genJavaHashCode(f, bq(f.name), false)})" }
       }
 
     s"""override def hashCode: Int = {

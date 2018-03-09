@@ -129,11 +129,6 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     s"""${genDoc(toDoc(f.comments))}
        |private ${genRealTpe(f.fieldType)} ${f.name};""".stripMargin
 
-  private def isPrimitive(tpe: ast.Type) =
-    !tpe.isListType && !tpe.isLazyType && tpe.isNotNullType && primitiveType(tpe.name)
-  private def isPrimitiveArray(tpe: ast.Type) =
-    tpe.isListType && !tpe.isLazyType && primitiveType(tpe.name)
-
   private def genRealTpe(tpe: ast.Type): String = tpe match {
     case t: ast.Type if t.isLazyType && t.isListType      => s"$lazyInterface<${unboxedType(t.name)}[]>"
     case t: ast.Type if t.isLazyType && !t.isNotNullType  => s"$lazyInterface<$optionalInterface<${boxedType(t.name)}>>"
@@ -331,11 +326,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
         val comparisonCode =
           if (allFields.isEmpty) "return true;"
           else
-            allFields.map {
-              case f if isPrimitive(f.fieldType)      => s"(${f.name}() == o.${f.name}())"
-              case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.equals(${f.name}(), o.${f.name}())"
-              case f if f.fieldType.isListType        => s"java.util.Arrays.deepEquals(${f.name}(), o.${f.name}())"
-              case f                                  => s"${f.name}().equals(o.${f.name}())"
+            allFields.map { f =>
+              genJavaEquals("this", "o", f, s"${f.name}()", true)
             }.mkString("return ", " && ", ";")
 
         s"""if (this == obj) {
@@ -353,12 +345,6 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
        |}""".stripMargin
   }
 
-  private def hashCode(f: FieldDefinition): String =
-    if (isPrimitive(f.fieldType)) s"(new ${boxedType(f.fieldType.name)}(${f.name}())).hashCode()"
-    else if (isPrimitiveArray(f.fieldType)) s"java.util.Arrays.hashCode(${f.name}())"
-    else if (f.fieldType.isListType) s"java.util.Arrays.deepHashCode(${f.name}())"
-    else s"${f.name}().hashCode()"
-
   private def genHashCode(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
     val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
@@ -367,7 +353,10 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       if (allFields exists { f => f.fieldType.isLazyType }) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
-        val computation = (seed /: allFields) { (acc, f) => s"37 * ($acc + ${hashCode(f)})" }
+        val computation = (seed /: allFields) { (acc, f) =>
+          val h = genJavaHashCode(f, s"${f.name}()", true)
+          s"37 * ($acc + $h)"
+        }
         s"return $computation;"
       }
 
