@@ -46,7 +46,7 @@ final class Person private (
   override def toString: String = {
     "Person(" + name + ", " + age + ")"
   }
-  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+  private[this] def copy(name: String = name, age: Option[Int] = age): Person = {
     new Person(name, age)
   }
   def withName(name: String): Person = {
