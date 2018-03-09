@@ -443,7 +443,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     def genParam(f: FieldDefinition) = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)} = ${bq(f.name)}"
     val params = allFields map genParam mkString ", "
     val constructorCall = allFields map (f => bq(f.name)) mkString ", "
-    s"""protected[this] def copy($params): ${r.name} = {
+    s"""private[this] def copy($params): ${r.name} = {
        |  new ${r.name}($constructorCall)
        |}""".stripMargin
   }
