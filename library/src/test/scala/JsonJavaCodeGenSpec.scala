@@ -45,7 +45,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return false;
         |        } else {
         |            simpleInterfaceExample o = (simpleInterfaceExample)obj;
-        |            return field().equals(o.field());
+        |            return this.field().equals(o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -81,7 +81,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return false;
         |        } else {
         |            oneChildInterfaceExample o = (oneChildInterfaceExample)obj;
-        |            return (field() == o.field());
+        |            return (this.field() == o.field());
         |        }
         |    }
         |    public int hashCode() {
@@ -120,7 +120,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return false;
         |        } else {
         |            childRecord o = (childRecord)obj;
-        |            return (field() == o.field()) && (x() == o.x());
+        |            return (this.field() == o.field()) && (this.x() == o.x());
         |        }
         |    }
         |    public int hashCode() {
@@ -248,7 +248,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            generateArgDocExample o = (generateArgDocExample)obj;
-            |            return (field() == o.field());
+            |            return (this.field() == o.field());
             |        }
             |    }
             |    public int hashCode() {
@@ -296,7 +296,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            simpleRecordExample o = (simpleRecordExample)obj;
-            |            return field().equals(o.field());
+            |            return this.field().equals(o.field());
             |        }
             |    }
             |    public int hashCode() {
@@ -351,7 +351,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            growableAddOneField o = (growableAddOneField)obj;
-            |            return (field() == o.field());
+            |            return (this.field() == o.field());
             |        }
             |    }
             |    public int hashCode() {
@@ -451,11 +451,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            Foo o = (Foo)obj;
-            |            return x().equals(o.x()) && java.util.Arrays.equals(y(), o.y());
+            |            return this.x().equals(o.x()) && java.util.Arrays.equals(this.y(), o.y());
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + y().hashCode());
+            |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + java.util.Arrays.hashCode(y()));
             |    }
             |    public String toString() {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
@@ -506,7 +506,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             return false;
         } else {
             primitiveTypesExample2 o = (primitiveTypesExample2)obj;
-            return (smallBoolean() == o.smallBoolean()) && (bigBoolean() == o.bigBoolean());
+            return (this.smallBoolean() == o.smallBoolean()) && (this.bigBoolean() == o.bigBoolean());
         }
     }
     public int hashCode() {
@@ -658,11 +658,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return false;
             |        } else {
             |            primitiveTypesNoLazyExample o = (primitiveTypesNoLazyExample)obj;
-            |            return (simpleInteger() == o.simpleInteger()) && java.util.Arrays.equals(arrayInteger(), o.arrayInteger());
+            |            return (this.simpleInteger() == o.simpleInteger()) && java.util.Arrays.equals(this.arrayInteger(), o.arrayInteger());
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + arrayInteger().hashCode());
+            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + java.util.Arrays.hashCode(arrayInteger()));
             |    }
             |    public String toString() {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
