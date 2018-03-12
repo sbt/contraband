@@ -1,0 +1,18 @@
+
+### breaking changes
+
+- Changes the generated copy method from being `protected[this]` to `private[this]`. [#121][] by [@dwijnand][]
+
+### bug fixes
+
+- Fixes equals/hashCode inconsistencies in Java & Java/Scala mixed sources. [#120][] by [@eed3si9n][]
+- Fixes the full codec generation to honour the "generateCodec" directive. [#118][] by [@dwijnand][]
+
+https://github.com/sbt/contraband/compare/v0.3.3...v0.4.0
+
+[#118]: https://github.com/sbt/contraband/pull/118
+[#120]: https://github.com/sbt/contraband/pull/120
+[#121]: https://github.com/sbt/contraband/pull/121
+
+[@eed3si9n]: https://github.com/eed3si9n
+[@dwijnand]: https://github.com/dwijnand
