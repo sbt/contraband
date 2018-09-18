@@ -20,6 +20,7 @@ package com.example @target(Scala)
 
 ## Example of a type
 type TypeExample {
+  ## something
   field: java.net.URL
 
   #x // Some extra code

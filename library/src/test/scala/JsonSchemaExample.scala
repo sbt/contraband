@@ -419,7 +419,6 @@ object JsonSchemaExample {
 /** A greeting interface */
 sealed abstract class Greetings(
   _message: => String,
-  /** The header of the Greeting */
   val header: com.example.GreetingHeader) extends com.example.GreetingsLike with Serializable {
   def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
   /**
@@ -443,7 +442,12 @@ object Greetings extends com.example.GreetingsCompanionLike {
   val empty: com.example.Greeting = new com.example.SimpleGreeting("Hello, World!")
 }
 
-/** A Greeting in its simplest form */
+/**
+ * A Greeting in its simplest form
+ * @param message The message of the Greeting
+                  This is a multiline doc comment
+ * @param header The header of the Greeting
+ */
 final class SimpleGreeting private (
   message: => String,
   header: com.example.GreetingHeader) extends com.example.Greetings(message, header) with Serializable {
@@ -473,7 +477,6 @@ object SimpleGreeting {
   def apply(message: => String): SimpleGreeting = new SimpleGreeting(message)
   def apply(message: => String, header: com.example.GreetingHeader): SimpleGreeting = new SimpleGreeting(message, header)
 }
-
 sealed abstract class GreetingExtra(
   message: => String,
   header: com.example.GreetingHeader,
@@ -494,7 +497,11 @@ sealed abstract class GreetingExtra(
 }
 object GreetingExtra {
 }
-
+/**
+ * @param message The message of the Greeting
+                  This is a multiline doc comment
+ * @param header The header of the Greeting
+ */
 final class GreetingExtraImpl private (
   message: com.example.Lazy[String],
   header: com.example.GreetingHeader,
@@ -533,11 +540,16 @@ object GreetingExtraImpl {
   def apply(message: com.example.Lazy[String], header: com.example.GreetingHeader, extra: Array[String], x: String): GreetingExtraImpl = new GreetingExtraImpl(message, header, extra, x)
 }
 
-/** A Greeting with attachments */
+/**
+ * A Greeting with attachments
+ * @param message The message of the Greeting
+                  This is a multiline doc comment
+ * @param header The header of the Greeting
+ * @param attachments The files attached to the greeting
+ */
 final class GreetingWithAttachments private (
   message: => String,
   header: com.example.GreetingHeader,
-  /** The files attached to the greeting */
   val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) with Serializable {
   private def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
 
@@ -569,12 +581,15 @@ object GreetingWithAttachments {
   def apply(message: => String, header: com.example.GreetingHeader, attachments: Vector[java.io.File]): GreetingWithAttachments = new GreetingWithAttachments(message, header, attachments)
 }
 
-/** Meta information of a Greeting */
+/**
+ * Meta information of a Greeting
+ * @param created Creation date
+ * @param priority The priority of this Greeting
+ * @param author The author of the Greeting
+ */
 final class GreetingHeader private (
   _created: => java.util.Date,
-  /** The priority of this Greeting */
   val priority: com.example.PriorityLevel,
-  /** The author of the Greeting */
   val author: String) extends Serializable {
   private def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
   /** Creation date */
@@ -637,11 +652,8 @@ object PriorityLevel {
           |    public static GreetingHeader of(com.example.MyLazy<java.util.Date> _created, com.example.PriorityLevel _priority, String _author) {
           |        return new GreetingHeader(_created, _priority, _author);
           |    }
-          |    /** Creation date */
           |    private com.example.MyLazy<java.util.Date> created;
-          |    /** The priority of this Greeting */
           |    private com.example.PriorityLevel priority;
-          |    /** The author of the Greeting */
           |    private String author;
           |
           |    protected GreetingHeader(com.example.MyLazy<java.util.Date> _created, String _author) {
@@ -658,14 +670,17 @@ object PriorityLevel {
           |        author = _author;
           |    }
           |
+          |    /** Creation date */
           |    public java.util.Date created() {
           |        return this.created.get();
           |    }
           |
+          |    /** The priority of this Greeting */
           |    public com.example.PriorityLevel priority() {
           |        return this.priority;
           |    }
           |
+          |    /** The author of the Greeting */
           |    public String author() {
           |        return this.author;
           |    }
@@ -721,7 +736,6 @@ object PriorityLevel {
           |    public static GreetingWithAttachments of(com.example.MyLazy<String> _message, com.example.GreetingHeader _header, java.io.File[] _attachments) {
           |        return new GreetingWithAttachments(_message, _header, _attachments);
           |    }
-          |    /** The files attached to the greeting */
           |    private java.io.File[] attachments;
           |    protected GreetingWithAttachments(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
           |        super(_message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"));
@@ -731,6 +745,7 @@ object PriorityLevel {
           |        super(_message, _header);
           |        attachments = _attachments;
           |    }
+          |    /** The files attached to the greeting */
           |    public java.io.File[] attachments() {
           |        return this.attachments;
           |    }
@@ -838,12 +853,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |/** A greeting interface */
           |public abstract class Greetings implements java.io.Serializable {
           |
-          |    /**
-          |     * The message of the Greeting
-          |     * This is a multiline doc comment
-          |     */
           |    private com.example.MyLazy<String> message;
-          |    /** The header of the Greeting */
           |    private com.example.GreetingHeader header;
           |
           |    protected Greetings(com.example.MyLazy<String> _message) {
@@ -858,10 +868,15 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |        header = _header;
           |    }
           |
+          |    /**
+          |     * The message of the Greeting
+          |     * This is a multiline doc comment
+          |     */
           |    public String message() {
           |        return this.message.get();
           |    }
           |
+          |    /** The header of the Greeting */
           |    public com.example.GreetingHeader header() {
           |        return this.header;
           |    }

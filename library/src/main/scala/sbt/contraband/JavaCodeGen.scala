@@ -126,8 +126,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
   private def genFields(fields: List[FieldDefinition]) = fields map genField mkString EOL
   private def genField(f: FieldDefinition) =
-    s"""${genDoc(toDoc(f.comments))}
-       |private ${genRealTpe(f.fieldType)} ${f.name};""".stripMargin
+    s"""private ${genRealTpe(f.fieldType)} ${f.name};""".stripMargin
 
   private def genRealTpe(tpe: ast.Type): String = tpe match {
     case t: ast.Type if t.isLazyType && t.isListType      => s"$lazyInterface<${unboxedType(t.name)}[]>"
@@ -151,7 +150,8 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       else if (!field.fieldType.isNotNullType) s"$optionalInterface<${boxedType(field.fieldType.name)}>"
       else unboxedType(field.fieldType.name)
 
-    s"""public $tpeSig ${field.name}() {
+    s"""${genDoc(toDoc(field.comments))}
+       |public $tpeSig ${field.name}() {
        |    return $accessCode;
        |}""".stripMargin
   }

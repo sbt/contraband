@@ -165,7 +165,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.withoutEmptyLines should equalLines (
       """sealed abstract class generateArgDocExample(
-        |  /** I'm a field. */
         |  val field: Int) extends Serializable {
         |  /**
         |   * A very simple example of a message.

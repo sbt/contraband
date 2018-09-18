@@ -224,12 +224,12 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ListMap(
         new File("generateArgDocExample.java") ->
           """public abstract class generateArgDocExample implements java.io.Serializable {
-            |    /** I'm a field. */
             |    private int field;
             |    protected generateArgDocExample(int _field) {
             |        super();
             |        field = _field;
             |    }
+            |    /** I'm a field. */
             |    public int field() {
             |        return this.field;
             |    }
