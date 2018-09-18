@@ -10,7 +10,7 @@ lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
     inThisBuild(List(
-      version := "0.4.0",
+      version := "0.4.1-SNAPSHOT",
       organization := "org.scala-sbt",
       crossScalaVersions := Seq("2.12.4", "2.11.12", "2.10.7"),
       scalaVersion := "2.10.7",
