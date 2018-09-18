@@ -30,7 +30,10 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     val code = mkScalaCodeGen.generate(ast)
     code.head._2.unindent should equalLines(
       """package com.example
-        |/** Example of a type */
+        |/**
+        |* Example of a type
+        |* @param field something
+        |*/
         |final class TypeExample private (
         |val field: Option[java.net.URL]) extends Serializable {
         |  // Some extra code
@@ -238,7 +241,6 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     code.head._2.unindent should equalLines(
       """package com.example
         |sealed abstract class IntfExample(
-        |  /** I'm a field. */
         |  val field: Option[Int]) extends Serializable {
         |  /**
         |   * A very simple example of a message.

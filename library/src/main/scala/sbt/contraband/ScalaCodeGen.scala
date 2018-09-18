@@ -71,12 +71,21 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val lazyMembers = genLazyMembers(localFields(r, parentsInSchema), intfLang) mkString EOL
     val privateCtr = if (scalaPrivateConstructor) " private " else ""
 
+    val argsDoc: List[String] = allFields flatMap { a: FieldDefinition =>
+      toDoc(a.comments) match {
+        case Nil        => Nil
+        case doc :: Nil => s"@param ${a.name} $doc" :: Nil
+        case docs =>
+          val prefix = s"@param ${a.name} "
+          docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
+      }
+    }
     val doc = toDoc(r.comments)
     val extra = toExtra(r)
     val since = getSince(r.directives)
     val code =
       s"""${genPackage(r)}
-         |${genDoc(doc)}
+         |${genDoc(doc ++ argsDoc)}
          |final class ${r.name}$privateCtr($ctorParameters) $extendsCode {
          |  ${extra mkString EOL}
          |  ${genAlternativeConstructors(since, allFields, scalaPrivateConstructor, intfLang) mkString EOL}
@@ -400,9 +409,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         case f if !inParent(f) && f.fieldType.isLazyType =>
           EOL + "_" + genParam(f, intfLang)
         case f if !inParent(f) =>
-          val doc = toDoc(f.comments)
-          s"""$EOL${genDoc(doc)}
-             |val ${genParam(f, intfLang)}""".stripMargin
+          s"""${EOL}val ${genParam(f, intfLang)}""".stripMargin
         case f => EOL + genParam(f, intfLang)
       }
     }

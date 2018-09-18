@@ -53,6 +53,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super();
         |        field = java.util.Optional.<java.net.URL>ofNullable(_field);
         |    }
+        |    /** something */
         |    public java.util.Optional<java.net.URL> field() {
         |        return this.field;
         |    }
@@ -352,7 +353,6 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
     code.head._2.unindent should equalLines(
       """package com.example;
         |public abstract class IntfExample implements java.io.Serializable {
-        |    /** I'm a field. */
         |    private java.util.Optional<Integer> field;
         |    protected IntfExample(java.util.Optional<Integer> _field) {
         |        super();
@@ -362,6 +362,7 @@ class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with Equ
         |        super();
         |        field = java.util.Optional.<Integer>ofNullable(_field);
         |    }
+        |    /** I'm a field. */
         |    public java.util.Optional<Integer> field() {
         |        return this.field;
         |    }

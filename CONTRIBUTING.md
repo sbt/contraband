@@ -8,7 +8,7 @@
 
 ```
 $ jenv shell 1.6
-$ sbt
+$ sbt -Dsbt.repository.secure=false -Djline.terminal=false
 > clean
 > publishSigned
 ```
@@ -16,8 +16,8 @@ $ sbt
 ```
 $ jenv shell 1.8
 $ sbt
-> ++2.12.4
-> ^^1.1.1
+> ++2.12.6
+> ^^1.2.3
 > clean
 > publishSigned
 ```
