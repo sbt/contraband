@@ -34,6 +34,16 @@ type TypeExample {
   field: StringStringMap!
 }"""
 
+  val modifierExample = """
+package com.example @target(Scala)
+
+type ModifierExample
+@modifier("sealed")
+{
+  field: Int!
+}
+"""
+
   val intfExample = """
 package com.example @target(Scala)
 @codecPackage("generated")

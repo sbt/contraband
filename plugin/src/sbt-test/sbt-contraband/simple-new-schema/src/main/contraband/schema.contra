@@ -19,3 +19,8 @@ type ScalaKeywordExample {
   type: String
   private: Boolean
 }
+
+type Dis @modifier("sealed") {
+  #x def x: Int = 1
+  #xcompanioninterface com.example.Dis
+}

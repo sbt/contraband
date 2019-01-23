@@ -90,6 +90,12 @@ trait JsonParser[T] {
       case _       => Some(ast.Directive.since(VersionNumber.empty.toString))
     }
 
+  def ModifierDirective(json: JValue): Option[ast.Directive] =
+    (json ->? "modifier") match {
+      case Some(x) => Some(ast.Directive.modifier(x))
+      case _       => None
+    }
+
   def CodecPackageDirective(json: JValue): Option[ast.Directive] =
     (json ->? "codecNamespace") orElse (json ->? "codecPackage") match {
       case Some(x) => Some(ast.Directive.codecPackage(x))
@@ -223,7 +229,9 @@ object JsonParser {
           }
         val fs = json ->* "fields" map FieldDefinition.parse
         val intfs = (superIntf map { i => toNamedType(i, None) }).toList
-        val directives = TargetDirective(json).toList ++ SinceDirective(json).toList ++
+        val directives = TargetDirective(json).toList ++
+          SinceDirective(json).toList ++
+          ModifierDirective(json).toList ++
           GenerateCodecDirective(json).toList
         ast.ObjectTypeDefinition(json -> "name",
           json ->? "namespace",

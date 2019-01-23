@@ -334,7 +334,37 @@ object primitiveTypesExample2 {
   def apply(smallBoolean: Boolean, bigBoolean: Boolean): primitiveTypesExample2 = new primitiveTypesExample2(smallBoolean, bigBoolean)
 }""".stripMargin.unindent)
   }
- 
+
+  override def recordWithModifier: Unit = {
+    val record = JsonParser.ObjectTypeDefinition.parse(modifierExample)
+    val code = mkScalaCodeGen generate record
+
+    code.head._2.unindent should equalLines (
+      """sealed class modifierExample private (
+        |val field: Int) extends Serializable {
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: modifierExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + "modifierExample".##) + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "modifierExample(" + field + ")"
+        |  }
+        |  private[this] def copy(field: Int = field): modifierExample = {
+        |    new modifierExample(field)
+        |  }
+        |  def withField(field: Int): modifierExample = {
+        |    copy(field = field)
+        |  }
+        |}
+        |object modifierExample {
+        |  def apply(field: Int): modifierExample = new modifierExample(field)
+        |}
+        |""".stripMargin.unindent)
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val code = mkScalaCodeGen generate schema

@@ -68,11 +68,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
     val toStringImpl: List[String] = toToStringImpl(r)
     val lfs = localFields(r, parentsInSchema)
+    val mod = toModifier(r.directives).getOrElse("public final")
 
     val code =
       s"""${genPackage(r)}
          |${genDoc(doc)}
-         |public final class $name $extendsCode {
+         |$mod class $name $extendsCode {
          |    ${extra mkString EOL}
          |    ${genFactoryMethods(r, parent)}
          |    ${genFields(lfs)}
