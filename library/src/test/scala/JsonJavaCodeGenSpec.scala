@@ -556,7 +556,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + "modifierExample".hashCode()) + (new Integer(field())).hashCode());
+            |        return 37 * (37 * (17 + "modifierExample".hashCode()) + Integer.valueOf(field()).hashCode());
             |    }
             |    public String toString() {
             |        return "modifierExample("  + "field: " + field() + ")";
