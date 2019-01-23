@@ -85,7 +85,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (17 + "oneChildInterfaceExample".hashCode()) + (new Integer(field())).hashCode());
+        |        return 37 * (37 * (17 + "oneChildInterfaceExample".hashCode()) + Integer.valueOf(field()).hashCode());
         |    }
         |    public String toString() {
         |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
@@ -124,7 +124,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        }
         |    }
         |    public int hashCode() {
-        |        return 37 * (37 * (37 * (17 + "childRecord".hashCode()) + (new Integer(field())).hashCode()) + (new Integer(x())).hashCode());
+        |        return 37 * (37 * (37 * (17 + "childRecord".hashCode()) + Integer.valueOf(field()).hashCode()) + Integer.valueOf(x()).hashCode());
         |    }
         |    public String toString() {
         |        return "childRecord("  + "field: " + field() + ", " + "x: " + x() + ")";
@@ -252,7 +252,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + "generateArgDocExample".hashCode()) + (new Integer(field())).hashCode());
+            |        return 37 * (37 * (17 + "generateArgDocExample".hashCode()) + Integer.valueOf(field()).hashCode());
             |    }
             |    public String toString() {
             |        return "generateArgDocExample("  + "field: " + field() + ")";
@@ -355,7 +355,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (17 + "growableAddOneField".hashCode()) + (new Integer(field())).hashCode());
+            |        return 37 * (37 * (17 + "growableAddOneField".hashCode()) + Integer.valueOf(field()).hashCode());
             |    }
             |    public String toString() {
             |        return "growableAddOneField("  + "field: " + field() + ")";
@@ -510,7 +510,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (37 * (17 + "primitiveTypesExample2".hashCode()) + (new Boolean(smallBoolean())).hashCode()) + (new Boolean(bigBoolean())).hashCode());
+        return 37 * (37 * (37 * (17 + "primitiveTypesExample2".hashCode()) + Boolean.valueOf(smallBoolean()).hashCode()) + Boolean.valueOf(bigBoolean()).hashCode());
     }
     public String toString() {
         return "primitiveTypesExample2("  + "smallBoolean: " + smallBoolean() + ", " + "bigBoolean: " + bigBoolean() + ")";
@@ -662,7 +662,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        }
             |    }
             |    public int hashCode() {
-            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + (new Integer(simpleInteger())).hashCode()) + java.util.Arrays.hashCode(arrayInteger()));
+            |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + Integer.valueOf(simpleInteger()).hashCode()) + java.util.Arrays.hashCode(arrayInteger()));
             |    }
             |    public String toString() {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";

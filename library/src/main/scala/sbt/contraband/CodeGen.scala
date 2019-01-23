@@ -219,7 +219,7 @@ abstract class CodeGenerator {
 
   protected def genJavaHashCode(f0: FieldDefinition, fieldName: String, isJava: Boolean): String =
     f0 match {
-      case f if isPrimitive(f.fieldType)      => s"(new ${boxedType(f.fieldType.name)}($fieldName)).hashCode()"
+      case f if isPrimitive(f.fieldType)      => s"${boxedType(f.fieldType.name)}.valueOf($fieldName).hashCode()"
       case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.hashCode($fieldName)"
       case f if f.fieldType.isListType        =>
         if (isJava) s"java.util.Arrays.deepHashCode($fieldName)"
