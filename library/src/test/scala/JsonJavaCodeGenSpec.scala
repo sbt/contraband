@@ -519,6 +519,52 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
       ))
   }
 
+  override def recordWithModifier: Unit = {
+    val record = JsonParser.ObjectTypeDefinition.parse(modifierExample)
+    val code = mkJavaCodeGen generate record
+
+    code mapValues (_.unindent) should equalMapLines (
+      ListMap(
+        new File("modifierExample.java") ->
+          """sealed class modifierExample implements java.io.Serializable {
+            |
+            |    public static modifierExample create(int _field) {
+            |        return new modifierExample(_field);
+            |    }
+            |    public static modifierExample of(int _field) {
+            |        return new modifierExample(_field);
+            |    }
+            |    private int field;
+            |    protected modifierExample(int _field) {
+            |        super();
+            |        field = _field;
+            |    }
+            |    public int field() {
+            |        return this.field;
+            |    }
+            |    public modifierExample withField(int field) {
+            |        return new modifierExample(field);
+            |    }
+            |    public boolean equals(Object obj) {
+            |        if (this == obj) {
+            |            return true;
+            |        } else if (!(obj instanceof modifierExample)) {
+            |            return false;
+            |        } else {
+            |            modifierExample o = (modifierExample)obj;
+            |            return (this.field() == o.field());
+            |        }
+            |    }
+            |    public int hashCode() {
+            |        return 37 * (37 * (17 + "modifierExample".hashCode()) + (new Integer(field())).hashCode());
+            |    }
+            |    public String toString() {
+            |        return "modifierExample("  + "field: " + field() + ")";
+            |    }
+            |}""".stripMargin.unindent
+      ))
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val code = mkJavaCodeGen generate schema

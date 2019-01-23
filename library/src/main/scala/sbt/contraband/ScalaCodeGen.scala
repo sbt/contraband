@@ -83,10 +83,11 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
     val doc = toDoc(r.comments)
     val extra = toExtra(r)
     val since = getSince(r.directives)
+    val mod = toModifier(r.directives).getOrElse("final")
     val code =
       s"""${genPackage(r)}
          |${genDoc(doc ++ argsDoc)}
-         |final class ${r.name}$privateCtr($ctorParameters) $extendsCode {
+         |$mod class ${r.name}$privateCtr($ctorParameters) $extendsCode {
          |  ${extra mkString EOL}
          |  ${genAlternativeConstructors(since, allFields, scalaPrivateConstructor, intfLang) mkString EOL}
          |  ${lazyMembers}

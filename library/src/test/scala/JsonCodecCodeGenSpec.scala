@@ -331,6 +331,9 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
 }""".stripMargin.unindent)
   }
 
+  override def recordWithModifier: Unit = {
+  }
+
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)

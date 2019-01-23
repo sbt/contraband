@@ -177,6 +177,38 @@ class GraphQLScalaCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |""".stripMargin.unindent)
   }
 
+  it should "generate with modifier" in {
+    val Success(ast) = SchemaParser.parse(modifierExample)
+    // println(ast)
+    val code = mkScalaCodeGen.generate(ast)
+
+    code.head._2.unindent should equalLines (
+      """package com.example
+        |sealed class ModifierExample private (
+        |val field: Int) extends Serializable {
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: ModifierExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + "com.example.ModifierExample".##) + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "ModifierExample(" + field + ")"
+        |  }
+        |  private[this] def copy(field: Int = field): ModifierExample = {
+        |    new ModifierExample(field)
+        |  }
+        |  def withField(field: Int): ModifierExample = {
+        |    copy(field = field)
+        |  }
+        |}
+        |object ModifierExample {
+        |  def apply(field: Int): ModifierExample = new ModifierExample(field)
+        |}
+        |""".stripMargin.unindent)
+  }
+
   "generate(Interface)" should "generate an interface with one child" in {
     val Success(ast) = SchemaParser.parse(intfExample)
     val code = mkScalaCodeGen.generate(ast)

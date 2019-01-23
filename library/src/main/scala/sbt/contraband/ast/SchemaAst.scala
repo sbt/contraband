@@ -185,6 +185,7 @@ object Directive {
   def fullCodec(value: String): Directive = Directive("fullCodec", Argument(None, StringValue(value)) :: Nil)
   def codecTypeField(value: String): Directive = Directive("codecTypeField", Argument(None, StringValue(value)) :: Nil)
   def generateCodec(value: Boolean): Directive = Directive("generateCodec", Argument(None, BooleanValue(value)) :: Nil)
+  def modifier(value: String): Directive = Directive("modifier", Argument(None, StringValue(value)) :: Nil)
 }
 
 
@@ -426,6 +427,9 @@ object AstUtil {
     }
   }
 
+  def toModifier(dirs: List[Directive]): Option[String] =
+    scanSingleStringDirective(dirs, "modifier")
+
   def toSince(dirs: List[Directive]): Option[VersionNumber] =
     scanSingleStringDirective(dirs, "since") map (VersionNumber(_))
 
@@ -437,7 +441,6 @@ object AstUtil {
     scanSingleStringDirective(dirs, "codecPackage") orElse
     scanSingleStringDirective(dirs, "codecNamespace")
   }
-
 
   def toFullCodec(d: Document): Option[String] = {
     val dirs = d.directives ++ (d.packageDecl map {_.directives}).toList.flatten

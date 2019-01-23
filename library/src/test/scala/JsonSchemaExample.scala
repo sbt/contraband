@@ -235,6 +235,19 @@ object JsonSchemaExample {
   ]
 }"""
 
+  val modifierExample = """{
+  "name": "modifierExample",
+  "target": "Scala",
+  "type": "record",
+  "modifier": "sealed",
+  "fields": [
+    {
+      "name": "field",
+      "type": "int"
+    }
+  ]
+}"""
+
   val generateArgDocExample = """{
   "codecNamespace": "generated",
   "types": [
