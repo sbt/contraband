@@ -46,7 +46,8 @@
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := &quot;2.11.8&quot;,
-    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % contrabandSjsonNewVersion.value
+  )
 </code></pre><p>sjson-new はコーデック・ツールキットで、一つのコーデック定義から Spray JSON の AST、SLIP-28 Scala JSON、MessagePack と複数のバックエンドをサポートすることができる。
 </p><p>コーデックのパッケージ名は <code>@codecPackage</code> アノテーションによって指定される。
 </p><pre><code class="">package com.example
@@ -87,6 +88,12 @@ scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
 q: com.example.Person = Person(Bob, 20)
 
 scala&gt; assert(p == q)
+</code></pre><h3 id="%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E7%94%9F%E6%88%90%E3%81%AE%E3%82%B9%E3%82%AD%E3%83%83%E3%83%97">コーデック生成のスキップ<a href="#%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E7%94%9F%E6%88%90%E3%81%AE%E3%82%B9%E3%82%AD%E3%83%83%E3%83%97" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p><code>@generateCodec(false)</code> アノテーションを使うことで特定の型をコーデック生成から除外することができる。
+</p><pre><code class="">interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
 </code></pre><div class="bottom nav end span-16">
                         <ul class="language-bar">
         <li><a href="../json.html"><span class="lang-item lang-en">English</span></a></li><li><a href="../ja/json.html"><span class="lang-item lang-ja">日本語</span></a></li>

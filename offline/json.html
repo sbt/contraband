@@ -46,8 +46,9 @@
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := &quot;2.11.8&quot;,
-    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
-</code></pre><p>sjson-new is a codec toolkit that lets you define a code that supports Sray JSON’s AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % contrabandSjsonNewVersion.value
+  )
+</code></pre><p>sjson-new is a codec toolkit that lets you define a code that supports Spray JSON’s AST, SLIP-28 Scala JSON, and MessagePack as the backend.
 </p><p>The package name for the codecs can be specified using <code>@codecPackage</code> directive.
 </p><pre><code class="">package com.example
 @target(Scala)
@@ -86,6 +87,12 @@ scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
 q: com.example.Person = Person(Bob, 20)
 
 scala&gt; assert(p == q)
+</code></pre><h3 id="Skipping+codec+generation">Skipping codec generation<a href="#Skipping+codec+generation" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Use the <code>@generateCodec(false)</code> annotation to skip the codec generation for some types.
+</p><pre><code class="">interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
 </code></pre><div class="bottom nav end span-16">
                         <ul class="language-bar">
         <li><a href="json.html"><span class="lang-item lang-en">English</span></a></li><li><a href="ja/json.html"><span class="lang-item lang-ja">日本語</span></a></li>

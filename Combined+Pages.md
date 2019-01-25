@@ -128,9 +128,9 @@ Contraband comes with a set of default scalar types out of the box:
 - `Short`
 - `Double`
 
-You can also use Java and Scala class names such as 'java.io.File'.
+You can also use Java and Scala class names such as `java.io.File`.
 
-This case, you would have to also supply how the type should be serialized and deserialized.
+If you use class names such as `java.io.File`, you would have to also supply how the type should be serialized and deserialized.
 
 ### Enumeration types
 
@@ -157,8 +157,7 @@ This means that wherever we use the type `Episode` in our schema, we expect it t
 
 ### Required type
 
-Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema,
-you can apply additional type modifiers that affect validation of those values. Let's look at an example:
+Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema, you can apply additional type modifiers that affect validation of those values. Let's look at an example:
 
 ```
 package com.example
@@ -305,7 +304,7 @@ This schema will produce the following Scala class:
 
 ```scala
 /**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -323,7 +322,7 @@ final class Person private (
   override def toString: String = {
     "Person(" + name + ", " + age + ")"
   }
-  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+  private[this] def copy(name: String = name, age: Option[Int] = age): Person = {
     new Person(name, age)
   }
   def withName(name: String): Person = {
@@ -356,39 +355,52 @@ Here's the Java code it generates (after changing the target annotation to `Java
 
 ```java
 /**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-
+    
+    public static Person create(String _name, java.util.Optional<Integer> _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, java.util.Optional<Integer> _age) {
+        return new Person(_name, _age);
+    }
+    public static Person create(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    
     private String name;
-    private com.example.Maybe<Integer> age;
-    public Person(String _name, com.example.Maybe<Integer> _age) {
+    private java.util.Optional<Integer> age;
+    protected Person(String _name, java.util.Optional<Integer> _age) {
         super();
         name = _name;
         age = _age;
     }
-    public Person(String _name, int _age) {
+    protected Person(String _name, int _age) {
         super();
         name = _name;
-        age = com.example.Maybe.<Integer>just(_age);
+        age = java.util.Optional.<Integer>ofNullable(_age);
     }
     public String name() {
         return this.name;
     }
-    public com.example.Maybe<Integer> age() {
+    public java.util.Optional<Integer> age() {
         return this.age;
     }
     public Person withName(String name) {
         return new Person(name, age);
     }
-    public Person withAge(com.example.Maybe<Integer> age) {
+    public Person withAge(java.util.Optional<Integer> age) {
         return new Person(name, age);
     }
     public Person withAge(int age) {
-        return new Person(name, com.example.Maybe.<Integer>just(age));
+        return new Person(name, java.util.Optional.<Integer>ofNullable(age));
     }
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -401,7 +413,7 @@ public final class Person implements java.io.Serializable {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+        return 37 * (37 * (37 * (17 + "com.example.Person".hashCode()) + name().hashCode()) + age().hashCode());
     }
     public String toString() {
         return "Person("  + "name: " + name() + ", " + "age: " + age() + ")";
@@ -422,10 +434,11 @@ lazy val root = (project in file(".")).
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := "2.11.8",
-    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % "0.4.1" )
+    libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % contrabandSjsonNewVersion.value
+  )
 ```
 
-sjson-new is a codec toolkit that lets you define a code that supports Sray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+sjson-new is a codec toolkit that lets you define a code that supports Spray JSON's AST, SLIP-28 Scala JSON, and MessagePack as the backend.
 
 The package name for the codecs can be specified using `@codecPackage` directive.
 
@@ -472,4 +485,16 @@ scala> val q = Converter.fromJsonUnsafe[Person](x)
 q: com.example.Person = Person(Bob, 20)
 
 scala> assert(p == q)
+```
+
+### Skipping codec generation
+
+Use the `@generateCodec(false)` annotation to skip the codec generation for some types.
+
+```
+interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
 ```

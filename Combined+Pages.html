@@ -117,8 +117,8 @@ type Greeting {
 </li><li><code>Long</code>
 </li><li><code>Short</code>
 </li><li><code>Double</code>
-</li></ul><p>You can also use Java and Scala class names such as ‘java.io.File’.
-</p><p>This case, you would have to also supply how the type should be serialized and deserialized.
+</li></ul><p>You can also use Java and Scala class names such as <code>java.io.File</code>.
+</p><p>If you use class names such as <code>java.io.File</code>, you would have to also supply how the type should be serialized and deserialized.
 </p><h3 id="Enumeration+types">Enumeration types<a href="#Enumeration+types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Also called Enums, enumeration types are a special kind of scalar that is restricted to a particular set of allowed values. This allows you to:
 </p><ol><li>Validate that any arguments of this type are one of the allowed values.
 </li><li>Communicate through the type system that a field will always be one of a finite set of values.
@@ -133,8 +133,7 @@ enum Episode {
   Jedi
 }
 </code></pre><p>This means that wherever we use the type <code>Episode</code> in our schema, we expect it to be exactly one of <code>NewHope</code>, <code>Empire</code>, or <code>Jedi</code>.
-</p><h3 id="Required+type">Required type<a href="#Required+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema,
-you can apply additional type modifiers that affect validation of those values. Let’s look at an example:
+</p><h3 id="Required+type">Required type<a href="#Required+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema, you can apply additional type modifiers that affect validation of those values. Let’s look at an example:
 </p><pre><code class="">package com.example
 @target(Scala)
 
@@ -229,7 +228,7 @@ type Person {
 }
 </code></pre><p>This schema will produce the following Scala class:
 </p><pre><code class="prettyprint lang-scala">/**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -247,7 +246,7 @@ final class Person private (
   override def toString: String = {
     &quot;Person(&quot; + name + &quot;, &quot; + age + &quot;)&quot;
   }
-  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+  private[this] def copy(name: String = name, age: Option[Int] = age): Person = {
     new Person(name, age)
   }
   def withName(name: String): Person = {
@@ -271,39 +270,52 @@ which cannot evolve in a binary compatible way.
 &gt; x.withAge(21)
 </code></pre><p>Here’s the Java code it generates (after changing the target annotation to <code>Java</code>):
 </p><pre><code class="prettyprint lang-java">/**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-
+    
+    public static Person create(String _name, java.util.Optional&lt;Integer&gt; _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, java.util.Optional&lt;Integer&gt; _age) {
+        return new Person(_name, _age);
+    }
+    public static Person create(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    
     private String name;
-    private com.example.Maybe&lt;Integer&gt; age;
-    public Person(String _name, com.example.Maybe&lt;Integer&gt; _age) {
+    private java.util.Optional&lt;Integer&gt; age;
+    protected Person(String _name, java.util.Optional&lt;Integer&gt; _age) {
         super();
         name = _name;
         age = _age;
     }
-    public Person(String _name, int _age) {
+    protected Person(String _name, int _age) {
         super();
         name = _name;
-        age = com.example.Maybe.&lt;Integer&gt;just(_age);
+        age = java.util.Optional.&lt;Integer&gt;ofNullable(_age);
     }
     public String name() {
         return this.name;
     }
-    public com.example.Maybe&lt;Integer&gt; age() {
+    public java.util.Optional&lt;Integer&gt; age() {
         return this.age;
     }
     public Person withName(String name) {
         return new Person(name, age);
     }
-    public Person withAge(com.example.Maybe&lt;Integer&gt; age) {
+    public Person withAge(java.util.Optional&lt;Integer&gt; age) {
         return new Person(name, age);
     }
     public Person withAge(int age) {
-        return new Person(name, com.example.Maybe.&lt;Integer&gt;just(age));
+        return new Person(name, java.util.Optional.&lt;Integer&gt;ofNullable(age));
     }
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -316,7 +328,7 @@ public final class Person implements java.io.Serializable {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+        return 37 * (37 * (37 * (17 + &quot;com.example.Person&quot;.hashCode()) + name().hashCode()) + age().hashCode());
     }
     public String toString() {
         return &quot;Person(&quot;  + &quot;name: &quot; + name() + &quot;, &quot; + &quot;age: &quot; + age() + &quot;)&quot;;
@@ -327,8 +339,9 @@ public final class Person implements java.io.Serializable {
   enablePlugins(ContrabandPlugin, JsonCodecPlugin).
   settings(
     scalaVersion := &quot;2.11.8&quot;,
-    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % &quot;0.4.1&quot; )
-</code></pre><p>sjson-new is a codec toolkit that lets you define a code that supports Sray JSON’s AST, SLIP-28 Scala JSON, and MessagePack as the backend.
+    libraryDependencies += &quot;com.eed3si9n&quot; %% &quot;sjson-new-scalajson&quot; % contrabandSjsonNewVersion.value
+  )
+</code></pre><p>sjson-new is a codec toolkit that lets you define a code that supports Spray JSON’s AST, SLIP-28 Scala JSON, and MessagePack as the backend.
 </p><p>The package name for the codecs can be specified using <code>@codecPackage</code> directive.
 </p><pre><code class="">package com.example
 @target(Scala)
@@ -367,6 +380,12 @@ scala&gt; val q = Converter.fromJsonUnsafe[Person](x)
 q: com.example.Person = Person(Bob, 20)
 
 scala&gt; assert(p == q)
+</code></pre><h3 id="Skipping+codec+generation">Skipping codec generation<a href="#Skipping+codec+generation" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Use the <code>@generateCodec(false)</code> annotation to skip the codec generation for some types.
+</p><pre><code class="">interface MiddleInterface implements InterfaceExample
+@generateCodec(false)
+{
+  field: Int
+}
 </code></pre>
           </div>
         </div>

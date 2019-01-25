@@ -24,7 +24,9 @@
         <script type="text/javascript">
           Pamflet.page.language = 'en';
         </script>
-        
+        <script type="text/javascript" src="js/prettify/prettify.js"></script><script type="text/javascript" src="js/prettify/lang-scala.js"></script><link type="text/css" rel="stylesheet" href="css/prettify.css"/><script type="text/javascript"><!--
+        window.onload=function() { prettyPrint(); };
+      --></script>
         <link rel="stylesheet" href="css/custom.css" type="text/css" media="screen, projection"/>
         
         
@@ -96,8 +98,8 @@ type Greeting {
 </li><li><code>Long</code>
 </li><li><code>Short</code>
 </li><li><code>Double</code>
-</li></ul><p>You can also use Java and Scala class names such as ‘java.io.File’.
-</p><p>This case, you would have to also supply how the type should be serialized and deserialized.
+</li></ul><p>You can also use Java and Scala class names such as <code>java.io.File</code>.
+</p><p>If you use class names such as <code>java.io.File</code>, you would have to also supply how the type should be serialized and deserialized.
 </p><h3 id="Enumeration+types">Enumeration types<a href="#Enumeration+types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Also called Enums, enumeration types are a special kind of scalar that is restricted to a particular set of allowed values. This allows you to:
 </p><ol><li>Validate that any arguments of this type are one of the allowed values.
 </li><li>Communicate through the type system that a field will always be one of a finite set of values.
@@ -112,8 +114,7 @@ enum Episode {
   Jedi
 }
 </code></pre><p>This means that wherever we use the type <code>Episode</code> in our schema, we expect it to be exactly one of <code>NewHope</code>, <code>Empire</code>, or <code>Jedi</code>.
-</p><h3 id="Required+type">Required type<a href="#Required+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema,
-you can apply additional type modifiers that affect validation of those values. Let’s look at an example:
+</p><h3 id="Required+type">Required type<a href="#Required+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema, you can apply additional type modifiers that affect validation of those values. Let’s look at an example:
 </p><pre><code class="">package com.example
 @target(Scala)
 

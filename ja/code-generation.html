@@ -54,7 +54,7 @@ type Person {
 }
 </code></pre><p>このスキーマは以下の Scala コードを生成する:
 </p><pre><code class="prettyprint lang-scala">/**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -72,7 +72,7 @@ final class Person private (
   override def toString: String = {
     &quot;Person(&quot; + name + &quot;, &quot; + age + &quot;)&quot;
   }
-  protected[this] def copy(name: String = name, age: Option[Int] = age): Person = {
+  private[this] def copy(name: String = name, age: Option[Int] = age): Person = {
     new Person(name, age)
   }
   def withName(name: String): Person = {
@@ -96,39 +96,52 @@ object Person {
 &gt; x.withAge(21)
 </code></pre><p>Java のコード生成は以下のようになっている (target アノテーションを Java に変更する):
 </p><pre><code class="prettyprint lang-java">/**
- * This code is generated using sbt-datatype.
+ * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-
+    
+    public static Person create(String _name, java.util.Optional&lt;Integer&gt; _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, java.util.Optional&lt;Integer&gt; _age) {
+        return new Person(_name, _age);
+    }
+    public static Person create(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    public static Person of(String _name, int _age) {
+        return new Person(_name, _age);
+    }
+    
     private String name;
-    private com.example.Maybe&lt;Integer&gt; age;
-    public Person(String _name, com.example.Maybe&lt;Integer&gt; _age) {
+    private java.util.Optional&lt;Integer&gt; age;
+    protected Person(String _name, java.util.Optional&lt;Integer&gt; _age) {
         super();
         name = _name;
         age = _age;
     }
-    public Person(String _name, int _age) {
+    protected Person(String _name, int _age) {
         super();
         name = _name;
-        age = com.example.Maybe.&lt;Integer&gt;just(_age);
+        age = java.util.Optional.&lt;Integer&gt;ofNullable(_age);
     }
     public String name() {
         return this.name;
     }
-    public com.example.Maybe&lt;Integer&gt; age() {
+    public java.util.Optional&lt;Integer&gt; age() {
         return this.age;
     }
     public Person withName(String name) {
         return new Person(name, age);
     }
-    public Person withAge(com.example.Maybe&lt;Integer&gt; age) {
+    public Person withAge(java.util.Optional&lt;Integer&gt; age) {
         return new Person(name, age);
     }
     public Person withAge(int age) {
-        return new Person(name, com.example.Maybe.&lt;Integer&gt;just(age));
+        return new Person(name, java.util.Optional.&lt;Integer&gt;ofNullable(age));
     }
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -141,7 +154,7 @@ public final class Person implements java.io.Serializable {
         }
     }
     public int hashCode() {
-        return 37 * (37 * (17 + name().hashCode()) + age().hashCode());
+        return 37 * (37 * (37 * (17 + &quot;com.example.Person&quot;.hashCode()) + name().hashCode()) + age().hashCode());
     }
     public String toString() {
         return &quot;Person(&quot;  + &quot;name: &quot; + name() + &quot;, &quot; + &quot;age: &quot; + age() + &quot;)&quot;;
