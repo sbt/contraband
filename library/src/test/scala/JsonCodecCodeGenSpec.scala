@@ -29,10 +29,10 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait SimpleEnumerationExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleEnumerationExampleFormat: JsonFormat[_root_.simpleEnumerationExample] = new JsonFormat[_root_.simpleEnumerationExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleEnumerationExample = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.readString(js) match {
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleEnumerationExample = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.readString(__js) match {
         |            case "first" => _root_.simpleEnumerationExample.first
         |            case "second" => _root_.simpleEnumerationExample.second
         |          }
@@ -69,7 +69,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait SimpleInterfaceExampleFormats {
         |  implicit lazy val simpleInterfaceExampleFormat: JsonFormat[_root_.simpleInterfaceExample] = new JsonFormat[_root_.simpleInterfaceExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleInterfaceExample = {
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleInterfaceExample = {
         |      deserializationError("No known implementation of simpleInterfaceExample.")
         |    }
         |    override def write[J](obj: _root_.simpleInterfaceExample, builder: Builder[J]): Unit = {
@@ -109,10 +109,10 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait ChildRecordFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val childRecordFormat: JsonFormat[_root_.childRecord] = new JsonFormat[_root_.childRecord] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.childRecord = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.childRecord = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val field = unbuilder.readField[Int]("field")
         |          val x = unbuilder.readField[Int]("x")
         |          unbuilder.endObject()
@@ -169,7 +169,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait GenerateArgDocExampleFormats {
         |  implicit lazy val generateArgDocExampleFormat: JsonFormat[_root_.generateArgDocExample] = new JsonFormat[_root_.generateArgDocExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.generateArgDocExample = {
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.generateArgDocExample = {
         |      deserializationError("No known implementation of generateArgDocExample.")
         |    }
         |    override def write[J](obj: _root_.generateArgDocExample, builder: Builder[J]): Unit = {
@@ -196,10 +196,10 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait SimpleRecordExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val simpleRecordExampleFormat: JsonFormat[_root_.simpleRecordExample] = new JsonFormat[_root_.simpleRecordExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleRecordExample = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.simpleRecordExample = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val field = unbuilder.readField[java.net.URL]("field")
         |          unbuilder.endObject()
         |          _root_.simpleRecordExample(field)
@@ -233,10 +233,10 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait GrowableAddOneFieldFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val growableAddOneFieldFormat: JsonFormat[_root_.growableAddOneField] = new JsonFormat[_root_.growableAddOneField] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.growableAddOneField = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.growableAddOneField = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val field = unbuilder.readField[Int]("field")
         |          unbuilder.endObject()
         |          _root_.growableAddOneField(field)
@@ -270,10 +270,10 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |
         |trait FooFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val FooFormat: JsonFormat[_root_.Foo] = new JsonFormat[_root_.Foo] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Foo = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Foo = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val x = unbuilder.readField[Option[Int]]("x")
         |          val y = unbuilder.readField[Vector[Int]]("y")
         |          unbuilder.endObject()
@@ -309,10 +309,10 @@ package generated
 import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 trait PrimitiveTypesExample2Formats { self: sjsonnew.BasicJsonProtocol =>
 implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypesExample2] = new JsonFormat[_root_.primitiveTypesExample2] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample2 = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.beginObject(js)
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample2 = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.beginObject(__js)
       val smallBoolean = unbuilder.readField[Boolean]("smallBoolean")
       val bigBoolean = unbuilder.readField[Boolean]("bigBoolean")
       unbuilder.endObject()
@@ -350,10 +350,10 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
         |
         |trait PrimitiveTypesExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesExampleFormat: JsonFormat[_root_.primitiveTypesExample] = new JsonFormat[_root_.primitiveTypesExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesExample = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
         |          val lazyInteger = unbuilder.readField[Int]("lazyInteger")
         |          val arrayInteger = unbuilder.readField[Vector[Int]]("arrayInteger")
@@ -397,10 +397,10 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
         |
         |trait PrimitiveTypesNoLazyExampleFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val primitiveTypesNoLazyExampleFormat: JsonFormat[_root_.primitiveTypesNoLazyExample] = new JsonFormat[_root_.primitiveTypesNoLazyExample] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesNoLazyExample = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.primitiveTypesNoLazyExample = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val simpleInteger = unbuilder.readField[Int]("simpleInteger")
         |          val arrayInteger = unbuilder.readField[Vector[Int]]("arrayInteger")
         |          unbuilder.endObject()
@@ -458,7 +458,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
         | 
         |trait GreetingFormats {
         |  implicit lazy val GreetingFormat: JsonFormat[_root_.Greeting] = new JsonFormat[_root_.Greeting] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Greeting = {
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): _root_.Greeting = {
         |      deserializationError("No known implementation of Greeting.")
         |    }
         |    override def write[J](obj: _root_.Greeting, builder: Builder[J]): Unit = {

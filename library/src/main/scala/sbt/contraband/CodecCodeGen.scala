@@ -149,7 +149,7 @@ class CodecCodeGen(codecParents: List[String],
              |
              |trait ${name.capitalize}Formats {
              |  implicit lazy val ${name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
-             |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
+             |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
              |      deserializationError("No known implementation of ${i.name}.")
              |    }
              |    override def write[J](obj: $fqn, builder: Builder[J]): Unit = {

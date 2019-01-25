@@ -976,10 +976,10 @@ import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
 trait SimpleGreetingFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] = new JsonFormat[com.example.SimpleGreeting] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.SimpleGreeting = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.beginObject(js)
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.SimpleGreeting = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.beginObject(__js)
       val message = unbuilder.readField[String]("message")
       val header = unbuilder.readField[com.example.GreetingHeader]("header")
       unbuilder.endObject()
@@ -1019,10 +1019,10 @@ import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
 trait GreetingExtraImplFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraImpl] = new JsonFormat[com.example.GreetingExtraImpl] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingExtraImpl = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.beginObject(js)
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingExtraImpl = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.beginObject(__js)
       val message = unbuilder.readField[String]("message")
       val header = unbuilder.readField[com.example.GreetingHeader]("header")
       val extra = unbuilder.readField[Array[String]]("extra")
@@ -1054,10 +1054,10 @@ import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
 trait GreetingWithAttachmentsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.beginObject(js)
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.beginObject(__js)
       val message = unbuilder.readField[String]("message")
       val header = unbuilder.readField[com.example.GreetingHeader]("header")
       val attachments = unbuilder.readField[Vector[java.io.File]]("attachments")
@@ -1087,10 +1087,10 @@ import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
 trait GreetingHeaderFormats { self: java.util.DateFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] = new JsonFormat[com.example.GreetingHeader] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingHeader = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.beginObject(js)
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingHeader = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.beginObject(__js)
       val created = unbuilder.readField[java.util.Date]("created")
       val priority = unbuilder.readField[com.example.PriorityLevel]("priority")
       val author = unbuilder.readField[String]("author")
@@ -1120,10 +1120,10 @@ import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
 trait PriorityLevelFormats { self: sjsonnew.BasicJsonProtocol =>
 implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = new JsonFormat[com.example.PriorityLevel] {
-  override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.PriorityLevel = {
-    jsOpt match {
-      case Some(js) =>
-      unbuilder.readString(js) match {
+  override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.PriorityLevel = {
+    __jsOpt match {
+      case Some(__js) =>
+      unbuilder.readString(__js) match {
         case "Low" => com.example.PriorityLevel.Low
         case "Medium" => com.example.PriorityLevel.Medium
         case "High" => com.example.PriorityLevel.High
