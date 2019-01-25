@@ -93,9 +93,9 @@ Contraband comes with a set of default scalar types out of the box:
 - `Short`
 - `Double`
 
-You can also use Java and Scala class names such as 'java.io.File'.
+You can also use Java and Scala class names such as `java.io.File`.
 
-This case, you would have to also supply how the type should be serialized and deserialized.
+If you use class names such as `java.io.File`, you would have to also supply how the type should be serialized and deserialized.
 
 ### Enumeration types
 
@@ -122,8 +122,7 @@ This means that wherever we use the type `Episode` in our schema, we expect it t
 
 ### Required type
 
-Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema,
-you can apply additional type modifiers that affect validation of those values. Let's look at an example:
+Record types and enums are the only kinds of types you can define in Contraband. But when you use the types in other parts of the schema, you can apply additional type modifiers that affect validation of those values. Let's look at an example:
 
 ```
 package com.example
