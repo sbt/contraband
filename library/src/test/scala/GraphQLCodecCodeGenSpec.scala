@@ -36,10 +36,10 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |trait ChildTypeFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val ChildTypeFormat: JsonFormat[com.example.ChildType] = new JsonFormat[com.example.ChildType] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val name = unbuilder.readField[Option[String]]("name")
         |          val field = unbuilder.readField[Option[Int]]("field")
         |          unbuilder.endObject()
@@ -88,10 +88,10 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |
         |trait ChildTypeFormats { self: sjsonnew.BasicJsonProtocol =>
         |  implicit lazy val ChildTypeFormat: JsonFormat[com.example.ChildType] = new JsonFormat[com.example.ChildType] {
-        |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {
-        |      jsOpt match {
-        |        case Some(js) =>
-        |          unbuilder.beginObject(js)
+        |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.ChildType = {
+        |      __jsOpt match {
+        |        case Some(__js) =>
+        |          unbuilder.beginObject(__js)
         |          val name = unbuilder.readField[Option[String]]("name")
         |          val field = unbuilder.readField[Option[Int]]("field")
         |          unbuilder.endObject()

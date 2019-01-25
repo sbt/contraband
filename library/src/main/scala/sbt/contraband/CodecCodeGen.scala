@@ -61,10 +61,10 @@ class CodecCodeGen(codecParents: List[String],
          |
          |trait ${e.name.capitalize}Formats { $selfType
          |  implicit lazy val ${e.name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
-         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
-         |      jsOpt match {
-         |        case Some(js) =>
-         |          unbuilder.readString(js) match {
+         |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
+         |      __jsOpt match {
+         |        case Some(__js) =>
+         |          unbuilder.readString(__js) match {
          |            ${readerValues mkString EOL}
          |          }
          |        case None =>
@@ -113,10 +113,10 @@ class CodecCodeGen(codecParents: List[String],
          |
          |trait ${r.name.capitalize}Formats { $selfType
          |  implicit lazy val ${r.name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
-         |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
-         |      jsOpt match {
-         |        case Some(js) =>
-         |          unbuilder.beginObject(js)
+         |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
+         |      __jsOpt match {
+         |        case Some(__js) =>
+         |          unbuilder.beginObject(__js)
          |          $getFields
          |          unbuilder.endObject()
          |          $reconstruct
@@ -149,7 +149,7 @@ class CodecCodeGen(codecParents: List[String],
              |
              |trait ${name.capitalize}Formats {
              |  implicit lazy val ${name}Format: JsonFormat[$fqn] = new JsonFormat[$fqn] {
-             |    override def read[J](jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
+             |    override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): $fqn = {
              |      deserializationError("No known implementation of ${i.name}.")
              |    }
              |    override def write[J](obj: $fqn, builder: Builder[J]): Unit = {
