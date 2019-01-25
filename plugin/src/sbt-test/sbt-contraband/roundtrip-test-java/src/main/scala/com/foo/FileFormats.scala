@@ -8,7 +8,7 @@ trait FileFormats {
   implicit val fileFormat: JsonFormat[File] = new JsonFormat[File] {
     override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): File = {
       __jsOpt match {
-        case Some(js) => new File(unbuilder.readString(__js))
+        case Some(__js) => new File(unbuilder.readString(__js))
         case None     => deserializationError("Expected JsString but found None")
       }
     }
