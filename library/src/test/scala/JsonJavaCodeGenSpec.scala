@@ -136,7 +136,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     val code = mkJavaCodeGen generate protocol
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
@@ -220,7 +220,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val schema = JsonParser.Document.parse(generateArgDocExample)
     val code = mkJavaCodeGen generate schema
 
-    code mapValues (_.withoutEmptyLines) should equalMapLines (
+    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines (
       ListMap(
         new File("generateArgDocExample.java") ->
           """public abstract class generateArgDocExample implements java.io.Serializable {
@@ -265,7 +265,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
     val code = mkJavaCodeGen generate record
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("simpleRecordExample.java") ->
           """/** Example of simple record */
@@ -313,7 +313,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
     val code = mkJavaCodeGen generate record
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("growableAddOneField.java") ->
           """public final class growableAddOneField implements java.io.Serializable {
@@ -368,7 +368,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsJavaExample)
     val code = mkJavaCodeGen generate record
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
@@ -468,7 +468,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val record = JsonParser.ObjectTypeDefinition.parse(primitiveTypesExample2)
     val code = mkJavaCodeGen generate record
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("primitiveTypesExample2.java") ->
           """public final class primitiveTypesExample2 implements java.io.Serializable {
@@ -523,7 +523,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val record = JsonParser.ObjectTypeDefinition.parse(modifierExample)
     val code = mkJavaCodeGen generate record
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("modifierExample.java") ->
           """sealed class modifierExample implements java.io.Serializable {
@@ -666,7 +666,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val schema = JsonParser.Document.parse(primitiveTypesNoLazyExample)
     val code = mkJavaCodeGen generate schema
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("primitiveTypesNoLazyExample.java") ->
           """public final class primitiveTypesNoLazyExample implements java.io.Serializable {
@@ -720,13 +720,13 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
   override def schemaGenerateComplete = {
     val schema = JsonParser.Document.parse(completeExample)
     val code = mkJavaCodeGen generate schema
-    code mapValues (_.unindent) should equalMapLines (completeExampleCodeJava mapValues (_.unindent))
+    code.mapValues(_.unindent).toMap should equalMapLines (completeExampleCodeJava.mapValues(_.unindent).toMap)
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = JsonParser.Document.parse(completeExample)
     val code = mkJavaCodeGen generate schema
-    code mapValues (_.withoutEmptyLines) should equalMapLines (completeExampleCodeJava mapValues (_.withoutEmptyLines))
+    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines (completeExampleCodeJava.mapValues(_.withoutEmptyLines).toMap)
   }
 
   def mkJavaCodeGen: JavaCodeGen =

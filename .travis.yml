@@ -4,10 +4,14 @@ script:
   - sbt "++${TRAVIS_SCALA_VERSION}" "^^${SBT_VERSION}" test scripted
 matrix:
   include:
-  - env: SBT_VERSION="0.13.17"
+  - env: SBT_VERSION="0.13.18"
     scala: 2.10.7
   - env: SBT_VERSION="1.2.8"
     scala: 2.12.8
+  - scala: 2.13.0
+    script: "++${TRAVIS_SCALA_VERSION}" library/test
+  - scala: 2.11.12
+    script: "++${TRAVIS_SCALA_VERSION}" library/test
 
 cache:
   directories:

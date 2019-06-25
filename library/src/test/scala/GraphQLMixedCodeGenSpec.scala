@@ -16,7 +16,7 @@ class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
       wrapOption = true)
     val code = gen.generate(ast)
 
-    code mapValues (_.unindent) should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines (
       ListMap(
         new File("com/example/Greeting.java") ->
           """/**
