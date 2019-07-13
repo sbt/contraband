@@ -10,8 +10,8 @@ trait EqualLines {
   private val emptyLines = Lines(Vector.empty)
 
   implicit class CleanedString(s: String) {
-    def unindent: Lines = Lines(s.lines map (_.trim) filterNot (_.isEmpty) toVector)
-    def withoutEmptyLines: Lines = Lines(s.lines filterNot (_.trim.isEmpty) toVector)
+    def unindent: Lines = Lines(s.lines.map(_.trim).filterNot(_.isEmpty).toVector)
+    def withoutEmptyLines: Lines = Lines(s.lines.filterNot(_.trim.isEmpty).toVector)
   }
 
   final class EqualLines(right: Lines) extends Matcher[Lines] {

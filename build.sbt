@@ -12,7 +12,7 @@ lazy val root = (project in file(".")).
     inThisBuild(List(
       version := "0.4.4-SNAPSHOT",
       organization := "org.scala-sbt",
-      crossScalaVersions := Seq("2.12.8", "2.11.12", "2.10.7"),
+      crossScalaVersions := Seq("2.13.0", "2.12.8", "2.11.12", "2.10.7"),
       scalaVersion := "2.10.7",
       organizationName := "sbt",
       organizationHomepage := Some(url("http://scala-sbt.org/")),
@@ -37,7 +37,15 @@ lazy val library = (project in file("library")).
   disablePlugins(BintrayPlugin).
   settings(
     name := "contraband",
-    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies.value ++ Seq(scalaTest % Test, diffutils % Test)
+    unmanagedSourceDirectories in Compile += {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, v)) if v <= 12 =>
+          baseDirectory.value / "src/main/scala-2.13-"
+        case _ =>
+          baseDirectory.value / "src/main/scala-2.13+"
+      }
+    },
+    libraryDependencies ++= Seq(parboiled.value) ++ jsonDependencies.value ++ Seq(scalaTest % Test, diffutils % Test)
   )
 
 lazy val plugin = (project in file("plugin")).

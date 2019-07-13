@@ -120,7 +120,7 @@ trait JsonParser[T] {
 trait Parse[T] extends JsonParser[T] {
   /** Parse an instance of `T` from `input`. */
   final def parse(input: String): T = {
-    val json = jawn.support.json4s.Parser.parseFromString(input).get
+    val json = Compat.Parser.parseFromString(input).get
     parse(json)
   }
 
@@ -132,7 +132,7 @@ trait ParseWithSuperIntf[A] extends JsonParser[A] {
   final def parse(input: String): A =
     parse(input, None)
   final def parse(input: String, superIntf: Option[ast.InterfaceTypeDefinition]): A = {
-    val json = jawn.support.json4s.Parser.parseFromString(input).get
+    val json = Compat.Parser.parseFromString(input).get
     parse(json, superIntf)
   }
   final def parse(json: JValue): A =
@@ -261,7 +261,7 @@ object JsonParser {
     def parseInterface(input: String): List[ast.TypeDefinition] =
       parseInterface(input, None)
     def parseInterface(input: String, superIntf: Option[ast.InterfaceTypeDefinition]): List[ast.TypeDefinition] = {
-      val json = jawn.support.json4s.Parser.parseFromString(input).get
+      val json = Compat.Parser.parseFromString(input).get
       parseInterface(json, superIntf)
     }
     def parseInterface(json: JValue): List[ast.TypeDefinition] =
@@ -310,7 +310,7 @@ object JsonParser {
       }
 
     def parseMessage(input: String): ast.FieldDefinition = {
-      val json = jawn.support.json4s.Parser.parseFromString(input).get
+      val json = Compat.Parser.parseFromString(input).get
       parseMessage(json)
     }
     def parseMessage(json: JValue): ast.FieldDefinition =
