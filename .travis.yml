@@ -11,7 +11,7 @@ matrix:
   - scala: 2.13.0
     script: "sbt \"++${TRAVIS_SCALA_VERSION}\" library/test"
   - scala: 2.11.12
-    script: "++${TRAVIS_SCALA_VERSION}" library/test
+    script: "sbt \"++${TRAVIS_SCALA_VERSION}\" library/test"
 
 cache:
   directories:
