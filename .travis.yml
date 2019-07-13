@@ -9,7 +9,7 @@ matrix:
   - env: SBT_VERSION="1.2.8"
     scala: 2.12.8
   - scala: 2.13.0
-    script: "++${TRAVIS_SCALA_VERSION}" library/test
+    script: "sbt \"++${TRAVIS_SCALA_VERSION}\" library/test"
   - scala: 2.11.12
     script: "++${TRAVIS_SCALA_VERSION}" library/test
 
