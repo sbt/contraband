@@ -1,10 +1,9 @@
 package sbt.contraband
 
+import sbt.Keys._
 import sbt._
-import Keys._
-import ast._
-import parser.{ JsonParser, SchemaParser }
-import scala.util.Success
+import sbt.contraband.ast._
+import sbt.contraband.parser.{JsonParser, SchemaParser}
 
 object ContrabandPlugin extends AutoPlugin {
 
@@ -201,7 +200,13 @@ object Generate {
       scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption,
       codecParents, instantiateJavaLazy, instantiateJavaOptional, formatsForType, s.log)
 
-    val f = FileFunction.cached(s.cacheDirectory / scalaVersion / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
+    val scalaVersionSubDir = scalaVersion match {
+      case VersionNumber(Seq(x, y, _*), _, _) => s"scala-$x.$y"
+      case _ => throw new IllegalArgumentException(s"Invalid Scala version: '$scalaVersion'")
+    }
+    val cacheDirectory = s.cacheDirectory / scalaVersionSubDir / "gen-api"
+
+    val f = FileFunction.cached(cacheDirectory, FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }
 }
