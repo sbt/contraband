@@ -68,6 +68,7 @@ object ContrabandPlugin extends AutoPlugin {
           (contrabandScalaFileNames in generateContrabands).value,
           (contrabandScalaSealInterface in generateContrabands).value,
           (contrabandScalaPrivateConstructor in generateContrabands).value,
+          (scalaVersion in generateContrabands).value,
           (contrabandWrapOption in generateContrabands).value,
           (contrabandCodecParents in generateContrabands).value,
           (contrabandInstantiateJavaLazy in generateContrabands).value,
@@ -188,6 +189,7 @@ object Generate {
     scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     scalaPrivateConstructor: Boolean,
+    scalaVersion: String,
     wrapOption: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
@@ -198,7 +200,8 @@ object Generate {
     def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,
       scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption,
       codecParents, instantiateJavaLazy, instantiateJavaOptional, formatsForType, s.log)
-    val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
+
+    val f = FileFunction.cached(s.cacheDirectory / scalaVersion / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }
 }
