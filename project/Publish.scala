@@ -51,16 +51,3 @@ object SonatypePublish extends AutoPlugin {
     }
   )
 }
-
-/**
- * For projects that are not published.
- */
-object NoPublish extends AutoPlugin {
-  override def requires = plugins.JvmPlugin && BintrayPublish
-
-  override def projectSettings = Seq(
-    publishArtifact := false,
-    publish := (),
-    publishLocal := ()
-  )
-}
