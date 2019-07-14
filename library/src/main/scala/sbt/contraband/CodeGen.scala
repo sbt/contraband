@@ -22,7 +22,7 @@ abstract class CodeGenerator {
 
           case Some(existing) =>
             // Remove `package blah` from what we want to add
-            val content = v.lines.toList.tail mkString EOL
+            val content = v.linesIterator.toList.tail mkString EOL
             acc + (k -> (existing + EOL + EOL + content))
         }
       }
@@ -38,7 +38,7 @@ abstract class CodeGenerator {
 
     final def indentWith(config: IndentationConfiguration): String = {
       val buffer = new IndentationAwareBuffer(config)
-      code.lines foreach buffer .+=
+      code.linesIterator foreach buffer .+=
       buffer.toString
     }
   }

@@ -12,7 +12,7 @@ class IndentationAwareBuffer(val config: IndentationConfiguration, private var l
   /** Add all the lines of `it` to the buffer. */
   def +=(it: Iterator[String]): Unit = it foreach append
   /** Add `s` to the buffer */
-  def +=(s: String): Unit = s.lines foreach append
+  def +=(s: String): Unit = s.linesIterator foreach append
 
   override def toString: String = buffer.mkString
 
