@@ -1,10 +1,9 @@
 package sbt.contraband
 
+import sbt.Keys._
 import sbt._
-import Keys._
-import ast._
-import parser.{ JsonParser, SchemaParser }
-import scala.util.Success
+import sbt.contraband.ast._
+import sbt.contraband.parser.{JsonParser, SchemaParser}
 
 object ContrabandPlugin extends AutoPlugin {
 
@@ -68,6 +67,7 @@ object ContrabandPlugin extends AutoPlugin {
           (contrabandScalaFileNames in generateContrabands).value,
           (contrabandScalaSealInterface in generateContrabands).value,
           (contrabandScalaPrivateConstructor in generateContrabands).value,
+          (scalaVersion in generateContrabands).value,
           (contrabandWrapOption in generateContrabands).value,
           (contrabandCodecParents in generateContrabands).value,
           (contrabandInstantiateJavaLazy in generateContrabands).value,
@@ -188,6 +188,7 @@ object Generate {
     scalaFileNames: Any => File,
     scalaSealInterface: Boolean,
     scalaPrivateConstructor: Boolean,
+    scalaVersion: String,
     wrapOption: Boolean,
     codecParents: List[String],
     instantiateJavaLazy: String => String,
@@ -198,7 +199,14 @@ object Generate {
     def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,
       scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption,
       codecParents, instantiateJavaLazy, instantiateJavaOptional, formatsForType, s.log)
-    val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
+
+    val scalaVersionSubDir = scalaVersion match {
+      case VersionNumber(Seq(x, y, _*), _, _) => s"scala-$x.$y"
+      case _ => throw new IllegalArgumentException(s"Invalid Scala version: '$scalaVersion'")
+    }
+    val cacheDirectory = s.cacheDirectory / scalaVersionSubDir / "gen-api"
+
+    val f = FileFunction.cached(cacheDirectory, FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }
 }
