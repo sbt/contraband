@@ -30,5 +30,5 @@ sbt-datatype 0.2.3 lets you put in extra code on top of the generated code.
   [31]: https://github.com/sbt/sbt-datatype/pull/31
   [32]: https://github.com/sbt/sbt-datatype/pull/32
   [@eed3si9n]: https://github.com/eed3si9n
-  [@dwijnand]: http://github.com/dwijnand
-  [@Duhemm]: http://github.com/Duhemm
+  [@dwijnand]: https://github.com/dwijnand
+  [@Duhemm]: https://github.com/Duhemm

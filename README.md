@@ -1,1 +1,1 @@
-See [Contraband](http://www.scala-sbt.org/contraband/) documentation.
+See [Contraband](https://www.scala-sbt.org/contraband/) documentation.

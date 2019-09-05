@@ -954,7 +954,7 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
 
   val completeExampleCodeCodec =
     """/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -966,7 +966,7 @@ trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.Bas
 implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = flatUnionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtraImpl, com.example.GreetingWithAttachments]("type")
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -997,7 +997,7 @@ implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] =
 }
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -1009,7 +1009,7 @@ trait GreetingExtraFormats { self: generated.GreetingHeaderFormats with sjsonnew
 implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = flatUnionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]("type")
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -1044,7 +1044,7 @@ implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraI
 }
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -1077,7 +1077,7 @@ implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.Greeting
 }
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -1110,7 +1110,7 @@ implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] =
 }
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -1143,7 +1143,7 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 }
 }
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY

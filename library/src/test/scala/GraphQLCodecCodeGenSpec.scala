@@ -13,7 +13,7 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
     code(new File("generated", "InterfaceExampleFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -26,7 +26,7 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
         |}""".stripMargin.unindent)
     code(new File("generated", "ChildTypeFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -64,7 +64,7 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
 
     code(new File("generated", "InterfaceExampleFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -78,7 +78,7 @@ class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with Eq
     code.contains(new File("generated", "MiddleInterfaceFormats.scala")) shouldEqual false
     code(new File("generated", "ChildTypeFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
