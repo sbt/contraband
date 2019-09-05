@@ -1,4 +1,4 @@
-This is the initial release of [sbt-datatype](http://www.scala-sbt.org/0.13/docs/Datatype.html).
+This is the initial release of [sbt-datatype](https://www.scala-sbt.org/0.13/docs/Datatype.html).
 
 sbt-datatype is a code generator that uses Apache Avro-like schema to generate datatypes for Java or Scala.
 Scala code will generate abstract classes and pseudo case classes.
@@ -36,4 +36,4 @@ Using `since` as a hint, sbt-datatype will generate two `apply` methods under `G
     }
 
 This way any code that was using `Greeting("hello")` will not break. It also won't generate `unapply`, which is problematic in keeping the binary compatibility.
-See [sbt-datatype](http://www.scala-sbt.org/0.13/docs/Datatype.html) for more details.
+See [sbt-datatype](https://www.scala-sbt.org/0.13/docs/Datatype.html) for more details.

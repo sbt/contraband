@@ -19,7 +19,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -59,7 +59,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -86,7 +86,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -99,7 +99,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |}""".stripMargin.unindent)
     code(new File("generated", "childRecordFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -138,7 +138,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -159,7 +159,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -186,7 +186,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -223,7 +223,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -260,7 +260,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -301,7 +301,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     code.head._2.unindent should equalLines (
       """/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -341,7 +341,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -388,7 +388,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -449,7 +449,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
 
     code.head._2.unindent should equalLines (
       """/**
-        | * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
