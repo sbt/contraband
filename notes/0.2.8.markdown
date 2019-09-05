@@ -14,4 +14,4 @@
   [47]: https://github.com/sbt/sbt-datatype/pull/47
   [48]: https://github.com/sbt/sbt-datatype/issues/48
   [50]: https://github.com/sbt/sbt-datatype/pull/50
-  [@dwijnand]: http://github.com/dwijnand
+  [@dwijnand]: https://github.com/dwijnand

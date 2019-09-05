@@ -49,6 +49,6 @@ This will generate `JsonFormat` traits under `com.example.codec` package. See [J
   [22]: https://github.com/sbt/sbt-datatype/pull/22
   [@eed3si9n]: https://github.com/eed3si9n
   [@jsuereth]: https://github.com/jsuereth
-  [@dwijnand]: http://github.com/dwijnand
-  [@Duhemm]: http://github.com/Duhemm
+  [@dwijnand]: https://github.com/dwijnand
+  [@Duhemm]: https://github.com/Duhemm
   [1]: https://github.com/eed3si9n/sjson-new

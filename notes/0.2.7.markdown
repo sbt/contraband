@@ -7,4 +7,4 @@
   [39]: https://github.com/sbt/sbt-datatype/issues/39
   [40]: https://github.com/sbt/sbt-datatype/pull/40
   [41]: https://github.com/sbt/sbt-datatype/pull/41
-  [@dwijnand]: http://github.com/dwijnand
+  [@dwijnand]: https://github.com/dwijnand

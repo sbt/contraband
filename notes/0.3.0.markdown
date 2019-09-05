@@ -6,4 +6,4 @@
 
   [#70]: https://github.com/sbt/contraband/issues/70
   [#71]: https://github.com/sbt/contraband/pull/71
-  [@dwijnand]: http://github.com/dwijnand
+  [@dwijnand]: https://github.com/dwijnand

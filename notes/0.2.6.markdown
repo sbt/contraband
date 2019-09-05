@@ -70,4 +70,4 @@ will now generate a class like this:
     }
 
   [38]: https://github.com/sbt/sbt-datatype/pull/38
-  [@dwijnand]: http://github.com/dwijnand
+  [@dwijnand]: https://github.com/dwijnand
