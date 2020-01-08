@@ -7,8 +7,8 @@ matrix:
   - env: SBT_VERSION="0.13.18" ADOPTOPENJDK=8
     scala: 2.10.7
   - env: SBT_VERSION="1.2.8"   ADOPTOPENJDK=11
-    scala: 2.12.8
-  - scala: 2.13.0
+    scala: 2.12.10
+  - scala: 2.13.1
     script: "sbt \"++${TRAVIS_SCALA_VERSION}!\" library/test"
   - scala: 2.11.12
     script: "sbt \"++${TRAVIS_SCALA_VERSION}!\" library/test"
