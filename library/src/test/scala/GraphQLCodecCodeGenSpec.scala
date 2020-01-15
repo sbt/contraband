@@ -5,8 +5,10 @@ import java.io.File
 import parser.SchemaParser
 import GraphQLExample._
 import scala.util.Success
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class GraphQLCodecCodeGenSpec extends FlatSpec with Matchers with Inside with EqualLines {
+class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
   "generate(Interface)" should "generate a codec for an interface" in {
     val Success(ast) = SchemaParser.parse(intfExample)
     val code = mkCodecCodeGen.generate(ast)

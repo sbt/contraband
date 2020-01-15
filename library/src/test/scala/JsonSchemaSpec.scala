@@ -5,8 +5,10 @@ import JsonSchemaExample._
 import ast._
 import parser.JsonParser
 import AstUtil._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class JsonSchemaSpec extends FlatSpec with Matchers with Inside {
+class JsonSchemaSpec extends AnyFlatSpec with Matchers with Inside {
   "Document.parse should" should "parse empty schemas" in {
     val s = JsonParser.Document.parse(emptySchemaExample)
     assert(s.definitions === Nil)

@@ -5,8 +5,10 @@ import parser.SchemaParser
 import ast._
 import org.scalatest._
 import scala.util.Success
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class GraphQLSchemaParserSpec extends FlatSpec with Matchers with Inside {
+class GraphQLSchemaParserSpec extends AnyFlatSpec with Matchers with Inside {
   "SchemaParser" should "parse an empty type" in {
     val Success(ast) = SchemaParser.parse("""type Hello {}""")
     // println(ast)

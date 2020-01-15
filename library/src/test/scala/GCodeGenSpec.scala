@@ -2,8 +2,10 @@ package sbt.contraband
 
 import org.scalatest._
 import sbt.contraband.ast._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-abstract class GCodeGenSpec(language: String) extends FlatSpec with Matchers with EqualLines {
+abstract class GCodeGenSpec(language: String) extends AnyFlatSpec with Matchers with EqualLines {
   implicit def typeDefinitions2Document(ds: List[TypeDefinition]): Document =
     Document(None, ds, Directive.codecPackage("generated") :: Nil, Nil, None)
   implicit def typeDefinition2Document(d: TypeDefinition): Document =
