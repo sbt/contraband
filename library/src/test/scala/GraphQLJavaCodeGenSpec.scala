@@ -5,8 +5,10 @@ import java.io.File
 import parser.SchemaParser
 import GraphQLExample._
 import scala.util.Success
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class GraphQLJavaCodeGenSpec extends FlatSpec with Matchers with Inside with EqualLines {
+class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
   "generate(Enumeration)" should "generate a simple enumeration" in {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)

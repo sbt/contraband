@@ -6,8 +6,10 @@ import parser.SchemaParser
 import GraphQLExample._
 import scala.util.Success
 import scala.collection.immutable._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
-class GraphQLMixedCodeGenSpec extends FlatSpec with Matchers with Inside with EqualLines {
+class GraphQLMixedCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
   "generate(Record)" should "handle mixed Java-Scala inheritance" in {
     val Success(ast) = SchemaParser.parse(mixedExample)
     // println(ast)

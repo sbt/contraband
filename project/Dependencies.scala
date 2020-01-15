@@ -36,7 +36,7 @@ object Dependencies {
       }
     }
 
-  val scalaTest         = "org.scalatest" %% "scalatest" % "3.0.8"
+  val scalaTest         = "org.scalatest" %% "scalatest" % "3.1.0"
   val parboiled         = Def.setting{
     val v = scalaBinaryVersion.value match {
       case "2.10" =>
