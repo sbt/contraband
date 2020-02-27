@@ -26,6 +26,8 @@ trait Tokens extends StringBuilding with PositionTracking { this: Parser with Ig
 
   def DotNames = rule { Name ~ ('.' ~ Name).* ~> ((n, ns) => n :: ns.toList) }
 
+  def RawNames = rule { atomic("raw\"" ~ capture(Characters) ~ "\"") ~> ((n: String) ⇒ List(n)) }
+
   def NumberValue = rule { atomic(Comments ~ trackPos ~ IntegerValuePart ~ FloatValuePart.? ~ IgnoredNoComment.*) ~>
       ((comment, pos, intPart, floatPart) ⇒
         floatPart map (f ⇒ ast.BigDecimalValue(BigDecimal(intPart + f), comment, Some(pos))) getOrElse
@@ -365,7 +367,7 @@ trait Types { this: Parser with Tokens with Ignored =>
 
   def LazyType = rule { trackPos ~ `lazy` ~ Type ~> ((pos, tpe) => ast.LazyType(tpe, Some(pos))) }
 
-  def TypeName = rule { DotNames }
+  def TypeName: Rule1[List[String]] = rule { RawNames | DotNames }
 
   def NamedType = rule { Ignored.* ~ trackPos ~ TypeName ~> ((pos, name) ⇒ ast.NamedType(name, Some(pos)))}
 
