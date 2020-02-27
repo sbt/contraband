@@ -70,10 +70,11 @@ class GraphQLSchemaParserSpec extends AnyFlatSpec with Matchers with Inside {
         |  name: String
         |  age: Int!
         |  xs: [java.util.Date]
+        |  x: raw"Map[String, String]"
         |}""".stripMargin)
     // println(ast)
     inside(ast) { case Document(_, foo :: Nil, _, _, _) =>
-      inside(foo) { case ObjectTypeDefinition(name, _, Nil, f1 :: f2 :: f3 :: Nil, _, _, _, _) =>
+      inside(foo) { case ObjectTypeDefinition(name, _, Nil, f1 :: f2 :: f3 :: f4 :: Nil, _, _, _, _) =>
         name shouldEqual "Person"
         inside(f1) { case FieldDefinition(name, NamedType(typeName :: Nil, _), _ , _, _, _, _) =>
           name shouldEqual "name"
@@ -86,6 +87,10 @@ class GraphQLSchemaParserSpec extends AnyFlatSpec with Matchers with Inside {
         inside(f3) { case FieldDefinition(name, ListType(NamedType(typeName, _), _), _, _, _, _, _) =>
           name shouldEqual "xs"
           typeName shouldEqual List("java", "util", "Date")
+        }
+        inside(f4) { case FieldDefinition(name, NamedType(typeName, _), _, _, _, _, _) =>
+          name shouldEqual "x"
+          typeName shouldEqual List("Map[String, String]")
         }
       }
     }
