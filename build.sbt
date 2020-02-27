@@ -1,6 +1,6 @@
 import Dependencies._
 
-ThisBuild / version := "0.4.5"
+ThisBuild / version := "0.4.6-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
 ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala211, scala210)
 ThisBuild / scalaVersion := "2.12.8"
