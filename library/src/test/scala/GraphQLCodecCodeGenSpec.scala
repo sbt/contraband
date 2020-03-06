@@ -1,19 +1,17 @@
 package sbt.contraband
 
-import org.scalatest._
+import verify._
 import java.io.File
 import parser.SchemaParser
 import GraphQLExample._
 import scala.util.Success
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
 
-class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
-  "generate(Interface)" should "generate a codec for an interface" in {
+object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
+  test("generate(Interface) should generate a codec for an interface") {
     val Success(ast) = SchemaParser.parse(intfExample)
     val code = mkCodecCodeGen.generate(ast)
-
-    code(new File("generated", "InterfaceExampleFormats.scala")).unindent should equalLines (
+    assertEquals(
+      code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
       """/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
@@ -25,8 +23,11 @@ class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |
         |trait InterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
         |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
-        |}""".stripMargin.unindent)
-    code(new File("generated", "ChildTypeFormats.scala")).unindent should equalLines (
+        |}""".stripMargin.stripSpace
+    )
+
+    assertEquals(
+      code(new File("generated", "ChildTypeFormats.scala")).stripSpace,
       """/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
@@ -57,14 +58,16 @@ class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "generate a codec for a two-level hierarchy of interfaces" in {
+  test("generate a codec for a two-level hierarchy of interfaces") {
     val Success(ast) = SchemaParser.parse(twoLevelIntfExample)
     val code = mkCodecCodeGen.generate(ast)
 
-    code(new File("generated", "InterfaceExampleFormats.scala")).unindent should equalLines (
+    assertEquals(
+      code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
       """/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
@@ -76,9 +79,13 @@ class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |
         |trait InterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
         |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
-        |}""".stripMargin.unindent)
-    code.contains(new File("generated", "MiddleInterfaceFormats.scala")) shouldEqual false
-    code(new File("generated", "ChildTypeFormats.scala")).unindent should equalLines (
+        |}""".stripMargin.stripSpace
+    )
+
+    assert(!code.contains(new File("generated", "MiddleInterfaceFormats.scala")))
+
+    assertEquals(
+      code(new File("generated", "ChildTypeFormats.scala")).stripSpace,
       """/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
@@ -109,7 +116,8 @@ class GraphQLCodecCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |      builder.endObject()
         |    }
         |  }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
   val codecParents = List("sjsonnew.BasicJsonProtocol")

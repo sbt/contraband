@@ -12,8 +12,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
     val code = mkJavaCodeGen generate enumeration
 
-    code.head._2.unindent should equalLines (
-      """/** Example of simple enumeration */
+    code.head._2.unindent should equalLines("""/** Example of simple enumeration */
         |public enum simpleEnumerationExample {
         |    /** First symbol */
         |    first,
@@ -26,9 +25,9 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(simpleInterfaceExample)
     val code = mkJavaCodeGen generate protocol
 
-    code.head._2.unindent should equalLines (
+    code.head._2.unindent should equalLines(
       """/** example of simple interface */
-        |public abstract class simpleInterfaceExample implements java.io.Serializable {
+        |public abstract class simpleInterfaceExample implements Interface1, Interface2, java.io.Serializable {
         |    // Some extra code...
         |    private type field;
         |    protected simpleInterfaceExample(type _field) {
@@ -54,7 +53,8 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return "custom";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.unindent
+    )
   }
 
   override def interfaceGenerateOneChild = {
@@ -62,8 +62,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     val code = mkJavaCodeGen generate protocol
     val code1 = code.toList(0)._2.unindent
     val code2 = code.toList(1)._2.unindent
-    code1 should equalLines (
-      """/** example of interface */
+    code1 should equalLines("""/** example of interface */
         |public abstract class oneChildInterfaceExample implements java.io.Serializable {
         |
         |    private int field;
@@ -91,8 +90,8 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
         |    }
         |}""".stripMargin.unindent)
-    code2 should equalLines (
-      """public final class childRecord extends oneChildInterfaceExample {
+    code2 should equalLines(
+      """public final class childRecord extends oneChildInterfaceExample implements java.io.Serializable {
         |    public static childRecord create(int _field, int _x) {
         |        return new childRecord(_field, _x);
         |    }
@@ -129,14 +128,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return "childRecord("  + "field: " + field() + ", " + "x: " + x() + ")";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.unindent
+    )
   }
 
   override def interfaceGenerateNested = {
     val protocol = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     val code = mkJavaCodeGen generate protocol
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("nestedProtocolExample.java") ->
           """/** example of nested protocols */
@@ -161,9 +161,8 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "nestedProtocolExample("  + ")";
             |    }
             |}""".stripMargin.unindent,
-
         new File("nestedProtocol.java") ->
-          """public abstract class nestedProtocol extends nestedProtocolExample {
+          """public abstract class nestedProtocol extends nestedProtocolExample implements java.io.Serializable {
             |    protected nestedProtocol() {
             |        super();
             |    }
@@ -184,9 +183,8 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "nestedProtocol("  + ")";
             |    }
             |}""".stripMargin.unindent,
-
         new File("ChildRecord.java") ->
-          """public final class ChildRecord extends nestedProtocol {
+          """public final class ChildRecord extends nestedProtocol implements java.io.Serializable {
             |    public static ChildRecord create() {
             |        return new ChildRecord();
             |    }
@@ -213,14 +211,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "ChildRecord("  + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def interfaceGenerateMessages = {
     val schema = JsonParser.Document.parse(generateArgDocExample)
     val code = mkJavaCodeGen generate schema
 
-    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines (
+    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines(
       ListMap(
         new File("generateArgDocExample.java") ->
           """public abstract class generateArgDocExample implements java.io.Serializable {
@@ -258,14 +257,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "generateArgDocExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.withoutEmptyLines
-      ))
+      )
+    )
   }
 
   override def recordGenerateSimple = {
     val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
     val code = mkJavaCodeGen generate record
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("simpleRecordExample.java") ->
           """/** Example of simple record */
@@ -306,14 +306,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def recordGrowZeroToOneField = {
     val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
     val code = mkJavaCodeGen generate record
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("growableAddOneField.java") ->
           """public final class growableAddOneField implements java.io.Serializable {
@@ -361,14 +362,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "growableAddOneField("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def recordGrowZeroToOneToTwoFields = {
     val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsJavaExample)
     val code = mkJavaCodeGen generate record
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("Foo.java") ->
           """public final class Foo implements java.io.Serializable {
@@ -461,14 +463,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def recordPrimitives: Unit = {
     val record = JsonParser.ObjectTypeDefinition.parse(primitiveTypesExample2)
     val code = mkJavaCodeGen generate record
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("primitiveTypesExample2.java") ->
           """public final class primitiveTypesExample2 implements java.io.Serializable {
@@ -516,14 +519,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         return "primitiveTypesExample2("  + "smallBoolean: " + smallBoolean() + ", " + "bigBoolean: " + bigBoolean() + ")";
     }
 }""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def recordWithModifier: Unit = {
     val record = JsonParser.ObjectTypeDefinition.parse(modifierExample)
     val code = mkJavaCodeGen generate record
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("modifierExample.java") ->
           """sealed class modifierExample implements java.io.Serializable {
@@ -562,14 +566,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "modifierExample("  + "field: " + field() + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val code = mkJavaCodeGen generate schema
 
-    code.head._2.unindent should equalLines (
+    code.head._2.unindent should equalLines(
       """public final class primitiveTypesExample implements java.io.Serializable {
         |
         |    public static primitiveTypesExample create(int _simpleInteger, com.example.MyLazy<Integer> _lazyInteger, int[] _arrayInteger, java.util.Optional<Integer> _optionInteger, com.example.MyLazy<int[]> _lazyArrayInteger, com.example.MyLazy<java.util.Optional<Integer>> _lazyOptionInteger) {
@@ -659,14 +664,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public String toString() {
         |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.unindent
+    )
   }
 
   override def schemaGenerateTypeReferencesNoLazy = {
     val schema = JsonParser.Document.parse(primitiveTypesNoLazyExample)
     val code = mkJavaCodeGen generate schema
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("primitiveTypesNoLazyExample.java") ->
           """public final class primitiveTypesNoLazyExample implements java.io.Serializable {
@@ -714,22 +720,22 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
             |    }
             |}""".stripMargin.unindent
-      ))
+      )
+    )
   }
 
   override def schemaGenerateComplete = {
     val schema = JsonParser.Document.parse(completeExample)
     val code = mkJavaCodeGen generate schema
-    code.mapValues(_.unindent).toMap should equalMapLines (completeExampleCodeJava.mapValues(_.unindent).toMap)
+    code.mapValues(_.unindent).toMap should equalMapLines(completeExampleCodeJava.mapValues(_.unindent).toMap)
   }
 
   override def schemaGenerateCompletePlusIndent = {
     val schema = JsonParser.Document.parse(completeExample)
     val code = mkJavaCodeGen generate schema
-    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines (completeExampleCodeJava.mapValues(_.withoutEmptyLines).toMap)
+    code.mapValues(_.withoutEmptyLines).toMap should equalMapLines(completeExampleCodeJava.mapValues(_.withoutEmptyLines).toMap)
   }
 
   def mkJavaCodeGen: JavaCodeGen =
-    new JavaCodeGen("com.example.MyLazy", CodeGen.javaOptional, CodeGen.instantiateJavaOptional,
-        wrapOption = true)
+    new JavaCodeGen("com.example.MyLazy", CodeGen.javaOptional, CodeGen.instantiateJavaOptional, wrapOption = true)
 }

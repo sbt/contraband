@@ -9,9 +9,12 @@ import AstUtil._
 /**
  * Code generator for Java.
  */
-class JavaCodeGen(lazyInterface: String, optionalInterface: String,
-  instantiateJavaOptional: (String, String) => String,
-  wrapOption: Boolean) extends CodeGenerator {
+class JavaCodeGen(
+    lazyInterface: String,
+    optionalInterface: String,
+    instantiateJavaOptional: (String, String) => String,
+    wrapOption: Boolean
+) extends CodeGenerator {
 
   /** Indentation configuration for Java sources. */
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -34,7 +37,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     val parentsInSchema = lookupInterfaces(s, parents)
     val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
     val allFields = fields filter { _.arguments.isEmpty }
-    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
+    val extendsCode = genExtendsCode(parent, extraParents)
     val doc = toDoc(comments)
     val extra = toExtra(i)
     val msgs = i.fields filter { _.arguments.nonEmpty }
@@ -65,7 +68,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     val parent: Option[InterfaceTypeDefinition] = parentsInSchema.headOption
     val doc = toDoc(r.comments)
     val extra = toExtra(r)
-    val extendsCode = parent map (p => s"extends ${fullyQualifiedName(p)}") getOrElse "implements java.io.Serializable"
+    val extendsCode = genExtendsCode(parent, extraParents)
     val toStringImpl: List[String] = toToStringImpl(r)
     val lfs = localFields(r, parentsInSchema)
     val mod = toModifier(r.directives).getOrElse("public final")
@@ -93,10 +96,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
 
     val valuesCode =
       if (values.isEmpty) ""
-      else (values map { case EnumValueDefinition(name, dir, comments, _) =>
-        s"""${genDoc(toDoc(comments))}
+      else
+        (values map {
+          case EnumValueDefinition(name, dir, comments, _) =>
+            s"""${genDoc(toDoc(comments))}
            |$name""".stripMargin
-      }).mkString("", "," + EOL, ";")
+        }).mkString("", "," + EOL, ";")
 
     val extra = toExtra(e)
     val code =
@@ -111,13 +116,21 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
   }
 
   private def genDoc(doc: List[String]) = doc match {
-    case Nil => ""
+    case Nil      => ""
     case l :: Nil => s"/** $l */"
     case lines =>
       val doc = lines map (l => s" * $l") mkString EOL
       s"""/**
          |$doc
          | */""".stripMargin
+  }
+
+  private def genExtendsCode(parent: Option[InterfaceTypeDefinition], extraParents: List[String]): String = {
+    val parentOpt = parent.map(p => fullyQualifiedName(p))
+    (parentOpt match {
+      case Some(p) => s"extends $p "
+      case _       => ""
+    }) + "implements " + (extraParents ::: List("java.io.Serializable")).mkString(", ")
   }
 
   private def genFile(d: TypeDefinition) = {
@@ -158,23 +171,24 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
   }
 
   private def genMessages(messages: List[FieldDefinition]) = messages map genMessage mkString EOL
-  private def genMessage(message: FieldDefinition): String =
-    {
-      val FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) = message
-      val doc = toDoc(comments)
-      val argsDoc = arguments flatMap { a: InputValueDefinition =>
-        toDoc(a.comments) match {
-          case Nil        => Nil
-          case doc :: Nil => s"@param ${a.name} $doc" :: Nil
-          case docs =>
-            val prefix = s"@param ${a.name} "
-            docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
-        }
+  private def genMessage(message: FieldDefinition): String = {
+    val FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) = message
+    val doc = toDoc(comments)
+    val argsDoc = arguments flatMap { a: InputValueDefinition =>
+      toDoc(a.comments) match {
+        case Nil        => Nil
+        case doc :: Nil => s"@param ${a.name} $doc" :: Nil
+        case docs =>
+          val prefix = s"@param ${a.name} "
+          docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
       }
-      val params: List[String] = arguments map { a => s"${genRealTpe(a.valueType)} ${a.name}" }
-      s"""${genDoc(doc ++ argsDoc)}
-         |public abstract ${genRealTpe(fieldType)} ${name}(${params mkString ","});"""
     }
+    val params: List[String] = arguments map { a =>
+      s"${genRealTpe(a.valueType)} ${a.name}"
+    }
+    s"""${genDoc(doc ++ argsDoc)}
+         |public abstract ${genRealTpe(fieldType)} ${name}(${params mkString ","});"""
+  }
 
   private def renderJavaValue(v: Value, tpe: Type): String =
     v match {
@@ -188,9 +202,11 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
         val str =
           v match {
             case x: ObjectValue =>
-              val args = x.fields map { f => f.value.renderPretty }
-              s"""new ${tpe.name}(${ args.mkString(", ") })"""
-            case _  => v.renderPretty
+              val args = x.fields map { f =>
+                f.value.renderPretty
+              }
+              s"""new ${tpe.name}(${args.mkString(", ")})"""
+            case _ => v.renderPretty
           }
         if (tpe.isListType) s"new Array { $str }"
         else if (tpe.isNotNullType) str
@@ -202,7 +218,7 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       case Some(v) => renderJavaValue(v, f.fieldType)
       case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
         renderJavaValue(NullValue(), f.fieldType)
-      case _       => sys.error(s"Needs a default value for field ${f.name}.")
+      case _ => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
   private def genFactoryMethods(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition]) =
@@ -212,21 +228,24 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       val args = provided map (f => s"_${f.name}")
 
       val factoryMethodNames = List("create", "of")
-      val methods = factoryMethodNames map { factory => genStaticFactoryMethod(cl, factory, ctorParameters, args) }
-      methods.mkString(EOL + EOL) +
-      {
+      val methods = factoryMethodNames map { factory =>
+        genStaticFactoryMethod(cl, factory, ctorParameters, args)
+      }
+      methods.mkString(EOL + EOL) + {
         if (!containsStrictOptional(provided) || !wrapOption) ""
         else {
           val ctorParameters2 = provided map { f =>
             if (f.fieldType.isOptionalType && !f.fieldType.isLazyType) s"${genRealTpe(f.fieldType.notNull)} _${f.name}"
             else s"${genRealTpe(f.fieldType)} _${f.name}"
           }
-          val methods2 = factoryMethodNames map { factory => genStaticFactoryMethod(cl, factory, ctorParameters2, args) }
+          val methods2 = factoryMethodNames map { factory =>
+            genStaticFactoryMethod(cl, factory, ctorParameters2, args)
+          }
           EOL + EOL + methods2.mkString(EOL + EOL)
         }
       }
     } mkString (EOL + EOL)
-  
+
   private def genStaticFactoryMethod(cl: RecordLikeDefinition, methodName: String, params: List[String], args: List[String]): String =
     s"""public static ${cl.name} ${methodName}(${params.mkString(", ")}) {
        |  return new ${cl.name}(${args.mkString(", ")});
@@ -280,12 +299,12 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
              |    $superCall2
              |    $assignments2
              |}""".stripMargin
-            }
+        }
       }
     } mkString (EOL + EOL)
 
   private def genWith(r: ObjectTypeDefinition, parents: List[InterfaceTypeDefinition]) = {
-    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
+    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1); fst.toUpperCase + rst }
     val allFields = (r.fields filter { _.arguments.isEmpty }).zipWithIndex
     val lfs = localFields(r, parents)
     def nonParam(f: (FieldDefinition, Int)): String = {
@@ -299,37 +318,41 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
       } else s"${f._1.name}()"
     }
 
-    allFields map { case (f, idx) =>
-      val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
-      val tpe = f.fieldType
-      val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
-      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(tpe)} ${f.name}) {
+    allFields map {
+      case (f, idx) =>
+        val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
+        val tpe = f.fieldType
+        val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
+        s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(tpe)} ${f.name}) {
          |    return new ${r.name}($params);
          |}""".stripMargin +
-      ( if (tpe.isListType || tpe.isNotNullType) ""
-        else {
-          val wrappedParams = (before map nonParam) ::: instantiateJavaOptional(boxedType(tpe.name), f.name) :: (after map nonParam) mkString ", "
-          s"""
+          (if (tpe.isListType || tpe.isNotNullType) ""
+           else {
+             val wrappedParams = (before map nonParam) ::: instantiateJavaOptional(boxedType(tpe.name), f.name) :: (after map nonParam) mkString ", "
+             s"""
              |public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.fieldType.notNull)} ${f.name}) {
              |    return new ${r.name}($wrappedParams);
              |}""".stripMargin
-        }
-      )
+           })
     } mkString (EOL + EOL)
   }
 
   private def genEquals(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
     val body =
-      if (allFields exists { f => f.fieldType.isLazyType }) {
+      if (allFields exists { f =>
+            f.fieldType.isLazyType
+          }) {
         "return this == obj; // We have lazy members, so use object identity to avoid circularity."
       } else {
         val comparisonCode =
           if (allFields.isEmpty) "return true;"
           else
-            allFields.map { f =>
-              genJavaEquals("this", "o", f, s"${f.name}()", true)
-            }.mkString("return ", " && ", ";")
+            allFields
+              .map { f =>
+                genJavaEquals("this", "o", f, s"${f.name}()", true)
+              }
+              .mkString("return ", " && ", ";")
 
         s"""if (this == obj) {
            |    return true;
@@ -351,7 +374,9 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
     val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
     val seed = s"""37 * (17 + "$fqcn".hashCode())"""
     val body =
-      if (allFields exists { f => f.fieldType.isLazyType }) {
+      if (allFields exists { f =>
+            f.fieldType.isLazyType
+          }) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
         val computation = (seed /: allFields) { (acc, f) =>
@@ -369,12 +394,16 @@ class JavaCodeGen(lazyInterface: String, optionalInterface: String,
   private def genToString(cl: RecordLikeDefinition, toString: List[String]) = {
     val body = if (toString.isEmpty) {
       val allFields = cl.fields filter { _.arguments.isEmpty }
-      if (allFields exists { f => f.fieldType.isLazyType }) {
+      if (allFields exists { f =>
+            f.fieldType.isLazyType
+          }) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."
       } else {
-        allFields.map{ f =>
-          s""" + "${f.name}: " + ${f.name}()"""
-        }.mkString(s"""return "${cl.name}(" """, " + \", \"", " + \")\";")
+        allFields
+          .map { f =>
+            s""" + "${f.name}: " + ${f.name}()"""
+          }
+          .mkString(s"""return "${cl.name}(" """, " + \", \"", " + \")\";")
       }
     } else toString mkString s"$EOL    "
 

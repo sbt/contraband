@@ -47,4 +47,5 @@ object Dependencies {
     "org.parboiled" %% "parboiled" % v
   }
   val diffutils         = "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
+  val verify            = "com.eed3si9n.verify" %% "verify" % "0.2.0"
 }
