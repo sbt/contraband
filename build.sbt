@@ -2,7 +2,7 @@ import Dependencies._
 
 ThisBuild / version := "0.4.6-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
-ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala211, scala210)
+ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala211)
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
@@ -51,8 +51,10 @@ lazy val plugin = (project in file("plugin"))
     name := "sbt-contraband",
     bintrayPackage := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
-    scriptedLaunchOpts := { scriptedLaunchOpts.value ++
-      Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+    scriptedLaunchOpts := {
+      scriptedLaunchOpts.value ++
+        Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
+    crossScalaVersions := Seq(scala212),
     publishLocal := (publishLocal dependsOn (publishLocal in library)).value
   )
