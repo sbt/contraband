@@ -1,19 +1,18 @@
 package sbt.contraband
 
-import org.scalatest._
+import verify._
 import java.io.File
 import parser.SchemaParser
 import GraphQLExample._
 import scala.util.Success
-import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should.Matchers
 
-class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
-  "generate(Enumeration)" should "generate a simple enumeration" in {
+object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
+  test("generate(Enumeration) should generate a simple enumeration") {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)
     val code = mkJavaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example;
         |/** Example of an enumeration */
         |public enum EnumExample {
@@ -21,14 +20,16 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    First,
         |    Second;
         |    // Some extra code
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  "generate(Record)" should "generate a record" in {
+  test("generate(Record) should generate a record") {
     val Success(ast) = SchemaParser.parse(recordExample)
     // println(ast)
     val code = mkJavaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example;
         |/** Example of a type */
         |public final class TypeExample implements java.io.Serializable {
@@ -81,15 +82,78 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "TypeExample("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "grow a record from 0 to 1 field" in {
+  test("generate with xinterface") {
+    val Success(ast) = SchemaParser.parse(recordExtraIntfExample)
+    // println(ast)
+    val code = mkJavaCodeGen.generate(ast)
+    assertEquals(
+      code.head._2.stripSpace,
+      """package com.example;
+        |/** Example of a type */
+        |public final class TypeExample implements Intf1, java.io.Serializable {
+        |
+        |    public static TypeExample create(java.util.Optional<java.net.URL> _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample of(java.util.Optional<java.net.URL> _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample create(java.net.URL _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    public static TypeExample of(java.net.URL _field) {
+        |        return new TypeExample(_field);
+        |    }
+        |    private java.util.Optional<java.net.URL> field;
+        |    protected TypeExample(java.util.Optional<java.net.URL> _field) {
+        |        super();
+        |        field = _field;
+        |    }
+        |    protected TypeExample(java.net.URL _field) {
+        |        super();
+        |        field = java.util.Optional.<java.net.URL>ofNullable(_field);
+        |    }
+        |    /** something */
+        |    public java.util.Optional<java.net.URL> field() {
+        |        return this.field;
+        |    }
+        |    public TypeExample withField(java.util.Optional<java.net.URL> field) {
+        |        return new TypeExample(field);
+        |    }
+        |    public TypeExample withField(java.net.URL field) {
+        |        return new TypeExample(java.util.Optional.<java.net.URL>ofNullable(field));
+        |    }
+        |    public boolean equals(Object obj) {
+        |        if (this == obj) {
+        |            return true;
+        |        } else if (!(obj instanceof TypeExample)) {
+        |            return false;
+        |        } else {
+        |            TypeExample o = (TypeExample)obj;
+        |            return this.field().equals(o.field());
+        |        }
+        |    }
+        |    public int hashCode() {
+        |        return 37 * (37 * (17 + "com.example.TypeExample".hashCode()) + field().hashCode());
+        |    }
+        |    public String toString() {
+        |        return "TypeExample("  + "field: " + field() + ")";
+        |    }
+        |}""".stripMargin.stripSpace
+    )
+  }
+
+  test("grow a record from 0 to 1 field") {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)
     val code = mkJavaCodeGen.generate(ast)
 
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example;
         |public final class Growable implements java.io.Serializable {
         |    public static Growable create() {
@@ -148,15 +212,17 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "Growable("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "grow a record from 0 to 2 field" in {
+  test("grow a record from 0 to 2 field") {
     val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
     // println(ast)
     val code = mkJavaCodeGen.generate(ast)
 
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example;
         |public final class Foo implements java.io.Serializable {
         |    public static Foo create() {
@@ -247,16 +313,18 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  "generate(Interface)" should "generate an interface with one child" in {
+  test("generate(Interface) should generate an interface with one child") {
     val Success(ast) = SchemaParser.parse(intfExample)
     val code = mkJavaCodeGen.generate(ast)
 
-    val code1 = code.toList(0)._2.unindent
-    val code2 = code.toList(1)._2.unindent
-    code1 should equalLines (
+    val code1 = code.toList(0)._2.stripSpace
+    val code2 = code.toList(1)._2.stripSpace
+    assertEquals(
+      code1,
       """package com.example;
         |/** Example of an interface */
         |public abstract class InterfaceExample implements java.io.Serializable {
@@ -290,10 +358,12 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "InterfaceExample("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent)
-    code2 should equalLines (
+        |}""".stripMargin.stripSpace
+    )
+    assertEquals(
+      code2,
       """package com.example;
-        |public final class ChildType extends com.example.InterfaceExample {
+        |public final class ChildType extends com.example.InterfaceExample implements java.io.Serializable {
         |    public static ChildType create(java.util.Optional<String> _name, java.util.Optional<Integer> _field) {
         |        return new ChildType(_name, _field);
         |    }
@@ -346,13 +416,15 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "ChildType("  + "name: " + name() + ", " + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "generate messages" in {
+  test("generate messages") {
     val Success(ast) = SchemaParser.parse(messageExample)
     val code = mkJavaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example;
         |public abstract class IntfExample implements java.io.Serializable {
         |    private java.util.Optional<Integer> field;
@@ -392,10 +464,9 @@ class GraphQLJavaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with 
         |    public String toString() {
         |        return "IntfExample("  + "field: " + field() + ")";
         |    }
-        |}""".stripMargin.unindent
+        |}""".stripMargin.stripSpace
     )
   }
   def mkJavaCodeGen: JavaCodeGen =
-    new JavaCodeGen("com.example.MyLazy", CodeGen.javaOptional, CodeGen.instantiateJavaOptional,
-        wrapOption = true)
+    new JavaCodeGen("com.example.MyLazy", CodeGen.javaOptional, CodeGen.instantiateJavaOptional, wrapOption = true)
 }

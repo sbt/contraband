@@ -10,6 +10,7 @@ trait EqualLines {
   private val emptyLines = Lines(Vector.empty)
 
   implicit class CleanedString(s: String) {
+    def stripSpace: String = unindent.value.mkString("\n")
     def unindent: Lines = Lines(s.linesIterator.map(_.trim).filterNot(_.isEmpty).toVector)
     def withoutEmptyLines: Lines = Lines(s.linesIterator.filterNot(_.trim.isEmpty).toVector)
   }

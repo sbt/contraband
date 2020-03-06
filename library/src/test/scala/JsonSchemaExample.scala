@@ -722,7 +722,6 @@ object PriorityLevel {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
-
       new File("com/example/PriorityLevel.java") ->
         """package com.example;
           |/** Priority levels */
@@ -732,11 +731,10 @@ object PriorityLevel {
           |    Medium,
           |    High;
           |}""".stripMargin,
-
       new File("com/example/GreetingWithAttachments.java") ->
         """package com.example;
           |/** A Greeting with attachments */
-          |public final class GreetingWithAttachments extends com.example.Greetings {
+          |public final class GreetingWithAttachments extends com.example.Greetings implements java.io.Serializable {
           |    public static GreetingWithAttachments create(com.example.MyLazy<String> _message, java.io.File[] _attachments) {
           |        return new GreetingWithAttachments(_message, _attachments);
           |    }
@@ -781,10 +779,9 @@ object PriorityLevel {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
-
       new File("com/example/GreetingExtra.java") ->
         """package com.example;
-public abstract class GreetingExtra extends com.example.Greetings {
+public abstract class GreetingExtra extends com.example.Greetings implements java.io.Serializable {
 
     private String[] extra;
     protected GreetingExtra(com.example.MyLazy<String> _message, String[] _extra) {
@@ -809,10 +806,9 @@ public abstract class GreetingExtra extends com.example.Greetings {
         return "Welcome, extra!";
     }
 }""",
-
       new File("com/example/GreetingExtraImpl.java") ->
         """package com.example;
-public final class GreetingExtraImpl extends com.example.GreetingExtra {
+public final class GreetingExtraImpl extends com.example.GreetingExtra implements java.io.Serializable {
 
     public static GreetingExtraImpl create(com.example.MyLazy<String> _message, String[] _extra, String _x) {
         return new GreetingExtraImpl(_message, _extra, _x);
@@ -860,11 +856,10 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
         return "Welcome, extra implosion!";
     }
 }""",
-
       new File("com/example/Greetings.java") ->
         """package com.example;
           |/** A greeting interface */
-          |public abstract class Greetings implements java.io.Serializable {
+          |public abstract class Greetings implements com.example.GreetingsLike, java.io.Serializable {
           |
           |    private com.example.MyLazy<String> message;
           |    private com.example.GreetingHeader header;
@@ -906,11 +901,10 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
           |}""".stripMargin,
-
       new File("com/example/SimpleGreeting.java") ->
         """package com.example;
           |/** A Greeting in its simplest form */
-          |public final class SimpleGreeting extends com.example.Greetings {
+          |public final class SimpleGreeting extends com.example.Greetings implements java.io.Serializable {
           |    public static SimpleGreeting create(com.example.MyLazy<String> _message) {
           |        return new SimpleGreeting(_message);
           |    }
@@ -950,7 +944,8 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra {
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
-          |}""".stripMargin)
+          |}""".stripMargin
+    )
 
   val completeExampleCodeCodec =
     """/**

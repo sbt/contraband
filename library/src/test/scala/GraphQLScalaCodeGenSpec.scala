@@ -1,6 +1,6 @@
 package sbt.contraband
 
-import org.scalatest._
+import verify._
 import java.io.File
 import parser.SchemaParser
 import GraphQLExample._
@@ -8,12 +8,13 @@ import scala.util.Success
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with EqualLines {
-  "generate(Enumeration)" should "generate a simple enumeration" in {
+object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
+  test("generate(Enumeration) should generate a simple enumeration") {
     val Success(ast) = SchemaParser.parse(simpleEnumerationExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |/** Example of an enumeration */
         |sealed abstract class EnumExample extends Serializable
@@ -23,14 +24,16 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |  case object First extends EnumExample
         |
         |  case object Second extends EnumExample
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  "generate(Record)" should "generate a record" in {
+  test("generate(Record) should generate a record") {
     val Success(ast) = SchemaParser.parse(recordExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |/**
         |* Example of a type
@@ -62,14 +65,56 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |object TypeExample {
         |  def apply(field: Option[java.net.URL]): TypeExample = new TypeExample(field)
         |  def apply(field: java.net.URL): TypeExample = new TypeExample(Option(field))
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "generate Map[String, String] from StringStringMap" in {
+  test("generate with xinterface") {
+    val Success(ast) = SchemaParser.parse(recordExtraIntfExample)
+    // println(ast)
+    val code = mkScalaCodeGen.generate(ast)
+    assertEquals(
+      code.head._2.stripSpace,
+      """package com.example
+        |/**
+        |* Example of a type
+        |* @param field something
+        |*/
+        |final class TypeExample private (
+        |val field: Option[java.net.URL]) extends Intf1 with Serializable {
+        |  override def equals(o: Any): Boolean = o match {
+        |    case x: TypeExample => (this.field == x.field)
+        |    case _ => false
+        |  }
+        |  override def hashCode: Int = {
+        |    37 * (37 * (17 + "com.example.TypeExample".##) + field.##)
+        |  }
+        |  override def toString: String = {
+        |    "TypeExample(" + field + ")"
+        |  }
+        |  private[this] def copy(field: Option[java.net.URL] = field): TypeExample = {
+        |    new TypeExample(field)
+        |  }
+        |  def withField(field: Option[java.net.URL]): TypeExample = {
+        |    copy(field = field)
+        |  }
+        |  def withField(field: java.net.URL): TypeExample = {
+        |    copy(field = Option(field))
+        |  }
+        |}
+        |object TypeExample {
+        |  def apply(field: Option[java.net.URL]): TypeExample = new TypeExample(field)
+        |  def apply(field: java.net.URL): TypeExample = new TypeExample(Option(field))
+        |}""".stripMargin.stripSpace
+    )
+  }
+
+  test("generate Map[String, String] from StringStringMap") {
     val Success(ast) = SchemaParser.parse(stringStringMapExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |/** Example of a type */
         |final class TypeExample private (
@@ -93,15 +138,17 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |}
         |object TypeExample {
         |  def apply(field: scala.collection.immutable.Map[String, String]): TypeExample = new TypeExample(field)
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "grow a record from 0 to 1 field" in {
+  test("grow a record from 0 to 1 field") {
     val Success(ast) = SchemaParser.parse(growableAddOneFieldExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
 
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |final class Growable private (
         |  val field: Option[Int]) extends Serializable {
@@ -131,15 +178,17 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |  def apply(field: Option[Int]): Growable = new Growable(field)
         |  def apply(field: Int): Growable = new Growable(Option(field))
         |}
-        |""".stripMargin.unindent)
+        |""".stripMargin.stripSpace
+    )
   }
 
-  it should "grow a record from 0 to 2 field" in {
+  test("grow a record from 0 to 2 field") {
     val Success(ast) = SchemaParser.parse(growableZeroToOneToTwoFieldsExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
 
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |final class Foo private (
         |  val x: Option[Int],
@@ -176,15 +225,17 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |  def apply(x: Option[Int], y: Vector[Int]): Foo = new Foo(x, y)
         |  def apply(x: Int, y: Vector[Int]): Foo = new Foo(Option(x), y)
         |}
-        |""".stripMargin.unindent)
+        |""".stripMargin.stripSpace
+    )
   }
 
-  it should "generate with modifier" in {
+  test("generate with modifier") {
     val Success(ast) = SchemaParser.parse(modifierExample)
     // println(ast)
     val code = mkScalaCodeGen.generate(ast)
 
-    code.head._2.unindent should equalLines (
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |sealed class ModifierExample private (
         |val field: Int) extends Serializable {
@@ -208,13 +259,15 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |object ModifierExample {
         |  def apply(field: Int): ModifierExample = new ModifierExample(field)
         |}
-        |""".stripMargin.unindent)
+        |""".stripMargin.stripSpace
+    )
   }
 
-  "generate(Interface)" should "generate an interface with one child" in {
+  test("generate(Interface) should generate an interface with one child") {
     val Success(ast) = SchemaParser.parse(intfExample)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |/** Example of an interface */
         |sealed abstract class InterfaceExample(
@@ -266,13 +319,15 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |object ChildType {
         |  def apply(name: Option[String], field: Option[Int]): ChildType = new ChildType(name, field)
         |  def apply(name: String, field: Int): ChildType = new ChildType(Option(name), Option(field))
-        |}""".stripMargin.unindent)
+        |}""".stripMargin.stripSpace
+    )
   }
 
-  it should "generate messages" in {
+  test("generate messages") {
     val Success(ast) = SchemaParser.parse(messageExample)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |sealed abstract class IntfExample(
         |  val field: Option[Int]) extends Serializable {
@@ -298,14 +353,15 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |
         |object IntfExample {
         |}
-        |""".stripMargin.unindent
+        |""".stripMargin.stripSpace
     )
   }
 
-  it should "generate with customization" in {
+  test("generate with customization") {
     val Success(ast) = SchemaParser.parse(customizationExample)
     val code = mkScalaCodeGen.generate(ast)
-    code.head._2.unindent should equalLines(
+    assertEquals(
+      code.head._2.stripSpace,
       """package com.example
         |/** Example of an interface */
         |sealed abstract class IntfExample(
@@ -326,13 +382,21 @@ class GraphQLScalaCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
         |object IntfExample extends CompanionInterface1 with CompanionInterface2 {
         |  // Some extra companion code...
         |}
-        |""".stripMargin.unindent
+        |""".stripMargin.stripSpace
     )
   }
 
   def mkScalaCodeGen: ScalaCodeGen =
-    new ScalaCodeGen(javaLazy, CodeGen.javaOptional, CodeGen.instantiateJavaOptional, scalaArray, genFileName,
-        scalaSealProtocols = true, scalaPrivateConstructor = true, wrapOption = true)
+    new ScalaCodeGen(
+      javaLazy,
+      CodeGen.javaOptional,
+      CodeGen.instantiateJavaOptional,
+      scalaArray,
+      genFileName,
+      scalaSealProtocols = true,
+      scalaPrivateConstructor = true,
+      wrapOption = true
+    )
   val javaLazy = "com.example.Lazy"
   val outputFile = new File("output.scala")
   val scalaArray = "Vector"

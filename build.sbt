@@ -40,7 +40,8 @@ lazy val library = (project in file("library"))
           baseDirectory.value / "src/main/scala-2.13+"
       }
     },
-    libraryDependencies ++= Seq(parboiled.value) ++ jsonDependencies.value ++ Seq(scalaTest % Test, diffutils % Test)
+    testFrameworks += new TestFramework("verify.runner.Framework"),
+    libraryDependencies ++= Seq(parboiled.value) ++ jsonDependencies.value ++ Seq(verify % Test, scalaTest % Test, diffutils % Test)
   )
 
 lazy val plugin = (project in file("plugin"))

@@ -26,6 +26,17 @@ type TypeExample {
   #x // Some extra code
 }"""
 
+  val recordExtraIntfExample = """
+package com.example @target(Scala)
+
+## Example of a type
+type TypeExample {
+  ## something
+  field: java.net.URL
+
+  #xinterface Intf1
+}"""
+
   val stringStringMapExample = """
 package com.example @target(Scala)
 
