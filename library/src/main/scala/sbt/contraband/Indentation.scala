@@ -1,13 +1,12 @@
 package sbt.contraband
 
-import scala.compat.Platform.EOL
-
 /**
  * Implementation of a string buffer which takes care of indentation (according to `augmentIndentTrigger`,
  * `augmentIndentAfterTrigger`, `reduceIndentTrigger` and `reduceIndentAfterTrigger`) as text is added.
  */
 class IndentationAwareBuffer(val config: IndentationConfiguration, private var level: Int = 0, private var inJavadoc: Boolean = false) {
   private val buffer: StringBuilder = new StringBuilder
+  val EOL = "\n"
 
   /** Add all the lines of `it` to the buffer. */
   def +=(it: Iterator[String]): Unit = it foreach append
