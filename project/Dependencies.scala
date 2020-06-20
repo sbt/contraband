@@ -2,7 +2,6 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val scala210 = "2.10.7"
   val scala211 = "2.11.12"
   val scala212 = "2.12.10"
   val scala213 = "2.13.1"
@@ -10,7 +9,7 @@ object Dependencies {
   val jsonDependencies =
     Def.setting {
       val json4sVersion = scalaBinaryVersion.value match {
-        case "2.10" | "2.11" =>
+        case "2.11" =>
           "3.2.10"
         case "2.12" =>
           "3.4.2"
@@ -18,7 +17,7 @@ object Dependencies {
           "3.6.6"
       }
       val jawn = scalaBinaryVersion.value match {
-        case "2.10" | "2.11" | "2.12" =>
+        case "2.11" | "2.12" =>
           val v = "0.10.4"
           Seq(
             "org.spire-math" %% "jawn-parser" % v,
@@ -37,15 +36,7 @@ object Dependencies {
     }
 
   val scalaTest         = "org.scalatest" %% "scalatest" % "3.1.2"
-  val parboiled         = Def.setting{
-    val v = scalaBinaryVersion.value match {
-      case "2.10" =>
-        "2.1.3"
-      case _ =>
-        "2.1.7"
-    }
-    "org.parboiled" %% "parboiled" % v
-  }
+  val parboiled         = "org.parboiled" %% "parboiled" % "2.1.7"
   val diffutils         = "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
   val verify            = "com.eed3si9n.verify" %% "verify" % "0.2.0"
 }

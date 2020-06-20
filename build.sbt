@@ -41,7 +41,7 @@ lazy val library = (project in file("library"))
       }
     },
     testFrameworks += new TestFramework("verify.runner.Framework"),
-    libraryDependencies ++= Seq(parboiled.value) ++ jsonDependencies.value ++ Seq(verify % Test, scalaTest % Test, diffutils % Test)
+    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies.value ++ Seq(verify % Test, scalaTest % Test, diffutils % Test)
   )
 
 lazy val plugin = (project in file("plugin"))
