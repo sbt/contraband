@@ -3,8 +3,8 @@ import Keys._
 
 object Dependencies {
   val scala211 = "2.11.12"
-  val scala212 = "2.12.10"
-  val scala213 = "2.13.1"
+  val scala212 = "2.12.11"
+  val scala213 = "2.13.3"
 
   val jsonDependencies =
     Def.setting {
