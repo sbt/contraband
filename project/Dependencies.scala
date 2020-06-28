@@ -35,7 +35,7 @@ object Dependencies {
       }
     }
 
-  val scalaTest         = "org.scalatest" %% "scalatest" % "3.1.2"
+  val scalaTest         = "org.scalatest" %% "scalatest" % "3.2.0"
   val parboiled         = "org.parboiled" %% "parboiled" % "2.1.7"
   val diffutils         = "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
   val verify            = "com.eed3si9n.verify" %% "verify" % "0.2.0"
