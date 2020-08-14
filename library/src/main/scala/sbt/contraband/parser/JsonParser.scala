@@ -3,8 +3,9 @@ package parser
 
 
 import scala.util.Try
-import org.json4s._
 import ast.AstUtil.toNamedType
+import sjsonnew.support.scalajson.unsafe.Parser
+import sjsonnew.shaded.scalajson.ast.unsafe._
 
 /**
  * Offers functinos allowing to parse a representation of a
@@ -13,8 +14,21 @@ import ast.AstUtil.toNamedType
 trait JsonParser[T] {
 
   implicit class JSONHelper(jValue: JValue) {
+    def lookup(key: String): Option[JValue] = {
+      jValue match {
+        case obj: JObject =>
+          obj.value find { case JField(field, value) =>
+            field == key
+          } map { case JField(field, value) =>
+            value
+          }
+        case _ => None
+      }
+    }
+
+
     /** Optionally retrieves the string field `key` from `jValue`. */
-    def ->?(key: String): Option[String] = (jValue \ key).toOption map {
+    def ->?(key: String): Option[String] = lookup(key) map {
       case JString(value) => value
       case json           => sys.error(s"Invalid $key: $json")
     }
@@ -23,7 +37,7 @@ trait JsonParser[T] {
     def ->(key: String): String = this ->? key getOrElse sys.error(s"""Undefined key "$key": $jValue""")
 
     /** Optionally retrieves the array field `key` from `jValue`. */
-    def ->*?(key: String): Option[List[JValue]] = (jValue \ key).toOption map {
+    def ->*?(key: String): Option[List[JValue]] = lookup(key) map {
       case JArray(values) => values.toList
       case json           => sys.error(s"Invalid $key: $json")
     }
@@ -32,9 +46,9 @@ trait JsonParser[T] {
     def ->*(key: String): List[JValue] = this ->*? key getOrElse Nil
 
     /** Optionally retrieves an array of strings or a single string */
-    def multiLineOpt(key: String): Option[List[String]] = (jValue \ key).toOption map {
+    def multiLineOpt(key: String): Option[List[String]] = lookup(key) map {
       case JString(value) => List(value)
-      case JArray(values) => values collect { case JString(value) => value }
+      case JArray(values) => values.toList collect { case JString(value) => value }
       case other          => sys.error(s"Expected string or array, found $other.")
     }
 
@@ -109,9 +123,9 @@ trait JsonParser[T] {
     }
 
   def GenerateCodecDirective(json: JValue): Option[ast.Directive] =
-    (json \ "generateCodec").toOption map {
-      case JBool(value) => ast.Directive.generateCodec(value)
-      case json         => sys.error(s"Invalid generateCodec: $json")
+    json.lookup("generateCodec") map {
+      case JBoolean(value) => ast.Directive.generateCodec(value)
+      case json            => sys.error(s"Invalid generateCodec: $json")
     }
 
   val emptyVersion: VersionNumber = VersionNumber("0.0.0")
@@ -120,7 +134,7 @@ trait JsonParser[T] {
 trait Parse[T] extends JsonParser[T] {
   /** Parse an instance of `T` from `input`. */
   final def parse(input: String): T = {
-    val json = Compat.Parser.parseFromString(input).get
+    val json = Parser.parseFromString(input).get
     parse(json)
   }
 
@@ -132,7 +146,7 @@ trait ParseWithSuperIntf[A] extends JsonParser[A] {
   final def parse(input: String): A =
     parse(input, None)
   final def parse(input: String, superIntf: Option[ast.InterfaceTypeDefinition]): A = {
-    val json = Compat.Parser.parseFromString(input).get
+    val json = Parser.parseFromString(input).get
     parse(json, superIntf)
   }
   final def parse(json: JValue): A =
@@ -261,7 +275,7 @@ object JsonParser {
     def parseInterface(input: String): List[ast.TypeDefinition] =
       parseInterface(input, None)
     def parseInterface(input: String, superIntf: Option[ast.InterfaceTypeDefinition]): List[ast.TypeDefinition] = {
-      val json = Compat.Parser.parseFromString(input).get
+      val json = Parser.parseFromString(input).get
       parseInterface(json, superIntf)
     }
     def parseInterface(json: JValue): List[ast.TypeDefinition] =
@@ -310,7 +324,7 @@ object JsonParser {
       }
 
     def parseMessage(input: String): ast.FieldDefinition = {
-      val json = Compat.Parser.parseFromString(input).get
+      val json = Parser.parseFromString(input).get
       parseMessage(json)
     }
     def parseMessage(json: JValue): ast.FieldDefinition =

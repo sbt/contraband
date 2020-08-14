@@ -1,9 +1,9 @@
 import Dependencies._
 
-ThisBuild / version := "0.4.7-SNAPSHOT"
+ThisBuild / version := "0.5.0-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
-ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala211)
-ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / crossScalaVersions := Seq(scala213, scala212)
+ThisBuild / scalaVersion := "2.12.12"
 ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
 ThisBuild / homepage := Some(url("http://scala-sbt.org/contraband"))
@@ -41,7 +41,7 @@ lazy val library = (project in file("library"))
       }
     },
     testFrameworks += new TestFramework("verify.runner.Framework"),
-    libraryDependencies ++= Seq(parboiled) ++ jsonDependencies.value ++ Seq(verify % Test, scalaTest % Test, diffutils % Test)
+    libraryDependencies ++= Seq(parboiled, sjsonNewScalaJson) ++ Seq(verify % Test, scalaTest % Test, diffutils % Test)
   )
 
 lazy val plugin = (project in file("plugin"))
