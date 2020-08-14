@@ -1,9 +1,9 @@
 import Dependencies._
 
-ThisBuild / version := "0.5.0-SNAPSHOT"
+ThisBuild / version := "0.5.1-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
 ThisBuild / crossScalaVersions := Seq(scala213, scala212)
-ThisBuild / scalaVersion := "2.12.12"
+ThisBuild / scalaVersion := scala212
 ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
 ThisBuild / homepage := Some(url("http://scala-sbt.org/contraband"))

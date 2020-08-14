@@ -9,11 +9,11 @@
 ```
 $ sbt
 > clean
-> publishSigned
-> ++2.12.6
-> ^^1.2.3
+> +library/publishSigned
 > clean
-> publishSigned
+> ++2.12.12!
+> ^^1.2.8
+> plugin/publishSigned
 ```
 
 * close the respository in https://oss.sonatype.org/#stagingRepositories

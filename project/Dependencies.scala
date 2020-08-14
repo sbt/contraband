@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 
 object Dependencies {
-  val scala212 = "2.12.11"
+  val scala212 = "2.12.12"
   val scala213 = "2.13.3"
 
   val sjsonNewScalaJson = "com.eed3si9n" %% "sjson-new-scalajson" % "0.9.0"
