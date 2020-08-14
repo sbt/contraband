@@ -1,6 +1,5 @@
 package sbt.contraband
 
-import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
 import CodeGen.bq
@@ -22,6 +21,7 @@ class CodecCodeGen(codecParents: List[String],
   formatsForType: ast.Type => List[String],
   includedSchemas: List[Document]) extends CodeGenerator {
   import CodecCodeGen._
+
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
     override def augmentIndentAfterTrigger(s: String) =

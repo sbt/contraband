@@ -1,6 +1,5 @@
 package sbt.contraband
 
-import scala.compat.Platform.EOL
 import java.io.File
 import scala.collection.immutable.ListMap
 import ast.{ Definition => _, _ }
@@ -10,6 +9,10 @@ import AstUtil._
  * The base for code generators.
  */
 abstract class CodeGenerator {
+
+  //make sure that EOL is *not* platform dependent by default, otherwise
+  //the output of contraband will be platform dependent too.
+  val EOL = "\n"
 
   implicit class ListMapOp[T](m: ListMap[T, String]) {
     def merge(o: ListMap[T, String]): ListMap[T, String] =
