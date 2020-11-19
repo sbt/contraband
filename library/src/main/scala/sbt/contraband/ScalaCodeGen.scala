@@ -235,10 +235,10 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
           }).mkString(" && "))
       }
 
-    s"""override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
+    s"""override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
        |  case $x: ${cl.name} => $comparisonCode
        |  case _ => false
-       |}""".stripMargin
+       |})""".stripMargin
   }
 
   private def genHashCode(cl: RecordLikeDefinition, intfLang: String) = {

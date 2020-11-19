@@ -83,10 +83,10 @@ final class SimpleGreeting private (
   message: String,
   s: java.util.Optional[String]) extends com.example.Greeting(message, s) with Serializable {
   private def this(message: String) = this(message, java.util.Optional.ofNullable[String]("1"))
-  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
     case x: SimpleGreeting => this.message.equals(x.message) && this.s.equals(x.s)
     case _ => false
-  }
+  })
   override def hashCode: Int = {
     37 * (37 * (37 * (17 + "com.example.SimpleGreeting".##) +  message.hashCode()) +  s.hashCode())
   }
