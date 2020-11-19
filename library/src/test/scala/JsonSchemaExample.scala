@@ -440,7 +440,7 @@ sealed abstract class Greetings(
    */
   lazy val message: String = _message
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
@@ -466,7 +466,7 @@ final class SimpleGreeting private (
   header: com.example.GreetingHeader) extends com.example.Greetings(message, header) with Serializable {
   private def this(message: => String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"))
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: SimpleGreeting => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
@@ -497,7 +497,7 @@ sealed abstract class GreetingExtra(
   def this(message: => String, extra: Vector[String]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra)
 
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: GreetingExtra => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
@@ -522,7 +522,7 @@ final class GreetingExtraImpl private (
   val x: String) extends com.example.GreetingExtra(message, header, extra) with Serializable {
   private def this(message: com.example.Lazy[String], extra: Array[String], x: String) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra, x)
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: GreetingExtraImpl => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
@@ -566,7 +566,7 @@ final class GreetingWithAttachments private (
   val attachments: Vector[java.io.File]) extends com.example.Greetings(message, header) with Serializable {
   private def this(message: => String, attachments: Vector[java.io.File]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), attachments)
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: GreetingWithAttachments => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }
@@ -607,7 +607,7 @@ final class GreetingHeader private (
   private def this(created: => java.util.Date, author: String) = this(created, com.example.PriorityLevel.Medium, author)
   /** Creation date */
   lazy val created: java.util.Date = _created
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case _: GreetingHeader => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
     case _ => false
   }

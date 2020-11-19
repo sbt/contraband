@@ -42,7 +42,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |final class TypeExample private (
         |val field: Option[java.net.URL]) extends Serializable {
         |  // Some extra code
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: TypeExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -82,7 +82,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |*/
         |final class TypeExample private (
         |val field: Option[java.net.URL]) extends Intf1 with Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: TypeExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -119,7 +119,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |/** Example of a type */
         |final class TypeExample private (
         |val field: scala.collection.immutable.Map[String, String]) extends Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: TypeExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -153,7 +153,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |final class Growable private (
         |  val field: Option[Int]) extends Serializable {
         |  private def this() = this(Option(0))
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: Growable => (this.field == x.field)
         |    case _ => false
         |  }
@@ -195,7 +195,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  val y: Vector[Int]) extends Serializable {
         |  private def this() = this(None, Vector())
         |  private def this(x: Option[Int]) = this(x, Vector())
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: Foo => (this.x == x.x) && (this.y == x.y)
         |    case _ => false
         |  }
@@ -239,7 +239,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
       """package com.example
         |sealed class ModifierExample private (
         |val field: Int) extends Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: ModifierExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -273,7 +273,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |sealed abstract class InterfaceExample(
         |val field: Option[Int]) extends Serializable {
         |  // Some extra code
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: InterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -289,7 +289,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |final class ChildType private (
         |  val name: Option[String],
         |  field: Option[Int]) extends com.example.InterfaceExample(field) with Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: ChildType => (this.name == x.name) && (this.field == x.field)
         |    case _ => false
         |  }
@@ -339,7 +339,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
         |  def messageExample(arg0: => Vector[Int], arg1: Option[Boolean]): Vector[Int]
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: IntfExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -367,7 +367,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |sealed abstract class IntfExample(
         |  val field: Option[Int]) extends Interface1 with Interface2 with Serializable {
         |  // Some extra code...
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: IntfExample => (this.field == x.field)
         |    case _ => false
         |  }

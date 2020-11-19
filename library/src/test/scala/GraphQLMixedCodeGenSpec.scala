@@ -83,7 +83,7 @@ final class SimpleGreeting private (
   message: String,
   s: java.util.Optional[String]) extends com.example.Greeting(message, s) with Serializable {
   private def this(message: String) = this(message, java.util.Optional.ofNullable[String]("1"))
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case x: SimpleGreeting => this.message.equals(x.message) && this.s.equals(x.s)
     case _ => false
   }

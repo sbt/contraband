@@ -31,7 +31,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |sealed abstract class simpleInterfaceExample(
         |  val field: type) extends Interface1 with Interface2 with Serializable {
         |  // Some extra code...
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: simpleInterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -57,7 +57,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """/** example of interface */
         |sealed abstract class oneChildInterfaceExample(
         |    val field: Int) extends Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: oneChildInterfaceExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -74,7 +74,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |final class childRecord private (
         |  field: Int,
         |  val x: Int) extends oneChildInterfaceExample(field) with Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: childRecord => (this.field == x.field) && (this.x == x.x)
         |    case _ => false
         |  }
@@ -108,7 +108,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent should equalLines (
       """/** example of nested protocols */
         |sealed abstract class nestedProtocolExample() extends Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case _: nestedProtocolExample => true
         |    case _ => false
         |  }
@@ -123,7 +123,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() with Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case _: nestedProtocol => true
         |    case _ => false
         |  }
@@ -139,7 +139,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |
         |final class ChildRecord private () extends nestedProtocol() with Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case _: ChildRecord => true
         |    case _ => false
         |  }
@@ -174,7 +174,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
         |  def messageExample(arg0: => Vector[Int], arg1: Boolean): Vector[Int]
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: generateArgDocExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -200,7 +200,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |final class simpleRecordExample private (
         |val field: java.net.URL) extends Serializable {
         |  // Some extra code...
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: simpleRecordExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -231,7 +231,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
       """final class growableAddOneField private (
         |  val field: Int) extends Serializable {
         |  private def this() = this(0)
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: growableAddOneField => (this.field == x.field)
         |    case _ => false
         |  }
@@ -265,7 +265,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  val y: Vector[Int]) extends Serializable {
         |  private def this() = this(Option(0), Vector(0))
         |  private def this(x: Option[Int]) = this(x, Vector(0))
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: Foo => (this.x == x.x) && (this.y == x.y)
         |    case _ => false
         |  }
@@ -309,7 +309,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
 
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
     case x: primitiveTypesExample2 => (this.smallBoolean == x.smallBoolean) && (this.bigBoolean == x.bigBoolean)
     case _ => false
   }
@@ -342,7 +342,7 @@ object primitiveTypesExample2 {
     code.head._2.unindent should equalLines (
       """sealed class modifierExample private (
         |val field: Int) extends Serializable {
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: modifierExample => (this.field == x.field)
         |    case _ => false
         |  }
@@ -381,7 +381,7 @@ object primitiveTypesExample2 {
         |  lazy val lazyInteger: Int = _lazyInteger
         |  lazy val lazyArrayInteger: Vector[Int] = _lazyArrayInteger
         |  lazy val lazyOptionInteger: Option[Int] = _lazyOptionInteger
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case _: primitiveTypesExample => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
         |    case _ => false
         |  }
@@ -439,7 +439,7 @@ object primitiveTypesExample2 {
         |  val arrayInteger: Vector[Int]) extends Serializable {
         |
         |
-        |  override def equals(o: Any): Boolean = o match {
+        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || o match {
         |    case x: primitiveTypesNoLazyExample => (this.simpleInteger == x.simpleInteger) && (this.arrayInteger == x.arrayInteger)
         |    case _ => false
         |  }
