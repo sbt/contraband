@@ -36,10 +36,10 @@ package com.example
 final class Person private (
   val name: String,
   val age: Option[Int]) extends Serializable {
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
     case x: Person => (this.name == x.name) && (this.age == x.age)
     case _ => false
-  }
+  })
   override def hashCode: Int = {
     37 * (37 * (17 + name.##) + age.##)
   }
