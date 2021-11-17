@@ -10,7 +10,7 @@ object JsonCodecPlugin extends AutoPlugin {
   import ContrabandPlugin.autoImport._
   override lazy val projectSettings =
     Vector(
-      skipGeneration in (Compile, generateJsonCodecs) := false,
-      skipGeneration in (Test, generateJsonCodecs) := false
+      Compile / generateJsonCodecs / skipGeneration := false,
+      Test / generateJsonCodecs / skipGeneration := false
     )
 }

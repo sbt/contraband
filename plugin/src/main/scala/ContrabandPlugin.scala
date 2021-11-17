@@ -38,44 +38,44 @@ object ContrabandPlugin extends AutoPlugin {
     }
 
     lazy val baseContrabandSettings: Seq[Def.Setting[_]] = Seq(
-      skipGeneration in generateContrabands := false,
-      skipGeneration in generateJsonCodecs := true,
-      contrabandCodecsDependencies in generateContrabands := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
-      contrabandJavaLazy in generateContrabands := "xsbti.api.Lazy",
-      contrabandJavaOption in generateContrabands := "java.util.Optional",
-      contrabandScalaArray in generateContrabands := "Vector",
-      contrabandSource in generateContrabands := Defaults.configSrcSub(sourceDirectory).value / "contraband",
-      sourceManaged in generateContrabands := sourceManaged.value,
-      contrabandScalaFileNames in generateContrabands := scalaDef2File,
+      generateContrabands / skipGeneration := false,
+      generateJsonCodecs / skipGeneration := true,
+      generateContrabands / contrabandCodecsDependencies := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
+      generateContrabands / contrabandJavaLazy := "xsbti.api.Lazy",
+      generateContrabands / contrabandJavaOption := "java.util.Optional",
+      generateContrabands / contrabandScalaArray := "Vector",
+      generateContrabands / contrabandSource := Defaults.configSrcSub(sourceDirectory).value / "contraband",
+      generateContrabands / sourceManaged := sourceManaged.value,
+      generateContrabands / contrabandScalaFileNames := scalaDef2File,
       // We cannot enable this by default, because the default function for naming Scala files that we provide
       // will create a separate file for every `Definition`.
-      contrabandScalaSealInterface in generateContrabands := false,
-      contrabandScalaPrivateConstructor in generateContrabands := true,
-      contrabandWrapOption in generateContrabands := true,
-      contrabandCodecParents in generateContrabands := List("sjsonnew.BasicJsonProtocol"),
-      contrabandInstantiateJavaLazy in generateContrabands := { (e: String) => s"xsbti.SafeLazy($e)" },
-      contrabandInstantiateJavaOptional in generateContrabands := CodeGen.instantiateJavaOptional,
-      contrabandFormatsForType in generateContrabands := CodecCodeGen.formatsForType,
+      generateContrabands / contrabandScalaSealInterface := false,
+      generateContrabands / contrabandScalaPrivateConstructor := true,
+      generateContrabands / contrabandWrapOption := true,
+      generateContrabands / contrabandCodecParents := List("sjsonnew.BasicJsonProtocol"),
+      generateContrabands / contrabandInstantiateJavaLazy := { (e: String) => s"xsbti.SafeLazy($e)" },
+      generateContrabands / contrabandInstantiateJavaOptional := CodeGen.instantiateJavaOptional,
+      generateContrabands / contrabandFormatsForType := CodecCodeGen.formatsForType,
       generateContrabands := {
-        Generate((contrabandSource in generateContrabands).value,
-          !(skipGeneration in generateContrabands).value,
-          !(skipGeneration in generateJsonCodecs).value,
-          (sourceManaged in generateContrabands).value,
-          (contrabandJavaLazy in generateContrabands).value,
-          (contrabandJavaOption in generateContrabands).value,
-          (contrabandScalaArray in generateContrabands).value,
-          (contrabandScalaFileNames in generateContrabands).value,
-          (contrabandScalaSealInterface in generateContrabands).value,
-          (contrabandScalaPrivateConstructor in generateContrabands).value,
-          (scalaVersion in generateContrabands).value,
-          (contrabandWrapOption in generateContrabands).value,
-          (contrabandCodecParents in generateContrabands).value,
-          (contrabandInstantiateJavaLazy in generateContrabands).value,
-          (contrabandInstantiateJavaOptional in generateContrabands).value,
-          (contrabandFormatsForType in generateContrabands).value,
+        Generate((generateContrabands / contrabandSource).value,
+          !(generateContrabands / skipGeneration).value,
+          !(generateJsonCodecs / skipGeneration).value,
+          (generateContrabands / sourceManaged).value,
+          (generateContrabands / contrabandJavaLazy).value,
+          (generateContrabands / contrabandJavaOption).value,
+          (generateContrabands / contrabandScalaArray).value,
+          (generateContrabands / contrabandScalaFileNames).value,
+          (generateContrabands / contrabandScalaSealInterface).value,
+          (generateContrabands / contrabandScalaPrivateConstructor).value,
+          (generateContrabands / scalaVersion).value,
+          (generateContrabands / contrabandWrapOption).value,
+          (generateContrabands / contrabandCodecParents).value,
+          (generateContrabands / contrabandInstantiateJavaLazy).value,
+          (generateContrabands / contrabandInstantiateJavaOptional).value,
+          (generateContrabands / contrabandFormatsForType).value,
           streams.value)
       },
-      sourceGenerators in Compile += generateContrabands.taskValue
+      Compile / sourceGenerators += generateContrabands.taskValue
     )
   }
 
@@ -87,15 +87,15 @@ object ContrabandPlugin extends AutoPlugin {
   override lazy val projectSettings =
     inConfig(Compile)(baseContrabandSettings) ++ inConfig(Test)(baseContrabandSettings) ++ Seq(
       libraryDependencies ++= {
-        val addInCompile = !(skipGeneration in (Compile, generateJsonCodecs)).value
-        val addInTest = !addInCompile && !(skipGeneration in (Test, generateJsonCodecs)).value
+        val addInCompile = !(Compile / generateJsonCodecs / skipGeneration).value
+        val addInTest = !addInCompile && !(Test / generateJsonCodecs / skipGeneration).value
 
         val inCompile =
-          if (addInCompile) (contrabandCodecsDependencies in generateContrabands in Compile).value
+          if (addInCompile) (Compile / generateContrabands / contrabandCodecsDependencies).value
           else Seq.empty
 
         val inTest =
-          if (addInTest) (contrabandCodecsDependencies in generateContrabands in Test).value map (_ % Test)
+          if (addInTest) (Test / generateContrabands / contrabandCodecsDependencies).value map (_ % Test)
           else Seq.empty
 
         inCompile ++ inTest

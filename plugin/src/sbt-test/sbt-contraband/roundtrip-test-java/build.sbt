@@ -5,11 +5,11 @@ lazy val root = (project in file(".")).
   settings(
     name := "example",
     scalaVersion := "2.13.0",
-    contrabandFormatsForType in generateContrabands in Compile := { tpe =>
+    Compile / generateContrabands / contrabandFormatsForType := { tpe =>
       val substitutions = Map("java.io.File" -> "com.foo.FileFormats")
       val name = tpe.removeTypeParameters.name
       if (substitutions contains name) substitutions(name) :: Nil
-      else ((contrabandFormatsForType in generateContrabands in Compile).value)(tpe)
+      else ((Compile / generateContrabands / contrabandFormatsForType).value)(tpe)
     },
     libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % contrabandSjsonNewVersion.value
     // scalacOptions += "-Xlog-implicits"

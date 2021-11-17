@@ -6,10 +6,10 @@ lazy val root = (project in file(".")).
     name := "example",
     libraryDependencies += "com.eed3si9n" %% "sjson-new-scalajson" % contrabandSjsonNewVersion.value,
     // scalacOptions += "-Xlog-implicits"
-    contrabandFormatsForType in (Compile, generateContrabands) := { tpe =>
+    Compile / generateContrabands / contrabandFormatsForType := { tpe =>
       val substitutions = Map("Integer" -> "com.foo.IntegerFormats")
       val name = tpe.removeTypeParameters.name
       if (substitutions contains name) substitutions(name) :: Nil
-      else ((contrabandFormatsForType in generateContrabands in Compile).value)(tpe)
+      else ((Compile / generateContrabands / contrabandFormatsForType).value)(tpe)
     }
   )
