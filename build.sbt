@@ -8,7 +8,6 @@ ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
 ThisBuild / homepage := Some(url("http://scala-sbt.org/contraband"))
 ThisBuild / licenses += ("Apache-2.0", url("https://github.com/sbt/contraband/blob/master/LICENSE"))
-ThisBuild / bintrayVcsUrl := Some("git@github.com:sbt/contraband.git")
 ThisBuild / scmInfo := Some(ScmInfo(url("https://github.com/sbt/contraband"), "git@github.com:sbt/contraband.git"))
 ThisBuild / developers := List(
   Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n")),
@@ -16,6 +15,8 @@ ThisBuild / developers := List(
   Developer("Duhemm", "Martin Duhem", "@Duhemm", url("https://github.com/Duhemm"))
 )
 ThisBuild / description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
+Global / semanticdbEnabled := true
+Global / semanticdbVersion := "4.4.32"
 
 lazy val root = (project in file("."))
   .enablePlugins(TravisSitePlugin)
@@ -29,10 +30,9 @@ lazy val root = (project in file("."))
 
 lazy val library = (project in file("library"))
   .enablePlugins(KeywordPlugin, SonatypePublish)
-  .disablePlugins(BintrayPlugin)
   .settings(
     name := "contraband",
-    unmanagedSourceDirectories in Compile += {
+    Compile / unmanagedSourceDirectories += {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v <= 12 =>
           baseDirectory.value / "src/main/scala-2.13-"
@@ -45,16 +45,21 @@ lazy val library = (project in file("library"))
   )
 
 lazy val plugin = (project in file("plugin"))
-  .enablePlugins(BintrayPublish, SbtPlugin)
+  .enablePlugins(SbtPlugin)
   .dependsOn(library)
   .settings(
     name := "sbt-contraband",
-    bintrayPackage := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
     scriptedLaunchOpts := {
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
     crossScalaVersions := Seq(scala212),
-    publishLocal := (publishLocal dependsOn (publishLocal in library)).value
+    pluginCrossBuild / sbtVersion := {
+      scalaBinaryVersion.value match {
+        case "2.13" => "1.2.8"
+        case "2.12" => "1.2.8" // set minimum sbt version
+      }
+    },
+    publishLocal := (publishLocal dependsOn (library / publishLocal)).value,
   )

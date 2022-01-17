@@ -3,7 +3,7 @@ import Keys._
 
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport._
-import com.typesafe.sbt.SbtGit.{git, GitKeys}
+import com.typesafe.sbt.SbtGit.{ git, GitKeys }
 import com.typesafe.sbt.git.GitRunner
 import com.typesafe.sbt.site.pamflet.PamfletPlugin
 import com.typesafe.sbt.site.SitePlugin
@@ -22,7 +22,7 @@ object TravisSitePlugin extends sbt.AutoPlugin {
   import autoImport._
 
   override lazy val projectSettings = Seq(
-    sourceDirectory in Pamflet := { baseDirectory.value / "docs" },
+    Pamflet / sourceDirectory := { baseDirectory.value / "docs" },
     // GitKeys.gitBranch in ghpagesUpdatedRepository := Some("gh-pages"),
     // This task is responsible for updating the master branch on some temp dir.
     // On the branch there are files that was generated in some other ways such as:
@@ -37,7 +37,7 @@ object TravisSitePlugin extends sbt.AutoPlugin {
       val r = GitKeys.gitRunner.value
       gitConfig(repo, siteEmail.value, r, s.log)
       gitRemoveFiles(repo, (repo * "*.html").get.toList, r, s)
-      val mappings =  for {
+      val mappings = for {
         (file, target) <- siteMappings.value
       } yield (file, repo / target)
       IO.copy(mappings)
@@ -62,28 +62,27 @@ object TravisSitePlugin extends sbt.AutoPlugin {
     git.remoteRepo := s"git@github.com:${siteGithubRepo.value}.git"
   )
 
-def gitRemoveFiles(dir: File, files: List[File], git: GitRunner, s: TaskStreams): Unit = {
-  if(!files.isEmpty)
-    git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: files.map(_.getAbsolutePath)) :_*)(dir, s.log)
-  ()
-}
+  def gitRemoveFiles(dir: File, files: List[File], git: GitRunner, s: TaskStreams): Unit = {
+    if (!files.isEmpty)
+      git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: files.map(_.getAbsolutePath)): _*)(dir, s.log)
+    ()
+  }
 
-def gitDocsChanged(dir: File, git: GitRunner, log: Logger): Boolean =
-  {
+  def gitDocsChanged(dir: File, git: GitRunner, log: Logger): Boolean = {
     // git diff --shortstat HEAD^..HEAD docs
     val range = sys.env.get("TRAVIS_COMMIT_RANGE") match {
       case Some(x) => x
       case _       => "HEAD^..HEAD"
     }
-    val stat = git(("diff" :: "--shortstat" :: range :: "docs" :: Nil) :_*)(dir, log)
+    val stat = git(("diff" :: "--shortstat" :: range :: "docs" :: Nil): _*)(dir, log)
     stat.trim.nonEmpty
   }
 
-def gitConfig(dir: File, email: String, git: GitRunner, log: Logger): Unit =
-  sys.env.get("CI") match {
-    case Some(_) =>
-      git(("config" :: "user.name" :: "Travis CI" :: Nil) :_*)(dir, log)
-      git(("config" :: "user.email" :: email :: Nil) :_*)(dir, log)
-    case _           => ()
-  }
+  def gitConfig(dir: File, email: String, git: GitRunner, log: Logger): Unit =
+    sys.env.get("CI") match {
+      case Some(_) =>
+        git(("config" :: "user.name" :: "Travis CI" :: Nil): _*)(dir, log)
+        git(("config" :: "user.email" :: email :: Nil): _*)(dir, log)
+      case _ => ()
+    }
 }
