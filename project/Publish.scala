@@ -16,26 +16,6 @@
 
 import sbt._
 import sbt.Keys._
-import bintray.{ BintrayKeys, BintrayPlugin }
-
-/**
- * Publish to private bintray repository.
- */
-object BintrayPublish extends AutoPlugin {
-  override def trigger = allRequirements
-  override def requires = plugins.JvmPlugin && BintrayPlugin
-
-  override def buildSettings = Seq(
-    BintrayKeys.bintrayOrganization := Some("sbt"),
-    BintrayKeys.bintrayReleaseOnPublish := false
-  )
-
-  override def projectSettings = Seq(
-    BintrayKeys.bintrayRepository := "sbt-plugin-releases",
-    BintrayKeys.bintrayPackage := "sbt-contraband",
-    pomIncludeRepository := { _ => false }
-  )
-}
 
 /**
  * Publish to private bintray repository.
