@@ -9,27 +9,32 @@ import AstUtil._
 /**
  * Code generator for Scala.
  */
-class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
-  scalaArray: String, genFile: Any => File,
-  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean,
-  wrapOption: Boolean) extends CodeGenerator {
+class ScalaCodeGen(
+    javaLazy: String,
+    javaOptional: String,
+    instantiateJavaOptional: (String, String) => String,
+    scalaArray: String,
+    genFile: Any => File,
+    scalaSealProtocols: Boolean,
+    scalaPrivateConstructor: Boolean,
+    wrapOption: Boolean
+) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
     override def augmentIndentAfterTrigger(s: String) =
       s.endsWith("{") ||
-      (s.contains(" class ") && s.endsWith("(")) // Constructor definition
+        (s.contains(" class ") && s.endsWith("(")) // Constructor definition
     override def reduceIndentTrigger(s: String) = s.startsWith("}")
     override def reduceIndentAfterTrigger(s: String) = s.endsWith(") {") || s.endsWith(" Serializable {") // End of constructor definition
     override def enterMultilineJavadoc(s: String) = s == "/**"
     override def exitMultilineJavadoc(s: String) = s == "*/"
   }
 
-
   override def generate(s: Document): ListMap[File, String] =
-    (s.definitions collect {
-      case td: TypeDefinition => td
-    }) map (generate (s, _)) reduce (_ merge _) mapV (_.indented)
+    (s.definitions collect { case td: TypeDefinition =>
+      td
+    }) map (generate(s, _)) reduce (_ merge _) mapV (_.indented)
 
   override def generateEnum(s: Document, e: EnumTypeDefinition): ListMap[File, String] = {
     val values =
@@ -153,8 +158,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
 
   private def interfaceLanguage(parents: List[InterfaceTypeDefinition]): String =
     if (parents.isEmpty) "Scala"
-    else
-    {
+    else {
       if (parents exists { p => toTarget(p.directives) == Some("Java") }) "Java"
       else "Scala"
     }
@@ -182,28 +186,29 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
   }
 
   private def genParam(f: FieldDefinition, intfLang: String): String = genParam(f.name, f.fieldType, intfLang)
-  private def genParam(name: String, fieldType: Type, intfLang: String): String = s"${bq(name)}: ${genRealTpe(fieldType, isParam = true, intfLang)}"
+  private def genParam(name: String, fieldType: Type, intfLang: String): String =
+    s"${bq(name)}: ${genRealTpe(fieldType, isParam = true, intfLang)}"
 
   private def lookupTpe(tpe: String): String = tpe match {
-    case "boolean" => "Boolean"
-    case "byte"    => "Byte"
-    case "char"    => "Char"
-    case "float"   => "Float"
-    case "int"     => "Int"
-    case "long"    => "Long"
-    case "short"   => "Short"
-    case "double"  => "Double"
+    case "boolean"         => "Boolean"
+    case "byte"            => "Byte"
+    case "char"            => "Char"
+    case "float"           => "Float"
+    case "int"             => "Int"
+    case "long"            => "Long"
+    case "short"           => "Short"
+    case "double"          => "Double"
     case "StringStringMap" => "scala.collection.immutable.Map[String, String]"
-    case other     => other
+    case other             => other
   }
 
   private def genRealTpe(tpe: ast.Type, isParam: Boolean, intfLang: String) =
     if (intfLang == "Scala") {
       val scalaTpe = lookupTpe(tpe.name)
       val base = tpe match {
-        case x if x.isListType      => s"$scalaArray[$scalaTpe]"
-        case x if !x.isNotNullType  => s"Option[$scalaTpe]"
-        case _                      => scalaTpe
+        case x if x.isListType     => s"$scalaArray[$scalaTpe]"
+        case x if !x.isNotNullType => s"Option[$scalaTpe]"
+        case _                     => scalaTpe
       }
       if (tpe.isLazyType && isParam) s"=> $base" else base
     } else {
@@ -230,9 +235,12 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         case "Scala" =>
           ("x", allFields map (f => s"(this.${bq(f.name)} == x.${bq(f.name)})") mkString " && ")
         case _ =>
-          ("x", (allFields map { f =>
-            genJavaEquals("this", "x", f, s"${bq(f.name)}", false)
-          }).mkString(" && "))
+          (
+            "x",
+            (allFields map { f =>
+              genJavaEquals("this", "x", f, s"${bq(f.name)}", false)
+            }).mkString(" && ")
+          )
       }
 
     s"""override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
@@ -291,8 +299,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
           v match {
             case x: ObjectValue =>
               val args = x.fields map { f => f.value.renderPretty }
-              s"""${tpe.name}(${ args.mkString(", ") })"""
-            case _  => v.renderPretty
+              s"""${tpe.name}(${args.mkString(", ")})"""
+            case _ => v.renderPretty
           }
         if (tpe.isListType) s"Vector($str)"
         else if (tpe.isNotNullType) str
@@ -312,8 +320,8 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
           v match {
             case x: ObjectValue =>
               val args = x.fields map { f => f.value.renderPretty }
-              s"""${tpe.name}(${ args.mkString(", ") })"""
-            case _  => v.renderPretty
+              s"""${tpe.name}(${args.mkString(", ")})"""
+            case _ => v.renderPretty
           }
         if (tpe.isListType) "Array(${str})"
         else if (tpe.isNotNullType) str
@@ -340,7 +348,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
       case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
         if (intfLang == "Scala") renderScalaValue(NullValue(), f.fieldType)
         else renderJavaValue(NullValue(), f.fieldType)
-      case _       => sys.error(s"Needs a default value for field ${f.name}.")
+      case _ => sys.error(s"Needs a default value for field ${f.name}.")
     }
 
   private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition], intfLang: String): List[String] =
@@ -352,8 +360,7 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
         val applyParameters = provided map { f => genParam(f, intfLang) } mkString ", "
 
         val ctorCallArguments = provided map (f => bq(f.name)) mkString ", "
-        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)" +
-        {
+        s"def apply($applyParameters): ${r.name} = new ${r.name}($ctorCallArguments)" + {
           if (!containsOptional(provided) || !wrapOption) ""
           else {
             val applyParameters2 = (provided map { f =>
@@ -361,19 +368,26 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
               else genParam(f, intfLang)
             }).mkString(", ")
             val ctorCallArguments2 =
-              provided.map { f =>
-                if (f.fieldType.isOptionalType)
-                  mkOptional(bq(f.name), f.fieldType, intfLang)
-                else
-                  bq(f.name)
-              }.mkString(", ")
+              provided
+                .map { f =>
+                  if (f.fieldType.isOptionalType)
+                    mkOptional(bq(f.name), f.fieldType, intfLang)
+                  else
+                    bq(f.name)
+                }
+                .mkString(", ")
             EOL + s"def apply($applyParameters2): ${r.name} = new ${r.name}($ctorCallArguments2)"
           }
         }
       }
     }
 
-  private def genAlternativeConstructors(since: VersionNumber, allFields: List[FieldDefinition], privateConstructor: Boolean, intfLang: String) =
+  private def genAlternativeConstructors(
+      since: VersionNumber,
+      allFields: List[FieldDefinition],
+      privateConstructor: Boolean,
+      intfLang: String
+  ) =
     perVersionNumber(since, allFields) {
       case (provided, byDefault) if byDefault.nonEmpty => // Don't duplicate up-to-date constructor
         val ctorParameters = provided map { f => genParam(f, intfLang) } mkString ", "
@@ -393,31 +407,30 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
   // parameter. Because val parameters may not be call-by-name, we prefix the parameter with `_`
   // and we will create the actual lazy val as a regular class member.
   // Non-lazy fields that belong to `cl` are made val parameters.
-  private def genCtorParameters(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition], intfLang: String): List[String] =
-    {
-      val allFields = cl.fields filter { _.arguments.isEmpty }
-      val parentFields: List[FieldDefinition] =
-        parent match {
-          case Some(x) => x.fields filter { _.arguments.isEmpty }
-          case _       => Nil
-        }
-      def inParent(f: FieldDefinition): Boolean = {
-        val x = parentFields exists { _.name == f.name }
-        x
+  private def genCtorParameters(cl: RecordLikeDefinition, parent: Option[InterfaceTypeDefinition], intfLang: String): List[String] = {
+    val allFields = cl.fields filter { _.arguments.isEmpty }
+    val parentFields: List[FieldDefinition] =
+      parent match {
+        case Some(x) => x.fields filter { _.arguments.isEmpty }
+        case _       => Nil
       }
-      allFields map {
-        case f if !inParent(f) && f.fieldType.isLazyType =>
-          EOL + "_" + genParam(f, intfLang)
-        case f if !inParent(f) =>
-          s"""${EOL}val ${genParam(f, intfLang)}""".stripMargin
-        case f => EOL + genParam(f, intfLang)
-      }
+    def inParent(f: FieldDefinition): Boolean = {
+      val x = parentFields exists { _.name == f.name }
+      x
     }
+    allFields map {
+      case f if !inParent(f) && f.fieldType.isLazyType =>
+        EOL + "_" + genParam(f, intfLang)
+      case f if !inParent(f) =>
+        s"""${EOL}val ${genParam(f, intfLang)}""".stripMargin
+      case f => EOL + genParam(f, intfLang)
+    }
+  }
 
   private def genLazyMembers(fields: List[FieldDefinition], intfLang: String): List[String] =
     fields filter (_.fieldType.isLazyType) map { f =>
-        val doc = toDoc(f.comments)
-        s"""${genDoc(doc)}
+      val doc = toDoc(f.comments)
+      s"""${genDoc(doc)}
            |lazy val ${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = false, intfLang)} = _${f.name}""".stripMargin
     }
 
@@ -456,17 +469,16 @@ class ScalaCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
   }
 
   private def genWith(r: ObjectTypeDefinition, intfLang: String) = {
-    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1) ; fst.toUpperCase + rst }
+    def capitalize(s: String) = { val (fst, rst) = s.splitAt(1); fst.toUpperCase + rst }
     r.fields map { f =>
       s"""def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)}): ${r.name} = {
          |  copy(${bq(f.name)} = ${bq(f.name)})
          |}""".stripMargin +
-      ( if (f.fieldType.isListType || f.fieldType.isNotNullType) ""
-        else s"""
+        (if (f.fieldType.isListType || f.fieldType.isNotNullType) ""
+         else s"""
                 |def with${capitalize(f.name)}(${bq(f.name)}: ${genRealTpe(f.fieldType.notNull, isParam = true, intfLang)}): ${r.name} = {
                 |  copy(${bq(f.name)} = ${mkOptional(bq(f.name), f.fieldType, intfLang)})
-                |}""".stripMargin
-      )
+                |}""".stripMargin)
     } mkString (EOL + EOL)
   }
 }

@@ -15,7 +15,8 @@ final case class Document(
     directives: List[Directive],
     trailingComments: List[Comment] = Nil,
     position: Option[Position] = None
-) extends AstNode with WithTrailingComments
+) extends AstNode
+    with WithTrailingComments
 
 final case class PackageDecl(
     nameSegments: List[String],
@@ -81,9 +82,9 @@ sealed trait Type extends AstNode {
     loop(this)
   }
 
-
   /** Removes all type parameters from `tpe` */
   def removeTypeParameters: ast.Type = {
+
     /** Removes all type parameters from `tpe` */
     def removeTp(tpe: String): String = tpe.replaceAll("<.+>", "").replaceAll("\\[.+\\]", "")
     def loop(tpe: Type): Type =
@@ -155,7 +156,7 @@ final case class LazyType(ofType: Type, position: Option[Position] = None) exten
   override def equals(other: Any): Boolean =
     other match {
       case that: LazyType => (that canEqual this) && ofType == that.ofType
-      case _ => false
+      case _              => false
     }
 
   override def hashCode: Int = 37 * (17 + ofType.##) + "LazyType".##
@@ -165,7 +166,6 @@ sealed trait NameValue extends AstNode with WithComments {
   def name: String
   def value: Value
 }
-
 
 final case class Directive(
     name: String,
@@ -188,13 +188,13 @@ object Directive {
   def modifier(value: String): Directive = Directive("modifier", Argument(None, StringValue(value)) :: Nil)
 }
 
-
 final case class Argument(
     nameOpt: Option[String],
     value: Value,
     comments: List[Comment] = Nil,
     position: Option[Position] = None
-) extends AstNode with WithComments
+) extends AstNode
+    with WithComments
 
 sealed trait Value extends AstNode with WithComments {
   def renderPretty: String =
@@ -231,12 +231,13 @@ final case class RawValue(value: String, comments: List[Comment] = Nil, position
 
 final case class ObjectValue(fields: List[ObjectField], comments: List[Comment] = Nil, position: Option[Position] = None) extends Value {
   lazy val fieldsByName: ListMap[String, Value] =
-    fields.foldLeft(ListMap.empty[String, Value]) {
-      case (acc, field) ⇒ acc + (field.name → field.value)
+    fields.foldLeft(ListMap.empty[String, Value]) { case (acc, field) ⇒
+      acc + (field.name → field.value)
     }
 }
 
-final case class ObjectField(name: String, value: Value, comments: List[Comment] = Nil, position: Option[Position] = None) extends NameValue {
+final case class ObjectField(name: String, value: Value, comments: List[Comment] = Nil, position: Option[Position] = None)
+    extends NameValue {
   def renderPretty: String = s"$name"
 }
 
@@ -255,13 +256,13 @@ final case class CompanionExtraComment(text: String, position: Option[Position] 
 // Schema definitions
 
 final case class FieldDefinition(
-  name: String,
-  fieldType: Type,
-  arguments: List[InputValueDefinition],
-  defaultValue: Option[Value] = None,
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  position: Option[Position] = None
+    name: String,
+    fieldType: Type,
+    arguments: List[InputValueDefinition],
+    defaultValue: Option[Value] = None,
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    position: Option[Position] = None
 ) extends SchemaAstNode {
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[FieldDefinition]
@@ -269,9 +270,9 @@ final case class FieldDefinition(
   override def equals(other: Any): Boolean = other match {
     case that: FieldDefinition =>
       (that canEqual this) &&
-        name == that.name &&
-        fieldType == that.fieldType &&
-        arguments == that.arguments
+      name == that.name &&
+      fieldType == that.fieldType &&
+      arguments == that.arguments
     case _ => false
   }
 
@@ -280,12 +281,12 @@ final case class FieldDefinition(
 }
 
 case class InputValueDefinition(
-  name: String,
-  valueType: Type,
-  defaultValue: Option[Value],
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  position: Option[Position] = None
+    name: String,
+    valueType: Type,
+    defaultValue: Option[Value],
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    position: Option[Position] = None
 ) extends SchemaAstNode {
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[InputValueDefinition]
@@ -293,8 +294,8 @@ case class InputValueDefinition(
   override def equals(other: Any): Boolean = other match {
     case that: InputValueDefinition =>
       (that canEqual this) &&
-        name == that.name &&
-        valueType == that.valueType
+      name == that.name &&
+      valueType == that.valueType
     case _ => false
   }
 
@@ -302,42 +303,45 @@ case class InputValueDefinition(
 }
 
 final case class ObjectTypeDefinition(
-  name: String,
-  namespace: Option[String],
-  interfaces: List[NamedType],
-  fields: List[FieldDefinition],
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  trailingComments: List[Comment] = Nil,
-  position: Option[Position] = None
-) extends RecordLikeDefinition with WithTrailingComments
+    name: String,
+    namespace: Option[String],
+    interfaces: List[NamedType],
+    fields: List[FieldDefinition],
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    trailingComments: List[Comment] = Nil,
+    position: Option[Position] = None
+) extends RecordLikeDefinition
+    with WithTrailingComments
 
 final case class InterfaceTypeDefinition(
-  name: String,
-  namespace: Option[String],
-  interfaces: List[NamedType],
-  fields: List[FieldDefinition],
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  trailingComments: List[Comment] = Nil,
-  position: Option[Position] = None
-) extends RecordLikeDefinition with WithTrailingComments
+    name: String,
+    namespace: Option[String],
+    interfaces: List[NamedType],
+    fields: List[FieldDefinition],
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    trailingComments: List[Comment] = Nil,
+    position: Option[Position] = None
+) extends RecordLikeDefinition
+    with WithTrailingComments
 
 final case class EnumTypeDefinition(
-  name: String,
-  namespace: Option[String],
-  values: List[EnumValueDefinition],
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  trailingComments: List[Comment] = Nil,
-  position: Option[Position] = None
-) extends TypeDefinition with WithTrailingComments
+    name: String,
+    namespace: Option[String],
+    values: List[EnumValueDefinition],
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    trailingComments: List[Comment] = Nil,
+    position: Option[Position] = None
+) extends TypeDefinition
+    with WithTrailingComments
 
 final case class EnumValueDefinition(
-  name: String,
-  directives: List[Directive] = Nil,
-  comments: List[Comment] = Nil,
-  position: Option[Position] = None
+    name: String,
+    directives: List[Directive] = Nil,
+    comments: List[Comment] = Nil,
+    position: Option[Position] = None
 ) extends SchemaAstNode
 
 sealed trait SchemaAstNode extends AstNode with WithComments
@@ -361,46 +365,46 @@ sealed trait AstNode
 
 object AstUtil {
   def toDoc(comments: List[Comment]): List[String] =
-    comments collect {
-      case DocComment(text, _) => text.trim
+    comments collect { case DocComment(text, _) =>
+      text.trim
     }
 
   def toExtra(d: TypeDefinition): List[String] =
-    (d.comments ++ d.trailingComments) collect {
-      case ExtraComment(text, _) => text
+    (d.comments ++ d.trailingComments) collect { case ExtraComment(text, _) =>
+      text
     }
 
   def toExtraIntf(d: TypeDefinition): List[String] =
-    (d.comments ++ d.trailingComments) collect {
-      case ExtraIntfComment(text, _) => text
+    (d.comments ++ d.trailingComments) collect { case ExtraIntfComment(text, _) =>
+      text
     }
 
   def toToStringImpl(d: TypeDefinition): List[String] =
-    (d.comments ++ d.trailingComments) collect {
-      case ToStringImplComment(text, _) => text
+    (d.comments ++ d.trailingComments) collect { case ToStringImplComment(text, _) =>
+      text
     }
 
   def toCompanionExtraIntfComment(d: TypeDefinition): List[String] =
-    (d.comments ++ d.trailingComments) collect {
-      case CompanionExtraIntfComment(text, _) => text
+    (d.comments ++ d.trailingComments) collect { case CompanionExtraIntfComment(text, _) =>
+      text
     }
 
   def toCompanionExtra(d: TypeDefinition): List[String] =
-    (d.comments ++ d.trailingComments) collect {
-      case CompanionExtraComment(text, _) => text
+    (d.comments ++ d.trailingComments) collect { case CompanionExtraComment(text, _) =>
+      text
     }
 
   def getTarget(opt: Option[String]): String =
     opt getOrElse sys.error("@target directive must be set either at the definition or at the package.")
 
   def scanSingleStringDirective(dirs: List[Directive], name: String): Option[String] =
-    scanSingleDirectiveArgumentValue(dirs, name) {
-      case StringValue(value, _, _) => value
+    scanSingleDirectiveArgumentValue(dirs, name) { case StringValue(value, _, _) =>
+      value
     }
 
   def scanSingleBooleanDirective(dirs: List[Directive], name: String): Option[Boolean] =
-    scanSingleDirectiveArgumentValue(dirs, name) {
-      case BooleanValue(value, _, _) => value
+    scanSingleDirectiveArgumentValue(dirs, name) { case BooleanValue(value, _, _) =>
+      value
     }
 
   def scanSingleDirective(dirs: List[Directive], name: String): Option[Directive] = {
@@ -412,8 +416,8 @@ object AstUtil {
   }
 
   def toTarget(dirs: List[Directive]): Option[String] =
-    scanSingleDirectiveArgumentValue(dirs, "target") {
-      case EnumValue(value, _, _) => value
+    scanSingleDirectiveArgumentValue(dirs, "target") { case EnumValue(value, _, _) =>
+      value
     }
 
   private def scanSingleDirectiveArgumentValue[A](dirs: List[Directive], name: String)(
@@ -437,18 +441,18 @@ object AstUtil {
     toSince(dirs) getOrElse VersionNumber.empty
 
   def toCodecPackage(d: Document): Option[String] = {
-    val dirs = d.directives ++ (d.packageDecl map {_.directives}).toList.flatten
+    val dirs = d.directives ++ (d.packageDecl map { _.directives }).toList.flatten
     scanSingleStringDirective(dirs, "codecPackage") orElse
-    scanSingleStringDirective(dirs, "codecNamespace")
+      scanSingleStringDirective(dirs, "codecNamespace")
   }
 
   def toFullCodec(d: Document): Option[String] = {
-    val dirs = d.directives ++ (d.packageDecl map {_.directives}).toList.flatten
+    val dirs = d.directives ++ (d.packageDecl map { _.directives }).toList.flatten
     scanSingleStringDirective(dirs, "fullCodec")
   }
 
   def toCodecTypeField(d: Document): Option[String] =
-    toCodecTypeField(d.directives ++ (d.packageDecl map {_.directives}).toList.flatten)
+    toCodecTypeField(d.directives ++ (d.packageDecl map { _.directives }).toList.flatten)
 
   def toCodecTypeField(dirs: List[Directive]): Option[String] =
     scanSingleStringDirective(dirs, "codecTypeField")

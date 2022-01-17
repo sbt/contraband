@@ -2,10 +2,7 @@ package sbt.contraband
 
 import scala.annotation.tailrec
 
-final class VersionNumber private[sbt] (
-    val numbers: Seq[Long],
-    val tags: Seq[String],
-    val extras: Seq[String]) {
+final class VersionNumber private[sbt] (val numbers: Seq[Long], val tags: Seq[String], val extras: Seq[String]) {
   def _1: Option[Long] = get(0)
   def _2: Option[Long] = get(1)
   def _3: Option[Long] = get(2)

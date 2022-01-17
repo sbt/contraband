@@ -24,7 +24,7 @@ jobs:
       run: sbt -v "++2.13.8!" library/test
     - if: ${{ matrix.jobtype == 2 }}
       shell: bash
-      run: sbt -v "++2.12.15!" test scripted
+      run: sbt -v "++2.12.15!" scalafmtCheckAll test scripted
     - shell: bash
       run: |
         rm -rf "$HOME/.sbt/scripted/" || true

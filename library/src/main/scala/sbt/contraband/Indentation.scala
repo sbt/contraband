@@ -10,6 +10,7 @@ class IndentationAwareBuffer(val config: IndentationConfiguration, private var l
 
   /** Add all the lines of `it` to the buffer. */
   def +=(it: Iterator[String]): Unit = it foreach append
+
   /** Add `s` to the buffer */
   def +=(s: String): Unit = s.linesIterator foreach append
 
@@ -28,6 +29,7 @@ class IndentationAwareBuffer(val config: IndentationConfiguration, private var l
 }
 
 abstract class IndentationConfiguration {
+
   /** When this predicate holds for `s`, this line and the following should have one more level of indentation. */
   def augmentIndentTrigger(s: String): Boolean = false
 

@@ -123,18 +123,20 @@ class JsonSchemaSpec extends AnyFlatSpec with Matchers with Inside {
 
   "Enumeration.parse" should "parse simple enumeration" in {
     JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample) match {
-      case e@EnumTypeDefinition(name, namespace, values, directives, comments, _, _) =>
+      case e @ EnumTypeDefinition(name, namespace, values, directives, comments, _, _) =>
         val doc = toDoc(comments)
         val target = toTarget(directives)
         val extra = toExtra(e)
-        assert((name === "simpleEnumerationExample") &&
-        (target === Some("Scala")) &&
-        (namespace === None) &&
-        (doc === List("Example of simple enumeration")) &&
-        (values.size === 2) &&
-        (values(0) === EnumValueDefinition("first", Nil, List(DocComment("First symbol")), None)) &&
-        (values(1) === EnumValueDefinition("second", Nil, Nil, None)) &&
-        (extra === List("// Some extra code...")))
+        assert(
+          (name === "simpleEnumerationExample") &&
+            (target === Some("Scala")) &&
+            (namespace === None) &&
+            (doc === List("Example of simple enumeration")) &&
+            (values.size === 2) &&
+            (values(0) === EnumValueDefinition("first", Nil, List(DocComment("First symbol")), None)) &&
+            (values(1) === EnumValueDefinition("second", Nil, Nil, None)) &&
+            (extra === List("// Some extra code..."))
+        )
     }
   }
 

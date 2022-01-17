@@ -8,20 +8,34 @@ import AstUtil._
 /**
  * Generator that produces both Scala and Java code.
  */
-class MixedCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOptional: (String, String) => String,
-  scalaArray: String, genScalaFileName: Any => File,
-  scalaSealProtocols: Boolean, scalaPrivateConstructor: Boolean, wrapOption: Boolean) extends CodeGenerator {
-  val javaGen  = new JavaCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-    wrapOption)
-  val scalaGen = new ScalaCodeGen(javaLazy, javaOptional, instantiateJavaOptional,
-    scalaArray, genScalaFileName, scalaSealProtocols, scalaPrivateConstructor,
-    wrapOption)
+class MixedCodeGen(
+    javaLazy: String,
+    javaOptional: String,
+    instantiateJavaOptional: (String, String) => String,
+    scalaArray: String,
+    genScalaFileName: Any => File,
+    scalaSealProtocols: Boolean,
+    scalaPrivateConstructor: Boolean,
+    wrapOption: Boolean
+) extends CodeGenerator {
+  val javaGen = new JavaCodeGen(javaLazy, javaOptional, instantiateJavaOptional, wrapOption)
+  val scalaGen = new ScalaCodeGen(
+    javaLazy,
+    javaOptional,
+    instantiateJavaOptional,
+    scalaArray,
+    genScalaFileName,
+    scalaSealProtocols,
+    scalaPrivateConstructor,
+    wrapOption
+  )
 
   def generate(s: Document): ListMap[File, String] =
-    s.definitions collect {
-      case td: TypeDefinition => td
-    } map (generate (s, _)) reduce (_ merge _) map { case (k, v) =>
-      (k, generateHeader + v) }
+    s.definitions collect { case td: TypeDefinition =>
+      td
+    } map (generate(s, _)) reduce (_ merge _) map { case (k, v) =>
+      (k, generateHeader + v)
+    }
 
   def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
     // We generate the code that corresponds to this protocol, but without its children, because they
@@ -41,8 +55,8 @@ class MixedCodeGen(javaLazy: String, javaOptional: String, instantiateJavaOption
 
   def generateRecord(s: Document, r: ObjectTypeDefinition): ListMap[File, String] = {
     toTarget(r.directives) match {
-      case Some("Java")  => javaGen.generateRecord(s, r) mapV (_ indentWith javaGen.indentationConfiguration)
-      case _             => scalaGen.generateRecord(s, r) mapV (_ indentWith scalaGen.indentationConfiguration)
+      case Some("Java") => javaGen.generateRecord(s, r) mapV (_ indentWith javaGen.indentationConfiguration)
+      case _            => scalaGen.generateRecord(s, r) mapV (_ indentWith scalaGen.indentationConfiguration)
     }
   }
 

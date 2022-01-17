@@ -1,7 +1,6 @@
 package sbt.contraband
 package parser
 
-
 import scala.util.Try
 import ast.AstUtil.toNamedType
 import sjsonnew.support.scalajson.unsafe.Parser
@@ -25,7 +24,6 @@ trait JsonParser[T] {
         case _ => None
       }
     }
-
 
     /** Optionally retrieves the string field `key` from `jValue`. */
     def ->?(key: String): Option[String] = lookup(key) map {
@@ -132,6 +130,7 @@ trait JsonParser[T] {
 }
 
 trait Parse[T] extends JsonParser[T] {
+
   /** Parse an instance of `T` from `input`. */
   final def parse(input: String): T = {
     val json = Parser.parseFromString(input).get
@@ -155,6 +154,7 @@ trait ParseWithSuperIntf[A] extends JsonParser[A] {
 }
 
 object JsonParser {
+
   /**
    * Represents a complete schema definition.
    * Syntax:
@@ -163,18 +163,17 @@ object JsonParser {
    *             (, "fullCodec": string constant)? }
    */
   object Document extends Parse[ast.Document] {
-    override def parse(json: JValue): ast.Document =
-      {
-        val types = json ->* "types" flatMap parser.JsonParser.TypeDefinitions.parse
-        val directives = CodecPackageDirective(json).toList ++ FullCodecDirective(json).toList
-        ast.Document(
-          None,
-          types,
-          directives,
-          Nil,
-          None
-        )
-      }
+    override def parse(json: JValue): ast.Document = {
+      val types = json ->* "types" flatMap parser.JsonParser.TypeDefinitions.parse
+      val directives = CodecPackageDirective(json).toList ++ FullCodecDirective(json).toList
+      ast.Document(
+        None,
+        types,
+        directives,
+        Nil,
+        None
+      )
+    }
   }
 
   object TypeDefinitions extends ParseWithSuperIntf[List[ast.TypeDefinition]] {
@@ -200,12 +199,14 @@ object JsonParser {
    */
   object EnumTypeDefinition extends Parse[ast.EnumTypeDefinition] {
     override def parse(json: JValue): ast.EnumTypeDefinition =
-      ast.EnumTypeDefinition(json -> "name",
+      ast.EnumTypeDefinition(
+        json -> "name",
         json ->? "namespace",
         (json ->* "symbols") map EnumValueDefinition.parse,
         TargetDirective(json).toList ++ GenerateCodecDirective(json).toList,
         // json ->? "since" map VersionNumber.apply getOrElse emptyVersion,
-        DocComment(json) ++ ExtraComment(json))
+        DocComment(json) ++ ExtraComment(json)
+      )
   }
 
   /**
@@ -213,14 +214,14 @@ object JsonParser {
    * Syntax:
    *   EnumerationValue := ID
    *                     | {   "name": ID
-                            (, "doc": string constant)? }
-    */
+   *                            (, "doc": string constant)? }
+   */
   object EnumValueDefinition extends Parse[ast.EnumValueDefinition] {
     override def parse(json: JValue): ast.EnumValueDefinition =
       json match {
         case JString(name) => ast.EnumValueDefinition(name, Nil)
         case json          => ast.EnumValueDefinition(json -> "name", Nil, DocComment(json))
-    }
+      }
   }
 
   /**
@@ -234,29 +235,30 @@ object JsonParser {
    *              (, "extra": string constant)? }
    */
   object ObjectTypeDefinition extends ParseWithSuperIntf[ast.ObjectTypeDefinition] {
-    def parse(json: JValue, superIntf: Option[ast.InterfaceTypeDefinition]): ast.ObjectTypeDefinition =
-      {
-        val superFields =
-          superIntf match {
-            case Some(s) => s.fields
-            case _       => Nil
-          }
-        val fs = json ->* "fields" map FieldDefinition.parse
-        val intfs = (superIntf map { i => toNamedType(i, None) }).toList
-        val directives = TargetDirective(json).toList ++
-          SinceDirective(json).toList ++
-          ModifierDirective(json).toList ++
-          GenerateCodecDirective(json).toList
-        ast.ObjectTypeDefinition(json -> "name",
-          json ->? "namespace",
-          intfs,
-          superFields ++ fs,
-          directives,
-          DocComment(json),
-          ExtraComment(json) ++ ExtraIntfComment(json) ++ ToStringImplComment(json) ++
+    def parse(json: JValue, superIntf: Option[ast.InterfaceTypeDefinition]): ast.ObjectTypeDefinition = {
+      val superFields =
+        superIntf match {
+          case Some(s) => s.fields
+          case _       => Nil
+        }
+      val fs = json ->* "fields" map FieldDefinition.parse
+      val intfs = (superIntf map { i => toNamedType(i, None) }).toList
+      val directives = TargetDirective(json).toList ++
+        SinceDirective(json).toList ++
+        ModifierDirective(json).toList ++
+        GenerateCodecDirective(json).toList
+      ast.ObjectTypeDefinition(
+        json -> "name",
+        json ->? "namespace",
+        intfs,
+        superFields ++ fs,
+        directives,
+        DocComment(json),
+        ExtraComment(json) ++ ExtraIntfComment(json) ++ ToStringImplComment(json) ++
           CompanionExtraIntfComment(json) ++ CompanionExtraComment(json),
-          None)
-      }
+        None
+      )
+    }
   }
 
   /**
@@ -280,83 +282,64 @@ object JsonParser {
     }
     def parseInterface(json: JValue): List[ast.TypeDefinition] =
       parseInterface(json, None)
-    def parseInterface(json: JValue, superIntf: Option[ast.InterfaceTypeDefinition]): List[ast.TypeDefinition] =
-      {
-        val superFields =
-          superIntf match {
-            case Some(s) => s.fields
-            case _       => Nil
-          }
-        val fs = (json ->* "fields" map FieldDefinition.parse) ++
-          (json ->* "messages" map FieldDefinition.parseMessage)
-        val parents = json multiLineOpt "parents" getOrElse Nil
-        val intfs = (superIntf map { i => toNamedType(i, None) }).toList
-        val directives = TargetDirective(json).toList ++ SinceDirective(json).toList ++
-          GenerateCodecDirective(json).toList
-        val intf = ast.InterfaceTypeDefinition(json -> "name",
-          json ->? "namespace",
-          intfs,
-          superFields ++ fs,
-          directives,
-          DocComment(json),
-          ExtraComment(json) ++ ExtraIntfComment(json) ++ ToStringImplComment(json) ++
+    def parseInterface(json: JValue, superIntf: Option[ast.InterfaceTypeDefinition]): List[ast.TypeDefinition] = {
+      val superFields =
+        superIntf match {
+          case Some(s) => s.fields
+          case _       => Nil
+        }
+      val fs = (json ->* "fields" map FieldDefinition.parse) ++
+        (json ->* "messages" map FieldDefinition.parseMessage)
+      val parents = json multiLineOpt "parents" getOrElse Nil
+      val intfs = (superIntf map { i => toNamedType(i, None) }).toList
+      val directives = TargetDirective(json).toList ++ SinceDirective(json).toList ++
+        GenerateCodecDirective(json).toList
+      val intf = ast.InterfaceTypeDefinition(
+        json -> "name",
+        json ->? "namespace",
+        intfs,
+        superFields ++ fs,
+        directives,
+        DocComment(json),
+        ExtraComment(json) ++ ExtraIntfComment(json) ++ ToStringImplComment(json) ++
           CompanionExtraIntfComment(json) ++ CompanionExtraComment(json),
-          None) // position
-        val childTypes = (json ->* "types") flatMap { j => TypeDefinitions.parse(j, Some(intf)) }
-        intf :: childTypes
-      }
+        None
+      ) // position
+      val childTypes = (json ->* "types") flatMap { j => TypeDefinitions.parse(j, Some(intf)) }
+      intf :: childTypes
+    }
   }
 
   object FieldDefinition extends Parse[ast.FieldDefinition] {
-    override def parse(json: JValue): ast.FieldDefinition =
-      {
-        val arguments = Nil
-        val defaultValue = (json ->? "default") map { ast.RawValue(_) }
-        val directives = SinceDirective(json).toList
-        val tpe = Type.parse(json -> "type")
-        ast.FieldDefinition(json -> "name",
-          tpe,
-          arguments,
-          defaultValue,
-          directives,
-          DocComment(json),
-          None)
-      }
+    override def parse(json: JValue): ast.FieldDefinition = {
+      val arguments = Nil
+      val defaultValue = (json ->? "default") map { ast.RawValue(_) }
+      val directives = SinceDirective(json).toList
+      val tpe = Type.parse(json -> "type")
+      ast.FieldDefinition(json -> "name", tpe, arguments, defaultValue, directives, DocComment(json), None)
+    }
 
     def parseMessage(input: String): ast.FieldDefinition = {
       val json = Parser.parseFromString(input).get
       parseMessage(json)
     }
-    def parseMessage(json: JValue): ast.FieldDefinition =
-      {
-        val arguments = (json ->* "request") map InputValueDefinition.parse
-        val defaultValue = (json ->? "default") map { ast.RawValue(_) }
-        val directives = SinceDirective(json).toList
-        val tpe = Type.parse(json -> "response")
-        ast.FieldDefinition(json -> "name",
-          tpe,
-          arguments,
-          defaultValue,
-          directives,
-          DocComment(json),
-          None)
-      }
+    def parseMessage(json: JValue): ast.FieldDefinition = {
+      val arguments = (json ->* "request") map InputValueDefinition.parse
+      val defaultValue = (json ->? "default") map { ast.RawValue(_) }
+      val directives = SinceDirective(json).toList
+      val tpe = Type.parse(json -> "response")
+      ast.FieldDefinition(json -> "name", tpe, arguments, defaultValue, directives, DocComment(json), None)
+    }
   }
 
   object InputValueDefinition extends Parse[ast.InputValueDefinition] {
-    override def parse(json: JValue): ast.InputValueDefinition =
-      {
-        val arguments = Nil
-        val defaultValue = (json ->? "default") map { ast.RawValue(_) }
-        val directives = SinceDirective(json).toList
-        val tpe = Type.parse(json -> "type")
-        ast.InputValueDefinition(json -> "name",
-          tpe,
-          defaultValue,
-          directives,
-          DocComment(json),
-          None)
-      }
+    override def parse(json: JValue): ast.InputValueDefinition = {
+      val arguments = Nil
+      val defaultValue = (json ->? "default") map { ast.RawValue(_) }
+      val directives = SinceDirective(json).toList
+      val tpe = Type.parse(json -> "type")
+      ast.InputValueDefinition(json -> "name", tpe, defaultValue, directives, DocComment(json), None)
+    }
   }
 
   object Type {
@@ -379,16 +362,17 @@ object JsonParser {
       }
     }
 
-    def parse(s: String): ast.Type =
-      {
-        val r = X(s)
-        val t0 = ast.NamedType(r.name, None)
-        val t1 = if (r.repeated) ast.ListType(t0, None)
-                 else if (!r.optional) ast.NotNullType(t0, None)
-                 else t0
-        val t2 = if (r.lzy) ast.LazyType(t1)
-                 else t1
-        t2
-      }
+    def parse(s: String): ast.Type = {
+      val r = X(s)
+      val t0 = ast.NamedType(r.name, None)
+      val t1 =
+        if (r.repeated) ast.ListType(t0, None)
+        else if (!r.optional) ast.NotNullType(t0, None)
+        else t0
+      val t2 =
+        if (r.lzy) ast.LazyType(t1)
+        else t1
+      t2
+    }
   }
 }

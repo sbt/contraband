@@ -17,8 +17,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val enumeration = JsonParser.EnumTypeDefinition.parse(simpleEnumerationExample)
     val code = gen generate enumeration
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -57,8 +56,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = JsonParser.InterfaceTypeDefinition.parseInterface(simpleInterfaceExample)
     val code = gen generate intf
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -84,8 +82,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = JsonParser.InterfaceTypeDefinition.parseInterface(oneChildInterfaceExample)
     val code = gen generate intf
 
-    code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should equalLines (
-      """/**
+    code(new File("generated", "oneChildInterfaceExampleFormats.scala")).unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -97,8 +94,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
         |trait OneChildInterfaceExampleFormats { self: sjsonnew.BasicJsonProtocol with generated.ChildRecordFormats =>
         |  implicit lazy val oneChildInterfaceExampleFormat: JsonFormat[_root_.oneChildInterfaceExample] = flatUnionFormat1[_root_.oneChildInterfaceExample, _root_.childRecord]("type")
         |}""".stripMargin.unindent)
-    code(new File("generated", "childRecordFormats.scala")).unindent should equalLines (
-      """/**
+    code(new File("generated", "childRecordFormats.scala")).unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -136,8 +132,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val intf = JsonParser.InterfaceTypeDefinition.parseInterface(nestedInterfaceExample)
     val code = gen generate intf
 
-    code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should equalLines (
-      """/**
+    code(new File("generated", "nestedProtocolExampleFormats.scala")).unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -157,8 +152,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -184,8 +178,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = JsonParser.ObjectTypeDefinition.parse(simpleRecordExample)
     val code = gen generate record
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -221,8 +214,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = JsonParser.ObjectTypeDefinition.parse(growableAddOneFieldExample)
     val code = gen generate record
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -258,8 +250,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
     val record = JsonParser.ObjectTypeDefinition.parse(growableZeroToOneToTwoFieldsExample)
     val code = gen generate record
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -299,8 +290,7 @@ class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {
 
     // println(code)
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
  * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
  */
 
@@ -331,16 +321,14 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
 }""".stripMargin.unindent)
   }
 
-  override def recordWithModifier: Unit = {
-  }
+  override def recordWithModifier: Unit = {}
 
   override def schemaGenerateTypeReferences = {
     val schema = JsonParser.Document.parse(primitiveTypesExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -386,8 +374,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
@@ -423,7 +410,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
     val schema = JsonParser.Document.parse(completeExample)
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
-    code.values.mkString.unindent should equalLines (completeExampleCodeCodec.unindent)
+    code.values.mkString.unindent should equalLines(completeExampleCodeCodec.unindent)
   }
 
   override def schemaGenerateCompletePlusIndent = {
@@ -431,7 +418,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.values.mkString.withoutEmptyLines should equalLines (completeExampleCodeCodec.withoutEmptyLines)
+    code.values.mkString.withoutEmptyLines should equalLines(completeExampleCodeCodec.withoutEmptyLines)
   }
 
   "The full codec object" should "include the codec of all protocol defined in the schema" in {
@@ -447,8 +434,7 @@ implicit lazy val primitiveTypesExample2Format: JsonFormat[_root_.primitiveTypes
     val gen = new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, schema :: Nil)
     val code = gen generate schema
 
-    code.head._2.unindent should equalLines (
-      """/**
+    code.head._2.unindent should equalLines("""/**
         | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
         | */
         |
