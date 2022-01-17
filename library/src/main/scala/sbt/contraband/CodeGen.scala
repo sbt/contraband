@@ -10,8 +10,8 @@ import AstUtil._
  */
 abstract class CodeGenerator {
 
-  //make sure that EOL is *not* platform dependent by default, otherwise
-  //the output of contraband will be platform dependent too.
+  // make sure that EOL is *not* platform dependent by default, otherwise
+  // the output of contraband will be platform dependent too.
   val EOL = "\n"
 
   implicit class ListMapOp[T](m: ListMap[T, String]) {
@@ -41,103 +41,100 @@ abstract class CodeGenerator {
 
     final def indentWith(config: IndentationConfiguration): String = {
       val buffer = new IndentationAwareBuffer(config)
-      code.linesIterator foreach buffer .+=
+      code.linesIterator foreach buffer.+=
       buffer.toString
     }
   }
 
-  protected def lookupInterfaces(s: Document, interfaceRefs: List[ast.NamedType]): List[InterfaceTypeDefinition] =
-    {
-      val pkg =
-        s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
-          nameSegments.mkString(".")
+  protected def lookupInterfaces(s: Document, interfaceRefs: List[ast.NamedType]): List[InterfaceTypeDefinition] = {
+    val pkg =
+      s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
+        nameSegments.mkString(".")
+      }
+    val refs =
+      interfaceRefs map { ref =>
+        ref.names match {
+          case Nil => sys.error(s"Invalid named type: $ref")
+          case xs =>
+            val namespace = xs.init match {
+              case Nil => pkg
+              case xs  => Some(xs.mkString("."))
+            }
+            (namespace, xs.last)
         }
-      val refs =
-        interfaceRefs map { ref =>
-          ref.names match {
-            case Nil => sys.error(s"Invalid named type: $ref")
-            case xs  =>
-              val namespace = xs.init match {
-                case Nil => pkg
-                case xs  => Some(xs.mkString("."))
-              }
-              (namespace, xs.last)
-          }
-        }
-      refs map { ref => lookupInterface(s, ref) }
-    }
+      }
+    refs map { ref => lookupInterface(s, ref) }
+  }
 
-  protected def lookupInterface(s: Document, ref: (Option[String], String)): InterfaceTypeDefinition =
-    {
-      val (ns, name) = ref
-      val intfs = s.definitions collect {
-        case i: InterfaceTypeDefinition => i
-      }
-      (intfs find { i =>
-        i.name == name && i.namespace == ns
-      }) match {
-        case Some(i) => i
-        case _       => sys.error(s"$ref not found")
-      }
+  protected def lookupInterface(s: Document, ref: (Option[String], String)): InterfaceTypeDefinition = {
+    val (ns, name) = ref
+    val intfs = s.definitions collect { case i: InterfaceTypeDefinition =>
+      i
     }
+    (intfs find { i =>
+      i.name == name && i.namespace == ns
+    }) match {
+      case Some(i) => i
+      case _       => sys.error(s"$ref not found")
+    }
+  }
 
-  protected def lookupChildLeaves(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] =
-    {
-      val pkg =
-        s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
-          nameSegments.mkString(".")
-        }
-      val tpe = toNamedType(interface, pkg)
-      def containsTpe(intfs: List[NamedType]): Boolean =
-        intfs exists { ref =>
-          ref.names.size match {
-            case 0 => sys.error(s"Invalid reference $intfs")
-            case 1 => ref.names.head == tpe.names.last
-            case _ => ref.names == tpe.names
-          }
-        }
-      s.definitions flatMap {
-        case r: ObjectTypeDefinition if containsTpe(r.interfaces)    => List(r)
-        case i: InterfaceTypeDefinition if containsTpe(i.interfaces) => lookupChildLeaves(s, i)
-        case _ => Nil
+  protected def lookupChildLeaves(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] = {
+    val pkg =
+      s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
+        nameSegments.mkString(".")
       }
+    val tpe = toNamedType(interface, pkg)
+    def containsTpe(intfs: List[NamedType]): Boolean =
+      intfs exists { ref =>
+        ref.names.size match {
+          case 0 => sys.error(s"Invalid reference $intfs")
+          case 1 => ref.names.head == tpe.names.last
+          case _ => ref.names == tpe.names
+        }
+      }
+    s.definitions flatMap {
+      case r: ObjectTypeDefinition if containsTpe(r.interfaces)    => List(r)
+      case i: InterfaceTypeDefinition if containsTpe(i.interfaces) => lookupChildLeaves(s, i)
+      case _                                                       => Nil
     }
+  }
 
-  protected def lookupChildren(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] =
-    {
-      val pkg =
-        s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
-          nameSegments.mkString(".")
-        }
-      val tpe = toNamedType(interface, pkg)
-      def containsTpe(intfs: List[NamedType]): Boolean =
-        intfs exists { ref =>
-          ref.names.size match {
-            case 0 => sys.error(s"Invalid reference $intfs")
-            case 1 => ref.names.head == tpe.names.last
-            case _ => ref.names == tpe.names
-          }
-        }
-      val result = s.definitions collect {
-        case r: ObjectTypeDefinition if containsTpe(r.interfaces)    => r
-        case i: InterfaceTypeDefinition if containsTpe(i.interfaces) => i
+  protected def lookupChildren(s: Document, interface: InterfaceTypeDefinition): List[TypeDefinition] = {
+    val pkg =
+      s.packageDecl map { case PackageDecl(nameSegments, _, _, _) =>
+        nameSegments.mkString(".")
       }
-      result
+    val tpe = toNamedType(interface, pkg)
+    def containsTpe(intfs: List[NamedType]): Boolean =
+      intfs exists { ref =>
+        ref.names.size match {
+          case 0 => sys.error(s"Invalid reference $intfs")
+          case 1 => ref.names.head == tpe.names.last
+          case _ => ref.names == tpe.names
+        }
+      }
+    val result = s.definitions collect {
+      case r: ObjectTypeDefinition if containsTpe(r.interfaces)    => r
+      case i: InterfaceTypeDefinition if containsTpe(i.interfaces) => i
     }
+    result
+  }
 
-  protected def localFields(cl: RecordLikeDefinition, parents: List[InterfaceTypeDefinition]): List[FieldDefinition] =
-    {
-      val allFields = cl.fields filter { _.arguments.isEmpty }
-      val parentFields: List[FieldDefinition] = parents flatMap { _.fields }
-      def inParent(f: FieldDefinition): Boolean = {
-        val x = parentFields exists { _.name == f.name }
-        x
-      }
-      allFields filterNot inParent
+  protected def localFields(cl: RecordLikeDefinition, parents: List[InterfaceTypeDefinition]): List[FieldDefinition] = {
+    val allFields = cl.fields filter { _.arguments.isEmpty }
+    val parentFields: List[FieldDefinition] = parents flatMap { _.fields }
+    def inParent(f: FieldDefinition): Boolean = {
+      val x = parentFields exists { _.name == f.name }
+      x
     }
+    allFields filterNot inParent
+  }
 
   /** Run an operation `op` for each different version number that affects the fields `fields`. */
-  protected final def perVersionNumber[T](since: VersionNumber, fields: List[FieldDefinition])(op: (List[FieldDefinition], List[FieldDefinition]) => T): List[T] = {
+  protected final def perVersionNumber[T](since: VersionNumber, fields: List[FieldDefinition])(
+      op: (List[FieldDefinition], List[FieldDefinition]) => T
+  ): List[T] = {
     val versionNumbers = (since :: fields.map({ f => getSince(f.directives) })).sorted.distinct
     versionNumbers map { v =>
       val (provided, byDefault) = fields partition { f => getSince(f.directives) <= v }
@@ -155,7 +152,7 @@ abstract class CodeGenerator {
       case "long" | "Long"       => "java.lang.Long"
       case "short" | "Short"     => "java.lang.Short"
       case "double" | "Double"   => "java.lang.Double"
-      case other     => other
+      case other                 => other
     }
 
   protected def boxedType(tpe: String): String =
@@ -168,7 +165,7 @@ abstract class CodeGenerator {
       case "long" | "Long"       => "Long"
       case "short" | "Short"     => "Short"
       case "double" | "Double"   => "Double"
-      case other     => other
+      case other                 => other
     }
 
   protected def unboxedType(tpe: String): String =
@@ -181,7 +178,7 @@ abstract class CodeGenerator {
       case "long" | "Long"       => "long"
       case "short" | "Short"     => "short"
       case "double" | "Double"   => "double"
-      case other     => other
+      case other                 => other
     }
 
   protected def primitiveType(tpe: String): Boolean =
@@ -194,7 +191,7 @@ abstract class CodeGenerator {
       case "long" | "Long"       => true
       case "short" | "Short"     => true
       case "double" | "Double"   => true
-      case other     => false
+      case other                 => false
     }
 
   protected def isPrimitive(tpe: ast.Type) =
@@ -209,25 +206,24 @@ abstract class CodeGenerator {
   protected def containsStrictOptional(fields: List[FieldDefinition]): Boolean =
     fields exists { f => f.fieldType.isOptionalType && !f.fieldType.isLazyType }
 
-  protected def genJavaEquals(lhs: String, rhs: String, f0: FieldDefinition,
-      fieldName: String, isJava: Boolean): String =
+  protected def genJavaEquals(lhs: String, rhs: String, f0: FieldDefinition, fieldName: String, isJava: Boolean): String =
     f0 match {
       case f if isPrimitive(f.fieldType)      => s"($lhs.$fieldName == $rhs.$fieldName)"
       case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.equals($lhs.$fieldName, $rhs.$fieldName)"
-      case f if f.fieldType.isListType        =>
+      case f if f.fieldType.isListType =>
         if (isJava) s"java.util.Arrays.deepEquals($lhs.$fieldName, $rhs.$fieldName)"
         else s"java.util.Arrays.deepEquals($lhs.$fieldName.asInstanceOf[Array[Object]], $rhs.$fieldName.asInstanceOf[Array[Object]])"
-      case f                                  => s"$lhs.$fieldName.equals($rhs.$fieldName)"
+      case f => s"$lhs.$fieldName.equals($rhs.$fieldName)"
     }
 
   protected def genJavaHashCode(f0: FieldDefinition, fieldName: String, isJava: Boolean): String =
     f0 match {
       case f if isPrimitive(f.fieldType)      => s"${boxedType(f.fieldType.name)}.valueOf($fieldName).hashCode()"
       case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.hashCode($fieldName)"
-      case f if f.fieldType.isListType        =>
+      case f if f.fieldType.isListType =>
         if (isJava) s"java.util.Arrays.deepHashCode($fieldName)"
         else s"java.util.Arrays.deepHashCode($fieldName.asInstanceOf[Array[Object]])"
-      case f                                  => s"$fieldName.hashCode()"
+      case f => s"$fieldName.hashCode()"
     }
 
   /** Generate the code corresponding to all definitions in `s`. */

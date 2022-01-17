@@ -25,8 +25,8 @@ class JavaCodeGen(
   }
 
   override def generate(s: Document): ListMap[File, String] =
-    ListMap((s.definitions collect {
-      case td: TypeDefinition => td
+    ListMap((s.definitions collect { case td: TypeDefinition =>
+      td
     }) flatMap (generate(s, _).toList): _*) mapV (_.indented)
 
   override def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
@@ -96,9 +96,8 @@ class JavaCodeGen(
     val valuesCode =
       if (values.isEmpty) ""
       else
-        (values map {
-          case EnumValueDefinition(name, dir, comments, _) =>
-            s"""${genDoc(toDoc(comments))}
+        (values map { case EnumValueDefinition(name, dir, comments, _) =>
+          s"""${genDoc(toDoc(comments))}
            |$name""".stripMargin
         }).mkString("", "," + EOL, ";")
 
@@ -317,31 +316,33 @@ class JavaCodeGen(
       } else s"${f._1.name}()"
     }
 
-    allFields map {
-      case (f, idx) =>
-        val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
-        val tpe = f.fieldType
-        val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
-        s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(tpe)} ${f.name}) {
+    allFields map { case (f, idx) =>
+      val (before, after) = allFields filterNot (_._2 == idx) splitAt idx
+      val tpe = f.fieldType
+      val params = (before map nonParam) ::: f.name :: (after map nonParam) mkString ", "
+      s"""public ${r.name} with${capitalize(f.name)}(${genRealTpe(tpe)} ${f.name}) {
          |    return new ${r.name}($params);
          |}""".stripMargin +
-          (if (tpe.isListType || tpe.isNotNullType) ""
-           else {
-             val wrappedParams = (before map nonParam) ::: instantiateJavaOptional(boxedType(tpe.name), f.name) :: (after map nonParam) mkString ", "
-             s"""
+        (if (tpe.isListType || tpe.isNotNullType) ""
+         else {
+           val wrappedParams =
+             (before map nonParam) ::: instantiateJavaOptional(boxedType(tpe.name), f.name) :: (after map nonParam) mkString ", "
+           s"""
              |public ${r.name} with${capitalize(f.name)}(${genRealTpe(f.fieldType.notNull)} ${f.name}) {
              |    return new ${r.name}($wrappedParams);
              |}""".stripMargin
-           })
+         })
     } mkString (EOL + EOL)
   }
 
   private def genEquals(cl: RecordLikeDefinition) = {
     val allFields = cl.fields filter { _.arguments.isEmpty }
     val body =
-      if (allFields exists { f =>
-            f.fieldType.isLazyType
-          }) {
+      if (
+        allFields exists { f =>
+          f.fieldType.isLazyType
+        }
+      ) {
         "return this == obj; // We have lazy members, so use object identity to avoid circularity."
       } else {
         val comparisonCode =
@@ -373,9 +374,11 @@ class JavaCodeGen(
     val fqcn = cl.namespace.fold("")(_ + ".") + cl.name
     val seed = s"""37 * (17 + "$fqcn".hashCode())"""
     val body =
-      if (allFields exists { f =>
-            f.fieldType.isLazyType
-          }) {
+      if (
+        allFields exists { f =>
+          f.fieldType.isLazyType
+        }
+      ) {
         "return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity."
       } else {
         val computation = (seed /: allFields) { (acc, f) =>
@@ -393,9 +396,11 @@ class JavaCodeGen(
   private def genToString(cl: RecordLikeDefinition, toString: List[String]) = {
     val body = if (toString.isEmpty) {
       val allFields = cl.fields filter { _.arguments.isEmpty }
-      if (allFields exists { f =>
-            f.fieldType.isLazyType
-          }) {
+      if (
+        allFields exists { f =>
+          f.fieldType.isLazyType
+        }
+      ) {
         "return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity."
       } else {
         allFields

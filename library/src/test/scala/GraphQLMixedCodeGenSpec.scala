@@ -13,12 +13,19 @@ class GraphQLMixedCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
   "generate(Record)" should "handle mixed Java-Scala inheritance" in {
     val Success(ast) = SchemaParser.parse(mixedExample)
     // println(ast)
-    val gen = new MixedCodeGen(javaLazy, CodeGen.javaOptional, CodeGen.instantiateJavaOptional,
-      scalaArray, genFileName, scalaSealProtocols = true, scalaPrivateConstructor = true,
-      wrapOption = true)
+    val gen = new MixedCodeGen(
+      javaLazy,
+      CodeGen.javaOptional,
+      CodeGen.instantiateJavaOptional,
+      scalaArray,
+      genFileName,
+      scalaSealProtocols = true,
+      scalaPrivateConstructor = true,
+      wrapOption = true
+    )
     val code = gen.generate(ast)
 
-    code.mapValues(_.unindent).toMap should equalMapLines (
+    code.mapValues(_.unindent).toMap should equalMapLines(
       ListMap(
         new File("com/example/Greeting.java") ->
           """/**
@@ -112,7 +119,8 @@ object SimpleGreeting {
   def apply(message: String, s: String): SimpleGreeting = new SimpleGreeting(message, java.util.Optional.ofNullable[String](s))
 }
 """.stripMargin.unindent
-    ))
+      )
+    )
   }
 
   val javaLazy = "com.example.Lazy"
