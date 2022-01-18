@@ -3,6 +3,7 @@ package sbt.contraband
 import verify._
 import java.io.File
 import parser.SchemaParser
+import ast.{ NamedType, Type }
 import GraphQLExample._
 import scala.util.Success
 
@@ -120,11 +121,39 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     )
   }
 
+  test("generate a codec for an interfaces, whose child contains custom field") {
+    val Success(ast) = SchemaParser.parse(intfExampleWithEmbed)
+    val code = mkCodecCodeGen.generate(ast)
+
+    assertEquals(
+      code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
+      """/**
+        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | */
+        |
+        |// DO NOT EDIT MANUALLY
+        |package generated
+        |
+        |import _root_.sjsonnew.JsonFormat
+        |
+        |trait InterfaceExampleFormats { self: generated.TestItemDetailFormats with com.example.StatusFormats with sjsonnew.BasicJsonProtocol with generated.ChildTypeFormats =>
+        |  implicit lazy val InterfaceExampleFormat: JsonFormat[com.example.InterfaceExample] = flatUnionFormat1[com.example.InterfaceExample, com.example.ChildType]("type")
+        |}""".stripMargin.stripSpace
+    )
+  }
+
   val codecParents = List("sjsonnew.BasicJsonProtocol")
   val instantiateJavaLazy = (s: String) => s"mkLazy($s)"
   val javaOption = "com.example.Option"
   val scalaArray = "Vector"
-  val formatsForType: ast.Type => List[String] = CodecCodeGen.formatsForType
+  val formatsForType: ast.Type => List[String] =
+    CodecCodeGen.extensibleFormatsForType {
+      case NamedType(List("com", "example", "Status"), _) =>
+        "com.example.StatusFormats" :: Nil
+      case other =>
+        CodecCodeGen.formatsForType(other)
+    }
+
   def mkCodecCodeGen: CodecCodeGen =
     new CodecCodeGen(codecParents, instantiateJavaLazy, javaOption, scalaArray, formatsForType, Nil)
 }

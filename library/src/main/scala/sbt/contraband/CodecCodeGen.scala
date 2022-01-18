@@ -246,7 +246,9 @@ class CodecCodeGen(
       }
     val allDefinitions = ds flatMap getAllDefinitions
     val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
-      val requiredFormats = getRequiredFormats(s, d)
+      val requiredFormats =
+        if (ds.contains(d)) getRequiredFormats(s, d)
+        else getAllRequiredFormats(s, d :: Nil)
       fullFormatsName(s, d) -> (d match {
         case i: InterfaceTypeDefinition =>
           lookupChildLeaves(s, i).map(c => fullFormatsName(s, c)) ::: requiredFormats
@@ -277,7 +279,7 @@ class CodecCodeGen(
     val typeFormats =
       d match {
         case _: EnumTypeDefinition   => Nil
-        case c: RecordLikeDefinition => c.fields flatMap (f => lookupFormats(f.fieldType))
+        case c: RecordLikeDefinition => c.fields flatMap { f => lookupFormats(s, f.fieldType) }
       }
     typeFormats ++ codecParents
   }
@@ -335,15 +337,24 @@ class CodecCodeGen(
     ListMap(new File(genFile(s, syntheticDefinition).getParentFile, s"$name.scala") -> code)
   }
 
-  private def lookupFormats(tpe: ast.Type): List[String] =
-    lookupDefinition(tpe.name) match {
-      case Some((s, d)) => fullFormatsName(s, d) :: Nil
-      case _            => formatsForType(tpe)
+  private def lookupFormats(s0: Document, tpe: ast.Type): List[String] =
+    tpe match {
+      case LazyType(t, _)      => lookupFormats(s0, t)
+      case ListType(t, _)      => lookupFormats(s0, t)
+      case NotNullType(t, _)   => lookupFormats(s0, t)
+      case NamedType(names, _) =>
+        // check if this is a locally defined type, which we know the format
+        lookupDefinition(s0, tpe.name) match {
+          case Some((s, d)) =>
+            fullFormatsName(s, d) :: getRequiredFormats(s, d)
+          case _ =>
+            formatsForType(tpe)
+        }
     }
 
-  private def lookupDefinition(fullName: String): Option[(Document, TypeDefinition)] = {
+  private def lookupDefinition(s0: Document, fullName: String): Option[(Document, TypeDefinition)] = {
     val (ns, name) = splitName(fullName)
-    (includedSchemas flatMap { s =>
+    ((s0 :: includedSchemas) flatMap { s =>
       s.definitions collect {
         case d: TypeDefinition if d.name == name && d.namespace == ns => (s, d)
       }
@@ -383,8 +394,8 @@ object CodecCodeGen {
     tpe.removeTypeParameters.name match {
       case "boolean" | "byte" | "char" | "float" | "int" | "long" | "short" | "double" | "String" => Nil
       case "Boolean" | "Byte" | "Char" | "Float" | "Int" | "Long" | "Short" | "Double"            => Nil
-      case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Calendar" | "java.math.BigInteger" | "java.math.BigDecimal" |
-          "java.io.File" =>
+      case "java.util.UUID" | "java.net.URI" | "java.net.URL" | "java.util.Date" | "java.util.Calendar" | "java.math.BigInteger" |
+          "java.math.BigDecimal" | "java.io.File" =>
         Nil
       case "StringStringMap"                   => Nil
       case "Throwable" | "java.lang.Throwable" => Nil
