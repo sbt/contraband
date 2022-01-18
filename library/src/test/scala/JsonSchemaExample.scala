@@ -957,7 +957,7 @@ package generated
 
 import _root_.sjsonnew.JsonFormat
 
-trait GreetingsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingWithAttachmentsFormats =>
+trait GreetingsFormats { self: generated.GreetingHeaderFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol with generated.SimpleGreetingFormats with generated.GreetingExtraImplFormats with generated.GreetingWithAttachmentsFormats =>
 implicit lazy val GreetingsFormat: JsonFormat[com.example.Greetings] = flatUnionFormat3[com.example.Greetings, com.example.SimpleGreeting, com.example.GreetingExtraImpl, com.example.GreetingWithAttachments]("type")
 }
 /**
@@ -969,7 +969,7 @@ package generated
 
 import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
-trait SimpleGreetingFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
+trait SimpleGreetingFormats { self: generated.GreetingHeaderFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val SimpleGreetingFormat: JsonFormat[com.example.SimpleGreeting] = new JsonFormat[com.example.SimpleGreeting] {
   override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.SimpleGreeting = {
     __jsOpt match {
@@ -1000,7 +1000,7 @@ package generated
 
 import _root_.sjsonnew.JsonFormat
 
-trait GreetingExtraFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol with generated.GreetingExtraImplFormats =>
+trait GreetingExtraFormats { self: generated.GreetingHeaderFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol with generated.GreetingExtraImplFormats =>
 implicit lazy val GreetingExtraFormat: JsonFormat[com.example.GreetingExtra] = flatUnionFormat1[com.example.GreetingExtra, com.example.GreetingExtraImpl]("type")
 }
 /**
@@ -1012,7 +1012,7 @@ package generated
 
 import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
-trait GreetingExtraImplFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
+trait GreetingExtraImplFormats { self: generated.GreetingHeaderFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingExtraImplFormat: JsonFormat[com.example.GreetingExtraImpl] = new JsonFormat[com.example.GreetingExtraImpl] {
   override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingExtraImpl = {
     __jsOpt match {
@@ -1047,7 +1047,7 @@ package generated
 
 import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
-trait GreetingWithAttachmentsFormats { self: generated.GreetingHeaderFormats with sjsonnew.BasicJsonProtocol =>
+trait GreetingWithAttachmentsFormats { self: generated.GreetingHeaderFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingWithAttachmentsFormat: JsonFormat[com.example.GreetingWithAttachments] = new JsonFormat[com.example.GreetingWithAttachments] {
   override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingWithAttachments = {
     __jsOpt match {
@@ -1080,7 +1080,7 @@ package generated
 
 import _root_.sjsonnew.{ Unbuilder, Builder, JsonFormat, deserializationError }
 
-trait GreetingHeaderFormats { self: java.util.DateFormats with generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
+trait GreetingHeaderFormats { self: generated.PriorityLevelFormats with sjsonnew.BasicJsonProtocol =>
 implicit lazy val GreetingHeaderFormat: JsonFormat[com.example.GreetingHeader] = new JsonFormat[com.example.GreetingHeader] {
   override def read[J](__jsOpt: Option[J], unbuilder: Unbuilder[J]): com.example.GreetingHeader = {
     __jsOpt match {
@@ -1143,8 +1143,7 @@ implicit lazy val PriorityLevelFormat: JsonFormat[com.example.PriorityLevel] = n
 
 // DO NOT EDIT MANUALLY
 package generated
-trait CustomProtocol extends java.util.DateFormats
-  with sjsonnew.BasicJsonProtocol
+trait CustomProtocol extends sjsonnew.BasicJsonProtocol
   with generated.PriorityLevelFormats
   with generated.GreetingHeaderFormats
   with generated.SimpleGreetingFormats

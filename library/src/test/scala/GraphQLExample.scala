@@ -72,6 +72,23 @@ type ChildType implements InterfaceExample {
 }
 """
 
+  val intfExampleWithEmbed = """
+package com.example @target(Scala)
+@codecPackage("generated")
+
+## Example of an interface
+interface InterfaceExample {}
+
+type ChildType implements InterfaceExample {
+  detail: [com.example.TestItemDetail]
+}
+
+type TestItemDetail {
+  ## Indicates whether the event represents a test success, failure, error, skipped, ignored, canceled, pending.
+  status: com.example.Status!
+}
+"""
+
   val twoLevelIntfExample = """
 package com.example @target(Scala)
 @codecPackage("generated")
