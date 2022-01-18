@@ -1,6 +1,6 @@
 import Dependencies._
 
-ThisBuild / version := "0.5.1-SNAPSHOT"
+ThisBuild / version := "0.5.3-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
 ThisBuild / crossScalaVersions := Seq(scala213, scala212)
 ThisBuild / scalaVersion := scala212
@@ -45,7 +45,7 @@ lazy val library = (project in file("library"))
   )
 
 lazy val plugin = (project in file("plugin"))
-  .enablePlugins(SbtPlugin)
+  .enablePlugins(SbtPlugin, SonatypePublish)
   .dependsOn(library)
   .settings(
     name := "sbt-contraband",
