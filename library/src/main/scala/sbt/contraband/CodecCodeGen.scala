@@ -278,8 +278,15 @@ class CodecCodeGen(
   private def getRequiredFormats(s: Document, d: TypeDefinition): List[String] = {
     val typeFormats =
       d match {
-        case _: EnumTypeDefinition   => Nil
-        case c: RecordLikeDefinition => c.fields flatMap { f => lookupFormats(s, f.fieldType) }
+        case _: EnumTypeDefinition => Nil
+        case c: RecordLikeDefinition =>
+          c.fields flatMap { f =>
+            // if the field type is d, we don't need additional codec
+            lookupDefinition(s, f.fieldType.name) match {
+              case Some((s1, d1)) if s1 == s && d1 == d => Nil
+              case _                                    => lookupFormats(s, f.fieldType)
+            }
+          }
       }
     typeFormats ++ codecParents
   }
