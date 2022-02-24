@@ -172,7 +172,7 @@ class JavaCodeGen(
   private def genMessage(message: FieldDefinition): String = {
     val FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) = message
     val doc = toDoc(comments)
-    val argsDoc = arguments flatMap { a: InputValueDefinition =>
+    val argsDoc = arguments flatMap { (a: InputValueDefinition) =>
       toDoc(a.comments) match {
         case Nil        => Nil
         case doc :: Nil => s"@param ${a.name} $doc" :: Nil
