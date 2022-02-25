@@ -75,7 +75,7 @@ class ScalaCodeGen(
     val lazyMembers = genLazyMembers(localFields(r, parentsInSchema), intfLang) mkString EOL
     val privateCtr = if (scalaPrivateConstructor) " private " else ""
 
-    val argsDoc: List[String] = allFields flatMap { a: FieldDefinition =>
+    val argsDoc: List[String] = allFields flatMap { (a: FieldDefinition) =>
       toDoc(a.comments) match {
         case Nil        => Nil
         case doc :: Nil => s"@param ${a.name} $doc" :: Nil
@@ -437,7 +437,7 @@ class ScalaCodeGen(
   private def genMessages(messages: List[FieldDefinition], intfLang: String): List[String] =
     messages map { case FieldDefinition(name, fieldType, arguments, defaultValue, dirs, comments, _) =>
       val params = arguments map (a => s"${bq(a.name)}: ${genRealTpe(a.valueType, isParam = true, intfLang)}") mkString ", "
-      val argsDoc = arguments flatMap { a: InputValueDefinition =>
+      val argsDoc = arguments flatMap { (a: InputValueDefinition) =>
         toDoc(a.comments) match {
           case Nil        => Nil
           case doc :: Nil => s"@param ${a.name} $doc" :: Nil

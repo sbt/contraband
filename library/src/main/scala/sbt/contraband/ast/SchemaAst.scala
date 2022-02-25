@@ -3,7 +3,6 @@ package ast
 
 import org.parboiled2.Position
 
-import scala.{ PartialFunction => ?=> }
 import scala.annotation.tailrec
 import scala.collection.immutable.ListMap
 
@@ -421,7 +420,7 @@ object AstUtil {
     }
 
   private def scanSingleDirectiveArgumentValue[A](dirs: List[Directive], name: String)(
-      pf: Value ?=> A
+      pf: PartialFunction[Value, A]
   ): Option[A] = {
     scanSingleDirective(dirs, name) map { d =>
       d.arguments match {
@@ -475,5 +474,5 @@ object AstUtil {
   private[contraband] def dotSep(s: String): List[String] =
     if (s contains ".") s.split('.').toList else s :: Nil
 
-  private def applyOrElse[A, B](pf: A ?=> B, x: A)(fb: A => B) = pf.applyOrElse(x, fb)
+  private def applyOrElse[A, B](pf: PartialFunction[A, B], x: A)(fb: A => B) = pf.applyOrElse(x, fb)
 }
