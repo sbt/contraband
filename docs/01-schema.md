@@ -147,7 +147,7 @@ this is denoted by wrapping the type in square brackets, `[` and `]`.
 
 ### Map type
 
-Contraband allows to use `StringStringMap` type, which is translates to `scala.collection.immutable.Map[String, String]`.
+Contraband allows to use `StringStringMap` type, which translates to `scala.collection.immutable.Map[String, String]`.
 
 ### Lazy type
 
