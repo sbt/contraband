@@ -145,6 +145,10 @@ type as a list, which indicates that this field will
 return a list of that type. In the schema language,
 this is denoted by wrapping the type in square brackets, `[` and `]`.
 
+### Map type
+
+Contraband allows to use `StringStringMap` type, which translates to `scala.collection.immutable.Map[String, String]`.
+
 ### Lazy type
 
 Lazy types defer the initialization of the field until it is first used.
