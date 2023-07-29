@@ -29,7 +29,7 @@ class GraphQLMixedCodeGenSpec extends AnyFlatSpec with Matchers with Inside with
       ListMap(
         new File("com/example/Greeting.java") ->
           """/**
- * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -81,7 +81,7 @@ public abstract class Greeting implements java.io.Serializable {
 """.stripMargin.unindent,
         new File("output.scala") ->
           """/**
- * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
