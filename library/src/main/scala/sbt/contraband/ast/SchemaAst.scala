@@ -230,8 +230,8 @@ final case class RawValue(value: String, comments: List[Comment] = Nil, position
 
 final case class ObjectValue(fields: List[ObjectField], comments: List[Comment] = Nil, position: Option[Position] = None) extends Value {
   lazy val fieldsByName: ListMap[String, Value] =
-    fields.foldLeft(ListMap.empty[String, Value]) { case (acc, field) ⇒
-      acc + (field.name → field.value)
+    fields.foldLeft(ListMap.empty[String, Value]) { case (acc, field) =>
+      acc + (field.name -> field.value)
     }
 }
 

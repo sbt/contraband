@@ -25,12 +25,12 @@ trait Tokens extends StringBuilding with PositionTracking { this: Parser with Ig
 
   def DotNames = rule { Name ~ ('.' ~ Name).* ~> ((n, ns) => n :: ns.toList) }
 
-  def RawNames = rule { atomic("raw\"" ~ capture(Characters) ~ "\"") ~> ((n: String) ⇒ List(n)) }
+  def RawNames = rule { atomic("raw\"" ~ capture(Characters) ~ "\"") ~> ((n: String) => List(n)) }
 
   def NumberValue = rule {
     atomic(Comments ~ trackPos ~ IntegerValuePart ~ FloatValuePart.? ~ IgnoredNoComment.*) ~>
-      ((comment, pos, intPart, floatPart) ⇒
-        floatPart map (f ⇒ ast.BigDecimalValue(BigDecimal(intPart + f), comment, Some(pos))) getOrElse
+      ((comment, pos, intPart, floatPart) =>
+        floatPart map (f => ast.BigDecimalValue(BigDecimal(intPart + f), comment, Some(pos))) getOrElse
           ast.BigIntValue(BigInt(intPart), comment, Some(pos))
       )
   }
@@ -57,7 +57,7 @@ trait Tokens extends StringBuilding with PositionTracking { this: Parser with Ig
 
   def StringValue = rule {
     atomic(
-      Comments ~ trackPos ~ '"' ~ clearSB() ~ Characters ~ '"' ~ push(sb.toString) ~ IgnoredNoComment.* ~> ((comment, pos, s) ⇒
+      Comments ~ trackPos ~ '"' ~ clearSB() ~ Characters ~ '"' ~ push(sb.toString) ~ IgnoredNoComment.* ~> ((comment, pos, s) =>
         ast.StringValue(s, comment, Some(pos))
       )
     )
@@ -76,7 +76,7 @@ trait Tokens extends StringBuilding with PositionTracking { this: Parser with Ig
       'n' ~ appendSB('\n') |
       'r' ~ appendSB('\r') |
       't' ~ appendSB('\t') |
-      Unicode ~> { code ⇒ sb.append(code.asInstanceOf[Char]); () }
+      Unicode ~> { code => sb.append(code.asInstanceOf[Char]); () }
   }
 
   def Unicode = rule { 'u' ~ capture(4 times HexDigit) ~> (Integer.parseInt(_, 16)) }
@@ -84,7 +84,7 @@ trait Tokens extends StringBuilding with PositionTracking { this: Parser with Ig
   def Keyword(s: String) = rule { atomic(Ignored.* ~ s ~ !NameChar ~ IgnoredNoComment.*) }
 }
 
-trait Ignored extends PositionTracking { this: Parser ⇒
+trait Ignored extends PositionTracking { this: Parser =>
 
   val WhiteSpace = CharPredicate("\u0009\u0020")
 
@@ -210,7 +210,7 @@ trait TypeSystemDefinitions {
 
   // def ScalarTypeDefinition = rule {
   //   Comments ~ trackPos ~ scalar ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~> (
-  //     (comment, pos, name, dirs) ⇒ ast.ScalarTypeDefinition(name, dirs, comment, Some(pos)))
+  //     (comment, pos, name, dirs) => ast.ScalarTypeDefinition(name, dirs, comment, Some(pos)))
   // }
 
   // TODO: clarify https://github.com/facebook/graphql/pull/90/files#r64149353
@@ -251,7 +251,7 @@ trait TypeSystemDefinitions {
 
   // def UnionTypeDefinition = rule {
   //   Comments ~ trackPos ~ union ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment('=') ~ UnionMembers ~> (
-  //       (comment, pos, name, dirs, members) ⇒ ast.UnionTypeDefinition(name, members, dirs, comment, Some(pos)))
+  //       (comment, pos, name, dirs, members) => ast.UnionTypeDefinition(name, members, dirs, comment, Some(pos)))
   // }
 
   // def UnionMembers = rule { NamedType.+(ws('|')) ~> (_.toList) }
@@ -259,54 +259,54 @@ trait TypeSystemDefinitions {
   def EnumTypeDefinition = rule {
     Comments ~ trackPos ~ enum ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment(
       '{'
-    ) ~ EnumValueDefinition.+ ~ ExtraComments ~ wsNoComment('}') ~> ((comment, pos, name, dirs, values, tc) ⇒
+    ) ~ EnumValueDefinition.+ ~ ExtraComments ~ wsNoComment('}') ~> ((comment, pos, name, dirs, values, tc) =>
       ast.EnumTypeDefinition(name, None, values.toList, dirs, comment, tc, Some(pos))
     )
   }
 
   def EnumValueDefinition = rule {
-    EnumValue ~ (Directives.? ~> (_ getOrElse Nil)) ~> ((v, dirs) ⇒ ast.EnumValueDefinition(v.value, dirs, v.comments, v.position))
+    EnumValue ~ (Directives.? ~> (_ getOrElse Nil)) ~> ((v, dirs) => ast.EnumValueDefinition(v.value, dirs, v.comments, v.position))
   }
 
   // // TODO: clarify https://github.com/facebook/graphql/pull/90/files#r64149353
   // def InputObjectTypeDefinition = rule {
   //   Comments ~ trackPos ~ inputType ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment('{') ~ InputValueDefinition.* ~ Comments ~ wsNoComment('}') ~> (
-  //     (comment, pos, name, dirs, fields, tc) ⇒ ast.InputObjectTypeDefinition(name, fields.toList, dirs, comment, tc, Some(pos)))
+  //     (comment, pos, name, dirs, fields, tc) => ast.InputObjectTypeDefinition(name, fields.toList, dirs, comment, tc, Some(pos)))
   // }
 
   // def TypeExtensionDefinition = rule {
   //   Comments ~ trackPos ~ extend ~ ObjectTypeDefinition ~> (
-  //     (comment, pos, definition) ⇒ ast.TypeExtensionDefinition(definition, comment, Some(pos)))
+  //     (comment, pos, definition) => ast.TypeExtensionDefinition(definition, comment, Some(pos)))
   // }
 
   // def DirectiveDefinition = rule {
   //   Comments ~ trackPos ~ directive ~ '@' ~ NameStrict ~ (ArgumentsDefinition.? ~> (_ getOrElse Nil)) ~ on ~ DirectiveLocations ~> (
-  //     (comment, pos, name, args, locations) ⇒ ast.DirectiveDefinition(name, args, locations, comment, Some(pos)))
+  //     (comment, pos, name, args, locations) => ast.DirectiveDefinition(name, args, locations, comment, Some(pos)))
   // }
 
   // def DirectiveLocations = rule { DirectiveLocation.+(wsNoComment('|')) ~> (_.toList) }
 
-  // def DirectiveLocation = rule { Comments ~ trackPos ~ Name ~> ((comment, pos, name) ⇒ ast.DirectiveLocation(name, comment, Some(pos))) }
+  // def DirectiveLocation = rule { Comments ~ trackPos ~ Name ~> ((comment, pos, name) => ast.DirectiveLocation(name, comment, Some(pos))) }
 
   // def SchemaDefinition = rule {
   //   Comments ~ trackPos ~ schema ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment('{') ~ OperationTypeDefinition.+ ~ Comments ~ wsNoComment('}') ~> (
-  //     (comment, pos, dirs, ops, tc) ⇒ ast.SchemaDefinition(ops.toList, dirs, comment, tc, Some(pos)))
+  //     (comment, pos, dirs, ops, tc) => ast.SchemaDefinition(ops.toList, dirs, comment, tc, Some(pos)))
   // }
 
   // def OperationTypeDefinition = rule {
   //   Comments ~ trackPos ~ OperationType ~ ws(':') ~ NamedType ~> (
-  //     (comment, pos, opType, tpe) ⇒ ast.OperationTypeDefinition(opType, tpe, comment, Some(pos)))
+  //     (comment, pos, opType, tpe) => ast.OperationTypeDefinition(opType, tpe, comment, Some(pos)))
   // }
 
 }
 
 trait Operations extends PositionTracking {
-  this: Parser with Tokens with Ignored /*with Fragments*/ with Values with Types with Directives ⇒
+  this: Parser with Tokens with Ignored /*with Fragments*/ with Values with Types with Directives =>
 
   // def OperationDefinition = rule {
-  //   Comments ~ trackPos ~ SelectionSet ~> ((comment, pos, s) ⇒ ast.OperationDefinition(selections = s._1, comments = comment, trailingComments = s._2, position = Some(pos))) |
+  //   Comments ~ trackPos ~ SelectionSet ~> ((comment, pos, s) => ast.OperationDefinition(selections = s._1, comments = comment, trailingComments = s._2, position = Some(pos))) |
   //   Comments ~ trackPos ~ OperationType ~ OperationName.? ~ (VariableDefinitions.? ~> (_ getOrElse Nil)) ~ (Directives.? ~> (_ getOrElse Nil)) ~ SelectionSet ~>
-  //       ((comment, pos, opType, name, vars, dirs, sels) ⇒ ast.OperationDefinition(opType, name, vars, dirs, sels._1, comment, sels._2, Some(pos)))
+  //       ((comment, pos, opType, name, vars, dirs, sels) => ast.OperationDefinition(opType, name, vars, dirs, sels._1, comment, sels._2, Some(pos)))
   // }
 
   // def OperationName = rule { Name }
@@ -326,7 +326,7 @@ trait Operations extends PositionTracking {
   // def VariableDefinitions = rule { wsNoComment('(') ~ VariableDefinition.+ ~ wsNoComment(')') ~> (_.toList)}
 
   // def VariableDefinition = rule { Comments ~ trackPos ~ Variable ~ ws(':') ~ Type ~ DefaultValue.? ~>
-  //     ((comment, pos, name, tpe, defaultValue) ⇒ ast.VariableDefinition(name, tpe, defaultValue, comment, Some(pos))) }
+  //     ((comment, pos, name, tpe, defaultValue) => ast.VariableDefinition(name, tpe, defaultValue, comment, Some(pos))) }
 
   def Variable = rule { Ignored.* ~ '$' ~ NameStrict }
 
@@ -334,7 +334,7 @@ trait Operations extends PositionTracking {
 
   // def SelectionSet: Rule1[(List[ast.Selection], List[ast.Comment])] = rule {
   //   wsNoComment('{') ~ Selection.+ ~ Comments ~ wsNoComment('}') ~>
-  //       ((x: Seq[ast.Selection], comments: List[ast.Comment]) ⇒ x.toList → comments)
+  //       ((x: Seq[ast.Selection], comments: List[ast.Comment]) => x.toList -> comments)
   // }
 
   // def Selection = rule { Field | FragmentSpread | InlineFragment }
@@ -343,8 +343,8 @@ trait Operations extends PositionTracking {
   //   Comments ~ trackPos ~ Alias.? ~ Name ~
   //     (Arguments.? ~> (_ getOrElse Nil)) ~
   //     (Directives.? ~> (_ getOrElse Nil)) ~
-  //     (SelectionSet.? ~> (_ getOrElse (Nil → Nil))) ~>
-  //       ((comment, pos, alias, name, args, dirs, sels) ⇒ ast.Field(alias, name, args, dirs, sels._1, comment, sels._2, Some(pos)))
+  //     (SelectionSet.? ~> (_ getOrElse (Nil -> Nil))) ~>
+  //       ((comment, pos, alias, name, args, dirs, sels) => ast.Field(alias, name, args, dirs, sels._1, comment, sels._2, Some(pos)))
   // }
 
   // def Alias = rule { Name ~ ws(':') }
@@ -353,18 +353,18 @@ trait Operations extends PositionTracking {
 
   def Argument = rule {
     Comments ~ trackPos ~ (Name ~ wsNoComment(':')).? ~ Value ~>
-      ((comment, pos, name, value) ⇒ ast.Argument(name, value, comment, Some(pos)))
+      ((comment, pos, name, value) => ast.Argument(name, value, comment, Some(pos)))
   }
 }
 
-trait Values { this: Parser with Tokens with Ignored with Operations ⇒
+trait Values { this: Parser with Tokens with Ignored with Operations =>
 
   def ValueConst: Rule1[ast.Value] = rule {
     NumberValue | RawValue | StringValue | BooleanValue | NullValue | EnumValue | ListValueConst | ObjectValueConst
   }
 
   def Value: Rule1[ast.Value] = rule {
-    Comments ~ trackPos ~ Variable ~> ((comment, pos, name) ⇒ ast.VariableValue(name, comment, Some(pos))) |
+    Comments ~ trackPos ~ Variable ~> ((comment, pos, name) => ast.VariableValue(name, comment, Some(pos))) |
       NumberValue |
       RawValue |
       StringValue |
@@ -376,8 +376,8 @@ trait Values { this: Parser with Tokens with Ignored with Operations ⇒
   }
 
   def BooleanValue = rule {
-    Comments ~ trackPos ~ True ~> ((comment, pos) ⇒ ast.BooleanValue(true, comment, Some(pos))) |
-      Comments ~ trackPos ~ False ~> ((comment, pos) ⇒ ast.BooleanValue(false, comment, Some(pos)))
+    Comments ~ trackPos ~ True ~> ((comment, pos) => ast.BooleanValue(true, comment, Some(pos))) |
+      Comments ~ trackPos ~ False ~> ((comment, pos) => ast.BooleanValue(false, comment, Some(pos)))
   }
 
   def True = rule { Keyword("true") }
@@ -386,40 +386,42 @@ trait Values { this: Parser with Tokens with Ignored with Operations ⇒
 
   def Null = rule { Keyword("null") }
 
-  def NullValue = rule { Comments ~ trackPos ~ Null ~> ((comment, pos) ⇒ ast.NullValue(comment, Some(pos))) }
+  def NullValue = rule { Comments ~ trackPos ~ Null ~> ((comment, pos) => ast.NullValue(comment, Some(pos))) }
 
-  def EnumValue = rule { Comments ~ !True ~ !False ~ trackPos ~ Name ~> ((comment, pos, name) ⇒ ast.EnumValue(name, comment, Some(pos))) }
+  def EnumValue = rule { Comments ~ !True ~ !False ~ trackPos ~ Name ~> ((comment, pos, name) => ast.EnumValue(name, comment, Some(pos))) }
 
   def ListValueConst = rule {
-    Comments ~ trackPos ~ wsNoComment('[') ~ ValueConst.* ~ wsNoComment(']') ~> ((comment, pos, v) ⇒
+    Comments ~ trackPos ~ wsNoComment('[') ~ ValueConst.* ~ wsNoComment(']') ~> ((comment, pos, v) =>
       ast.ListValue(v.toList, comment, Some(pos))
     )
   }
 
   def ListValue = rule {
-    Comments ~ trackPos ~ wsNoComment('[') ~ Value.* ~ wsNoComment(']') ~> ((comment, pos, v) ⇒ ast.ListValue(v.toList, comment, Some(pos)))
+    Comments ~ trackPos ~ wsNoComment('[') ~ Value.* ~ wsNoComment(']') ~> ((comment, pos, v) =>
+      ast.ListValue(v.toList, comment, Some(pos))
+    )
   }
 
   def ObjectValueConst = rule {
-    Comments ~ trackPos ~ wsNoComment('{') ~ ObjectFieldConst.* ~ wsNoComment('}') ~> ((comment, pos, f) ⇒
+    Comments ~ trackPos ~ wsNoComment('{') ~ ObjectFieldConst.* ~ wsNoComment('}') ~> ((comment, pos, f) =>
       ast.ObjectValue(f.toList, comment, Some(pos))
     )
   }
 
   def ObjectValue = rule {
-    Comments ~ trackPos ~ wsNoComment('{') ~ ObjectField.* ~ wsNoComment('}') ~> ((comment, pos, f) ⇒
+    Comments ~ trackPos ~ wsNoComment('{') ~ ObjectField.* ~ wsNoComment('}') ~> ((comment, pos, f) =>
       ast.ObjectValue(f.toList, comment, Some(pos))
     )
   }
 
   def ObjectFieldConst = rule {
-    Comments ~ trackPos ~ Name ~ wsNoComment(':') ~ ValueConst ~> ((comment, pos, name, value) ⇒
+    Comments ~ trackPos ~ Name ~ wsNoComment(':') ~ ValueConst ~> ((comment, pos, name, value) =>
       ast.ObjectField(name, value, comment, Some(pos))
     )
   }
 
   def ObjectField = rule {
-    Comments ~ trackPos ~ Name ~ wsNoComment(':') ~ Value ~> ((comment, pos, name, value) ⇒
+    Comments ~ trackPos ~ Name ~ wsNoComment(':') ~ Value ~> ((comment, pos, name, value) =>
       ast.ObjectField(name, value, comment, Some(pos))
     )
   }
@@ -427,19 +429,19 @@ trait Values { this: Parser with Tokens with Ignored with Operations ⇒
   def RawValue = rule {
     atomic(
       Comments ~ trackPos ~ 'r' ~ 'a' ~ 'w' ~ '"' ~ clearSB() ~ Characters ~ '"' ~ push(sb.toString) ~ IgnoredNoComment.* ~> (
-        (comment, pos, s) ⇒ ast.RawValue(s, comment, Some(pos))
+        (comment, pos, s) => ast.RawValue(s, comment, Some(pos))
       )
     )
   }
 }
 
-trait Directives { this: Parser with Tokens with Operations with Ignored ⇒
+trait Directives { this: Parser with Tokens with Operations with Ignored =>
 
   def Directives = rule { Directive.+ ~> (_.toList) }
 
   def Directive = rule {
     Comments ~ trackPos ~ '@' ~ NameStrict ~ (Arguments.? ~> (_ getOrElse Nil)) ~>
-      ((comment, pos, name, args) ⇒ ast.Directive(name, args, comment, Some(pos)))
+      ((comment, pos, name, args) => ast.Directive(name, args, comment, Some(pos)))
   }
 
 }
@@ -453,13 +455,13 @@ trait Types { this: Parser with Tokens with Ignored =>
 
   def TypeName: Rule1[List[String]] = rule { RawNames | DotNames }
 
-  def NamedType = rule { Ignored.* ~ trackPos ~ TypeName ~> ((pos, name) ⇒ ast.NamedType(name, Some(pos))) }
+  def NamedType = rule { Ignored.* ~ trackPos ~ TypeName ~> ((pos, name) => ast.NamedType(name, Some(pos))) }
 
-  def ListType = rule { trackPos ~ ws('[') ~ Type ~ wsNoComment(']') ~> ((pos, tpe) ⇒ ast.ListType(tpe, Some(pos))) }
+  def ListType = rule { trackPos ~ ws('[') ~ Type ~ wsNoComment(']') ~> ((pos, tpe) => ast.ListType(tpe, Some(pos))) }
 
   def NonNullType = rule {
-    trackPos ~ TypeName ~ wsNoComment('!') ~> ((pos, name) ⇒ ast.NotNullType(ast.NamedType(name, Some(pos)), Some(pos))) |
-      trackPos ~ ListType ~ wsNoComment('!') ~> ((pos, tpe) ⇒ ast.NotNullType(tpe, Some(pos)))
+    trackPos ~ TypeName ~ wsNoComment('!') ~> ((pos, name) => ast.NotNullType(ast.NamedType(name, Some(pos)), Some(pos))) |
+      trackPos ~ ListType ~ wsNoComment('!') ~> ((pos, tpe) => ast.NotNullType(tpe, Some(pos)))
   }
 }
 
