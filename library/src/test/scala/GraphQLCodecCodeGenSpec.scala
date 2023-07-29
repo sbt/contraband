@@ -14,7 +14,7 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     assertEquals(
       code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
       """/**
-        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -30,7 +30,7 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     assertEquals(
       code(new File("generated", "ChildTypeFormats.scala")).stripSpace,
       """/**
-        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -70,7 +70,7 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     assertEquals(
       code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
       """/**
-        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -88,7 +88,7 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     assertEquals(
       code(new File("generated", "ChildTypeFormats.scala")).stripSpace,
       """/**
-        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
@@ -128,7 +128,7 @@ object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
     assertEquals(
       code(new File("generated", "InterfaceExampleFormats.scala")).stripSpace,
       """/**
-        | * This code is generated using [[https://www.scala-sbt.org/contraband/ sbt-contraband]].
+        | * This code is generated using [[https://www.scala-sbt.org/contraband]].
         | */
         |
         |// DO NOT EDIT MANUALLY
