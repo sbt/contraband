@@ -2,7 +2,7 @@ import Dependencies._
 
 ThisBuild / version := "0.5.3-SNAPSHOT"
 ThisBuild / organization := "org.scala-sbt"
-ThisBuild / crossScalaVersions := Seq(scala213, scala212)
+ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala3)
 ThisBuild / scalaVersion := scala212
 ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
@@ -59,6 +59,7 @@ lazy val plugin = (project in file("plugin"))
       scalaBinaryVersion.value match {
         case "2.13" => "1.2.8"
         case "2.12" => "1.2.8" // set minimum sbt version
+        case _ => "1.2.8"
       }
     },
     publishLocal := (publishLocal dependsOn (library / publishLocal)).value,

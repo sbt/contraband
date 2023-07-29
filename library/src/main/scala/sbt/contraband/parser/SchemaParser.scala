@@ -154,6 +154,9 @@ trait Ignored extends PositionTracking { this: Parser =>
 
 trait Document {
   this: Parser
+    with Values
+    with Operations
+    with Types
     with Tokens /* with Operations*/
     with Ignored /*with Fragments with Operations with Values*/
     with Directives
@@ -186,7 +189,7 @@ trait TypeSystemDefinitions {
   def `type` = rule { Keyword("type") }
   def interface = rule { Keyword("interface") }
   def union = rule { Keyword("union") }
-  def enum = rule { Keyword("enum") }
+  def `enum` = rule { Keyword("enum") }
   def inputType = rule { Keyword("input") }
   def implements = rule { Keyword("implements") }
   def extend = rule { Keyword("extend") }
@@ -257,7 +260,7 @@ trait TypeSystemDefinitions {
   // def UnionMembers = rule { NamedType.+(ws('|')) ~> (_.toList) }
 
   def EnumTypeDefinition = rule {
-    Comments ~ trackPos ~ enum ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment(
+    Comments ~ trackPos ~ `enum` ~ Name ~ (Directives.? ~> (_ getOrElse Nil)) ~ wsNoComment(
       '{'
     ) ~ EnumValueDefinition.+ ~ ExtraComments ~ wsNoComment('}') ~> ((comment, pos, name, dirs, values, tc) =>
       ast.EnumTypeDefinition(name, None, values.toList, dirs, comment, tc, Some(pos))
@@ -357,7 +360,7 @@ trait Operations extends PositionTracking {
   }
 }
 
-trait Values { this: Parser with Tokens with Ignored with Operations =>
+trait Values { this: Parser with Tokens with Ignored with Operations with Types with Directives =>
 
   def ValueConst: Rule1[ast.Value] = rule {
     NumberValue | RawValue | StringValue | BooleanValue | NullValue | EnumValue | ListValueConst | ObjectValueConst
@@ -435,7 +438,8 @@ trait Values { this: Parser with Tokens with Ignored with Operations =>
   }
 }
 
-trait Directives { this: Parser with Tokens with Operations with Ignored =>
+trait Directives {
+  this: Parser with Tokens with Operations with Ignored with Values with Operations with Types =>
 
   def Directives = rule { Directive.+ ~> (_.toList) }
 
