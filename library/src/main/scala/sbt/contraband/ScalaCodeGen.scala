@@ -348,7 +348,7 @@ class ScalaCodeGen(
       case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
         if (intfLang == "Scala") renderScalaValue(NullValue(), f.fieldType)
         else renderJavaValue(NullValue(), f.fieldType)
-      case _ => sys.error(s"Needs a default value for field ${f.name}.")
+      case _ => sys.error(s"Needs a default value for field: ${f.name}.")
     }
 
   private def genApplyOverloads(r: ObjectTypeDefinition, allFields: List[FieldDefinition], intfLang: String): List[String] =
