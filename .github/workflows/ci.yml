@@ -33,4 +33,4 @@ jobs:
       run: sbt -v "++3.x" library/test
     - if: ${{ matrix.jobtype == 4 }}
       shell: bash
-      run: sbt -v "++2.12.x" scalafmtCheckAll
+      run: sbt -v "++2.12.x" scalafmtSbtCheck scalafmtCheckAll
