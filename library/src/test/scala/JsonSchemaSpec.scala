@@ -1,10 +1,10 @@
 package sbt.contraband
 
-import org.scalatest._
-import JsonSchemaExample._
-import ast._
+import org.scalatest.*
+import JsonSchemaExample.*
+import ast.*
 import parser.JsonParser
-import AstUtil._
+import AstUtil.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

@@ -1,7 +1,7 @@
 package sbt.contraband
 package parser
 
-import org.parboiled2._
+import org.parboiled2.*
 import CharPredicate.{ HexDigit, Digit19, AlphaNum }
 import scala.util.{ Failure, Success, Try }
 
@@ -486,7 +486,7 @@ object SchemaParser {
 }
 
 object Transform {
-  import ast.AstUtil._
+  import ast.AstUtil.*
 
   def run(doc: ast.Document): ast.Document =
     propateNamespace(doc)

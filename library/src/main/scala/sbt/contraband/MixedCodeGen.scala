@@ -2,8 +2,8 @@ package sbt.contraband
 
 import java.io.File
 import scala.collection.immutable.ListMap
-import ast._
-import AstUtil._
+import ast.*
+import AstUtil.*
 
 /**
  * Generator that produces both Scala and Java code.

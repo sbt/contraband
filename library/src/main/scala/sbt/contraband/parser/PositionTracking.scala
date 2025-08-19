@@ -1,7 +1,7 @@
 package sbt.contraband
 package parser
 
-import org.parboiled2._
+import org.parboiled2.*
 
 trait PositionTracking { this: Parser =>
   private var lineIdx = Vector(0)

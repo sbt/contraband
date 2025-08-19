@@ -1,9 +1,9 @@
 package sbt.contraband
 
-import scala.collection.immutable.{ Seq => sciSeq }
-import scala.collection.JavaConverters._
+import scala.collection.immutable.{ Seq as sciSeq }
+import scala.collection.JavaConverters.*
 
-import difflib._
+import difflib.*
 
 object TestUtils {
   def unifiedDiff(

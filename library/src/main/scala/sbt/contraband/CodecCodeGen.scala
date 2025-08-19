@@ -3,8 +3,8 @@ package sbt.contraband
 import java.io.File
 import scala.collection.immutable.ListMap
 import CodeGen.bq
-import ast._
-import AstUtil._
+import ast.*
+import AstUtil.*
 
 /**
  * Code generator to produce a codec for a given type.
@@ -23,7 +23,7 @@ class CodecCodeGen(
     includedSchemas: List[Document],
     scalaVersion: String,
 ) extends CodeGenerator {
-  import CodecCodeGen._
+  import CodecCodeGen.*
 
   implicit object indentationConfiguration extends IndentationConfiguration {
     override val indentElement = "  "
@@ -201,7 +201,7 @@ class CodecCodeGen(
     val codecs: ListMap[File, String] = ((s.definitions collect { case td: TypeDefinition =>
       td
     } map { d =>
-      ListMap(generate(s, d).toSeq: _*)
+      ListMap(generate(s, d).toSeq*)
     }) reduce (_ merge _)) mapV (_.indented)
     val result = toFullCodec(s) match {
       case Some(x) =>

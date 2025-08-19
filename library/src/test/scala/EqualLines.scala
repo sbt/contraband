@@ -1,6 +1,6 @@
 package sbt.contraband
 
-import org.scalatest._, matchers._
+import org.scalatest.*, matchers.*
 
 trait EqualLines {
   final case class Lines(value: Vector[String]) {
