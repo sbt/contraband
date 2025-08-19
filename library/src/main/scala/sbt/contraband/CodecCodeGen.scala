@@ -249,7 +249,7 @@ class CodecCodeGen(
         case _ => d :: Nil
       }
     val allDefinitions = ds flatMap getAllDefinitions
-    val dependencies: Map[String, List[String]] = Map(allDefinitions map { d =>
+    val dependencies: Map[String, List[String]] = Map(allDefinitions.map { d =>
       val requiredFormats =
         if (ds.contains(d)) getRequiredFormats(s, d)
         else getAllRequiredFormats(s, d :: Nil)
@@ -258,7 +258,7 @@ class CodecCodeGen(
           lookupChildLeaves(s, i).map(c => fullFormatsName(s, c)) ::: requiredFormats
         case _ => requiredFormats
       })
-    }: _*)
+    }*)
     val xs = Dag.topologicalSortUnchecked[String](seedFormats) { s => dependencies.get(s).getOrElse(Nil) }
     xs.reverse
   }
