@@ -1,7 +1,7 @@
 package sbt.contraband
 
-import org.scalatest._
-import sbt.contraband.ast._
+import org.scalatest.*
+import sbt.contraband.ast.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

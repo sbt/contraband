@@ -2,7 +2,7 @@ package sbt.contraband
 
 import java.io.File
 
-import JsonSchemaExample._
+import JsonSchemaExample.*
 import parser.JsonParser
 
 class JsonCodecCodeGenSpec extends GCodeGenSpec("Codec") {

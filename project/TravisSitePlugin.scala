@@ -1,8 +1,8 @@
-import sbt._
-import Keys._
+import sbt.*
+import Keys.*
 
 import com.typesafe.sbt.sbtghpages.GhpagesPlugin
-import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport._
+import com.typesafe.sbt.sbtghpages.GhpagesPlugin.autoImport.*
 import com.typesafe.sbt.SbtGit.{ git, GitKeys }
 import com.typesafe.sbt.git.GitRunner
 import com.typesafe.sbt.site.pamflet.PamfletPlugin
@@ -10,8 +10,8 @@ import com.typesafe.sbt.site.SitePlugin
 
 object TravisSitePlugin extends sbt.AutoPlugin {
   override def requires = PamfletPlugin && GhpagesPlugin
-  import PamfletPlugin.autoImport._
-  import SitePlugin.autoImport._
+  import PamfletPlugin.autoImport.*
+  import SitePlugin.autoImport.*
 
   object autoImport {
     lazy val pushSiteIfChanged = taskKey[Unit]("push the site if changed")
@@ -19,7 +19,7 @@ object TravisSitePlugin extends sbt.AutoPlugin {
     lazy val siteEmail = settingKey[String]("")
   }
 
-  import autoImport._
+  import autoImport.*
 
   override lazy val projectSettings = Seq(
     Pamflet / sourceDirectory := { baseDirectory.value / "docs" },
@@ -64,7 +64,7 @@ object TravisSitePlugin extends sbt.AutoPlugin {
 
   def gitRemoveFiles(dir: File, files: List[File], git: GitRunner, s: TaskStreams): Unit = {
     if (!files.isEmpty)
-      git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: files.map(_.getAbsolutePath)): _*)(dir, s.log)
+      git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: files.map(_.getAbsolutePath))*)(dir, s.log)
     ()
   }
 
@@ -74,15 +74,15 @@ object TravisSitePlugin extends sbt.AutoPlugin {
       case Some(x) => x
       case _       => "HEAD^..HEAD"
     }
-    val stat = git(("diff" :: "--shortstat" :: range :: "docs" :: Nil): _*)(dir, log)
+    val stat = git(("diff" :: "--shortstat" :: range :: "docs" :: Nil)*)(dir, log)
     stat.trim.nonEmpty
   }
 
   def gitConfig(dir: File, email: String, git: GitRunner, log: Logger): Unit =
     sys.env.get("CI") match {
       case Some(_) =>
-        git(("config" :: "user.name" :: "Travis CI" :: Nil): _*)(dir, log)
-        git(("config" :: "user.email" :: email :: Nil): _*)(dir, log)
+        git(("config" :: "user.name" :: "Travis CI" :: Nil)*)(dir, log)
+        git(("config" :: "user.email" :: email :: Nil)*)(dir, log)
       case _ => ()
     }
 }

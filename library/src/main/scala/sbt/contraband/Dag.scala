@@ -96,7 +96,7 @@ object Dag {
    * Otherwise, the empty list is returned.
    */
   private[sbt] def findNegativeCycle[Node](graph: DirectedSignedGraph[Node]): List[graph.Arrow] = {
-    import graph._
+    import graph.*
     val finished = new mutable.HashSet[Node]
     val visited = new mutable.HashSet[Node]
 

@@ -3,7 +3,7 @@ package sbt.contraband
 import java.io.File
 
 import scala.collection.immutable.ListMap
-import JsonSchemaExample._
+import JsonSchemaExample.*
 
 import parser.JsonParser
 

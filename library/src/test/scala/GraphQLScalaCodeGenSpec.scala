@@ -1,9 +1,9 @@
 package sbt.contraband
 
-import verify._
+import verify.*
 import java.io.File
 import parser.SchemaParser
-import GraphQLExample._
+import GraphQLExample.*
 import scala.util.Success
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers

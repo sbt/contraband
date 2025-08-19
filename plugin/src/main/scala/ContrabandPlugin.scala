@@ -1,8 +1,8 @@
 package sbt.contraband
 
-import sbt.Keys._
-import sbt.{ given, _ }
-import sbt.contraband.ast._
+import sbt.Keys.*
+import sbt.{ given, * }
+import sbt.contraband.ast.*
 import sbt.contraband.parser.{ JsonParser, SchemaParser }
 
 object ContrabandPlugin extends AutoPlugin {
@@ -40,7 +40,7 @@ object ContrabandPlugin extends AutoPlugin {
       case object Scala extends ContrabandTargetLang
     }
 
-    lazy val baseContrabandSettings: Seq[Def.Setting[_]] = Seq(
+    lazy val baseContrabandSettings: Seq[Def.Setting[?]] = Seq(
       generateContrabands / skipGeneration := false,
       generateJsonCodecs / skipGeneration := true,
       generateContrabands / contrabandCodecsDependencies := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
@@ -84,7 +84,7 @@ object ContrabandPlugin extends AutoPlugin {
     )
   }
 
-  import autoImport._
+  import autoImport.*
 
   override def requires = sbt.plugins.JvmPlugin
   override def trigger = noTrigger

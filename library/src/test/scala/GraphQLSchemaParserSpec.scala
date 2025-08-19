@@ -2,8 +2,8 @@ package sbt.contraband
 
 import org.parboiled2.Position
 import parser.SchemaParser
-import ast._
-import verify._
+import ast.*
+import verify.*
 import scala.util.Success
 
 object GraphQLSchemaParserSpec extends BasicTestSuite {

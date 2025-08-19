@@ -1,11 +1,11 @@
 package sbt.contraband
 
-import org.scalatest._
+import org.scalatest.*
 import java.io.File
 import parser.SchemaParser
-import GraphQLExample._
+import GraphQLExample.*
 import scala.util.Success
-import scala.collection.immutable._
+import scala.collection.immutable.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

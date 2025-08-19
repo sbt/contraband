@@ -4,7 +4,7 @@ package parser
 import scala.util.Try
 import ast.AstUtil.toNamedType
 import sjsonnew.support.scalajson.unsafe.Parser
-import sjsonnew.shaded.scalajson.ast.unsafe._
+import sjsonnew.shaded.scalajson.ast.unsafe.*
 
 /**
  * Offers functinos allowing to parse a representation of a

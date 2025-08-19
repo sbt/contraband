@@ -2,8 +2,8 @@ package sbt.contraband
 
 import java.io.File
 import scala.collection.immutable.ListMap
-import ast.{ Definition => _, _ }
-import AstUtil._
+import ast.{ Definition as _, * }
+import AstUtil.*
 
 /**
  * The base for code generators.

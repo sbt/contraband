@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
 
 /**
  * Publish to private bintray repository.

@@ -1,5 +1,5 @@
-import sbt._
-import Keys._
+import sbt.*
+import Keys.*
 
 object KeywordPlugin extends AutoPlugin {
   override val requires = plugins.JvmPlugin
@@ -24,7 +24,7 @@ object KeywordPlugin extends AutoPlugin {
     IO.write(out, keywordsSrc)
     out
   }
-  override def projectSettings: Seq[Setting[_]] = inConfig(Compile)(
+  override def projectSettings: Seq[Setting[?]] = inConfig(Compile)(
     Seq(
       scalaKeywords := getScalaKeywords,
       generateKeywords := writeScalaKeywords(sourceManaged.value, scalaKeywords.value),

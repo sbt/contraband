@@ -1,5 +1,5 @@
-import sbt._
-import Keys._
+import sbt.*
+import Keys.*
 
 object Dependencies {
   val scala212 = "2.12.20"

@@ -3,8 +3,8 @@ package sbt.contraband
 import java.io.File
 import scala.collection.immutable.ListMap
 import CodeGen.bq
-import ast.{ Definition => _, _ }
-import AstUtil._
+import ast.{ Definition as _, * }
+import AstUtil.*
 
 /**
  * Code generator for Scala.

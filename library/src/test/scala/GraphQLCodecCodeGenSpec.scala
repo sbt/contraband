@@ -1,10 +1,10 @@
 package sbt.contraband
 
-import verify._
+import verify.*
 import java.io.File
 import parser.SchemaParser
 import ast.{ NamedType, Type }
-import GraphQLExample._
+import GraphQLExample.*
 import scala.util.Success
 
 object GraphQLCodecCodeGenSpec extends BasicTestSuite with EqualLines {
