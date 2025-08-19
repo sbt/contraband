@@ -4,6 +4,7 @@ import sbt.Keys.*
 import sbt.{ given, * }
 import sbt.contraband.ast.*
 import sbt.contraband.parser.{ JsonParser, SchemaParser }
+import sbt.contraband.ContrabandPluginCompat.*
 
 object ContrabandPlugin extends AutoPlugin {
 
@@ -59,7 +60,7 @@ object ContrabandPlugin extends AutoPlugin {
       generateContrabands / contrabandInstantiateJavaLazy := { (e: String) => s"xsbti.SafeLazy($e)" },
       generateContrabands / contrabandInstantiateJavaOptional := CodeGen.instantiateJavaOptional,
       generateContrabands / contrabandFormatsForType := CodecCodeGen.formatsForType,
-      generateContrabands := {
+      generateContrabands := Def.uncached {
         Generate(
           (generateContrabands / contrabandSource).value,
           !(generateContrabands / skipGeneration).value,
