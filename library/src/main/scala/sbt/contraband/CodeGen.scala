@@ -31,9 +31,9 @@ abstract class CodeGenerator {
       }
 
     def mapV(f: String => String): ListMap[T, String] =
-      ListMap(m.toList map { case (k, v) =>
+      ListMap(m.toList.map { case (k, v) =>
         (k, f(v))
-      }: _*)
+      }*)
   }
 
   implicit protected class IndentationAwareString(code: String) {

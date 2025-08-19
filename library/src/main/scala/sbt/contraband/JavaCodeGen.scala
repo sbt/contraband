@@ -25,9 +25,13 @@ class JavaCodeGen(
   }
 
   override def generate(s: Document): ListMap[File, String] =
-    ListMap((s.definitions collect { case td: TypeDefinition =>
-      td
-    }) flatMap (generate(s, _).toList): _*) mapV (_.indented)
+    ListMap(
+      s.definitions
+        .collect { case td: TypeDefinition =>
+          td
+        }
+        .flatMap(generate(s, _).toList)*
+    ) mapV (_.indented)
 
   override def generateInterface(s: Document, i: InterfaceTypeDefinition): ListMap[File, String] = {
     val InterfaceTypeDefinition(name, namespace, interfaces, fields, dirs, comments, trailingComments, position) = i
