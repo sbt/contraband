@@ -7,7 +7,7 @@ ThisBuild / scalaVersion := scala212
 ThisBuild / organizationName := "sbt"
 ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
 ThisBuild / homepage := Some(url("http://scala-sbt.org/contraband"))
-ThisBuild / licenses += ("Apache-2.0", url("https://github.com/sbt/contraband/blob/master/LICENSE"))
+ThisBuild / licenses += License.Apache2
 ThisBuild / scmInfo := Some(ScmInfo(url("https://github.com/sbt/contraband"), "git@github.com:sbt/contraband.git"))
 ThisBuild / developers := List(
   Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n")),
