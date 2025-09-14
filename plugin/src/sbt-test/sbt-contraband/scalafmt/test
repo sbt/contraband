@@ -1,0 +1,6 @@
+> compile
+> check expect_format
+> set Compile / generateContrabands / contrabandScalafmt := false
+> clean
+> compile
+> check expect_no_format

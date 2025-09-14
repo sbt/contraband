@@ -1,0 +1,32 @@
+/**
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
+ */
+
+// DO NOT EDIT MANUALLY
+package com.example
+final class Person private (
+  val name: String) extends Serializable {
+  
+  
+  
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
+    case x: Person => (this.name == x.name)
+    case _ => false
+  })
+  override def hashCode: Int = {
+    37 * (37 * (17 + "com.example.Person".##) + name.##)
+  }
+  override def toString: String = {
+    "Person(" + name + ")"
+  }
+  private def copy(name: String = name): Person = {
+    new Person(name)
+  }
+  def withName(name: String): Person = {
+    copy(name = name)
+  }
+}
+object Person {
+  
+  def apply(name: String): Person = new Person(name)
+}

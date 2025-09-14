@@ -5,6 +5,8 @@ import sbt.{ given, * }
 import sbt.contraband.ast.*
 import sbt.contraband.parser.{ JsonParser, SchemaParser }
 import sbt.contraband.ContrabandPluginCompat.*
+import org.scalafmt.interfaces.ScalafmtSession
+import org.scalafmt.interfaces.Scalafmt
 
 object ContrabandPlugin extends AutoPlugin {
 
@@ -35,8 +37,21 @@ object ContrabandPlugin extends AutoPlugin {
     val contrabandFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
     val contrabandSjsonNewVersion = settingKey[String]("The version of sjson-new to use")
     val contrabandScala3enum = settingKey[Boolean]("")
+    val contrabandScalafmt = settingKey[Boolean]("Format with scalafmt if true")
+
+    private val createScalafmtInstance: Def.Initialize[Task[Option[ScalafmtSession]]] =
+      Def.task {
+        // https://github.com/scalameta/sbt-scalafmt/blob/a23504e8f21599f4/plugin/src/main/scala/org/scalafmt/sbt/ScalafmtPlugin.scala#L42-L45
+        // return `None` if there is not `scalafmtConfig` key
+        TaskKey[File]("scalafmtConfig").?.value.filter(_.isFile).map { conf =>
+          Scalafmt
+            .create(this.getClass.getClassLoader)
+            .createSession(conf.toPath)
+        }
+      }
 
     lazy val baseContrabandSettings: Seq[Def.Setting[?]] = Seq(
+      generateContrabands / contrabandScalafmt := true,
       generateContrabands / skipGeneration := false,
       generateJsonCodecs / skipGeneration := true,
       generateContrabands / contrabandCodecsDependencies := Seq("com.eed3si9n" %% "sjson-new-core" % contrabandSjsonNewVersion.value),
@@ -76,6 +91,15 @@ object ContrabandPlugin extends AutoPlugin {
           (generateContrabands / contrabandFormatsForType).value,
           streams.value,
           (generateContrabands / contrabandScala3enum).value,
+          Def
+            .taskIf(
+              if ((generateContrabands / contrabandScalafmt).value) {
+                createScalafmtInstance.value
+              } else {
+                None
+              }
+            )
+            .value
         )
       },
       Compile / sourceGenerators += generateContrabands.taskValue
@@ -136,7 +160,8 @@ object Generate {
       instantiateJavaOptional: (String, String) => String,
       formatsForType: Type => List[String],
       log: Logger,
-      scala3enum: Boolean
+      scala3enum: Boolean,
+      scalafmt: Option[ScalafmtSession]
   ): Seq[File] = {
     val jsonFiles = definitions.toList collect {
       case f: File if f.getName endsWith ".json" => f
@@ -210,7 +235,16 @@ object Generate {
       } else {
         List.empty
       }
-    datatypes ++ formats
+    val result = datatypes ++ formats
+    scalafmt.foreach { fmt =>
+      result.filter(_.getName.endsWith(".scala")).foreach { f =>
+        IO.write(
+          f,
+          fmt.format(f.toPath, IO.read(f))
+        )
+      }
+    }
+    result
   }
 
   def apply(
@@ -232,6 +266,7 @@ object Generate {
       formatsForType: Type => List[String],
       s: TaskStreams,
       scala3enum: Boolean,
+      scalafmt: Option[ScalafmtSession]
   ): Seq[File] = {
     val definitions = IO listFiles base
     def gen() = generate(
@@ -252,7 +287,8 @@ object Generate {
       instantiateJavaOptional,
       formatsForType,
       s.log,
-      scala3enum
+      scala3enum,
+      scalafmt
     )
 
     val scalaVersionSubDir = scalaVersion match {

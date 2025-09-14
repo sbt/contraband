@@ -1,0 +1,7 @@
+package com.example
+
+@target(Scala)
+
+type Person {
+  name: String!
+}
