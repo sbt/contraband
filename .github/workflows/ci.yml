@@ -35,3 +35,21 @@ jobs:
     - if: ${{ matrix.jobtype == 4 }}
       shell: bash
       run: sbt -v "++2.12.x" scalafmtSbtCheck scalafmtCheckAll
+  push_gh_pages:
+    needs: test
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-java@v5
+      with:
+        java-version: 8
+        distribution: adopt
+    - uses: actions/checkout@v5
+    - uses: sbt/setup-sbt@v1
+    - run: sbt makeSite
+    - name: Push to gh-pages
+      if: ${{ github.repository_owner == 'sbt' && github.ref == 'refs/heads/develop' && github.event_name == 'push' }}
+      uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4.7.3
+      with:
+        branch: gh-pages
+        folder: target/site
