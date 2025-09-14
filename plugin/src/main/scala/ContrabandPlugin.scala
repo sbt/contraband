@@ -35,12 +35,6 @@ object ContrabandPlugin extends AutoPlugin {
     val contrabandFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
     val contrabandSjsonNewVersion = settingKey[String]("The version of sjson-new to use")
 
-    sealed trait ContrabandTargetLang
-    object ContrabandTargetLang {
-      case object Java extends ContrabandTargetLang
-      case object Scala extends ContrabandTargetLang
-    }
-
     lazy val baseContrabandSettings: Seq[Def.Setting[?]] = Seq(
       generateContrabands / skipGeneration := false,
       generateJsonCodecs / skipGeneration := true,
