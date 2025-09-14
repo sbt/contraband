@@ -30,12 +30,10 @@ ThisBuild / scalacOptions ++= {
 ThisBuild / publishMavenStyle := true
 
 lazy val root = (project in file("."))
-  .enablePlugins(TravisSitePlugin)
+  .enablePlugins(ContrabandSitePlugin)
   .aggregate(library, plugin)
   .settings(
     name := "contraband root",
-    siteGithubRepo := "sbt/contraband",
-    siteEmail := { "eed3si9n" + "@" + "gmail.com" },
     publish / skip := true,
     crossScalaVersions := Nil,
   )
