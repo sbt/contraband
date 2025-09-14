@@ -18,6 +18,10 @@ interface EmptyInterface {
 type ScalaKeywordExample {
   type: String
   private: Boolean
+  enum: String
+  export: String
+  given: String
+  then: String
 }
 
 type Dis @modifier("sealed") {
