@@ -1,6 +1,6 @@
 package sbt.contraband
 
-import scala.collection.immutable.{ Seq as sciSeq }
+import scala.collection.immutable.Seq as sciSeq
 import scala.collection.JavaConverters.*
 
 import difflib.*

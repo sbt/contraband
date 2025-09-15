@@ -55,7 +55,7 @@ abstract class CodeGenerator {
       interfaceRefs map { ref =>
         ref.names match {
           case Nil => sys.error(s"Invalid named type: $ref")
-          case xs =>
+          case xs  =>
             val namespace = xs.init match {
               case Nil => pkg
               case xs  => Some(xs.mkString("."))
@@ -210,7 +210,7 @@ abstract class CodeGenerator {
     f0 match {
       case f if isPrimitive(f.fieldType)      => s"($lhs.$fieldName == $rhs.$fieldName)"
       case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.equals($lhs.$fieldName, $rhs.$fieldName)"
-      case f if f.fieldType.isListType =>
+      case f if f.fieldType.isListType        =>
         if (isJava) s"java.util.Arrays.deepEquals($lhs.$fieldName, $rhs.$fieldName)"
         else s"java.util.Arrays.deepEquals($lhs.$fieldName.asInstanceOf[Array[Object]], $rhs.$fieldName.asInstanceOf[Array[Object]])"
       case f => s"$lhs.$fieldName.equals($rhs.$fieldName)"
@@ -220,7 +220,7 @@ abstract class CodeGenerator {
     f0 match {
       case f if isPrimitive(f.fieldType)      => s"${boxedType(f.fieldType.name)}.valueOf($fieldName).hashCode()"
       case f if isPrimitiveArray(f.fieldType) => s"java.util.Arrays.hashCode($fieldName)"
-      case f if f.fieldType.isListType =>
+      case f if f.fieldType.isListType        =>
         if (isJava) s"java.util.Arrays.deepHashCode($fieldName)"
         else s"java.util.Arrays.deepHashCode($fieldName.asInstanceOf[Array[Object]])"
       case f => s"$fieldName.hashCode()"

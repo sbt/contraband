@@ -120,7 +120,7 @@ class JavaCodeGen(
   private def genDoc(doc: List[String]) = doc match {
     case Nil      => ""
     case l :: Nil => s"/** $l */"
-    case lines =>
+    case lines    =>
       val doc = lines map (l => s" * $l") mkString EOL
       s"""/**
          |$doc
@@ -180,7 +180,7 @@ class JavaCodeGen(
       toDoc(a.comments) match {
         case Nil        => Nil
         case doc :: Nil => s"@param ${a.name} $doc" :: Nil
-        case docs =>
+        case docs       =>
           val prefix = s"@param ${a.name} "
           docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
       }
@@ -217,7 +217,7 @@ class JavaCodeGen(
 
   private def renderDefaultValue(f: FieldDefinition): String =
     f.defaultValue match {
-      case Some(v) => renderJavaValue(v, f.fieldType)
+      case Some(v)                                                      => renderJavaValue(v, f.fieldType)
       case None if f.fieldType.isListType || !f.fieldType.isNotNullType =>
         renderJavaValue(NullValue(), f.fieldType)
       case _ => sys.error(s"Needs a default value for field ${f.name}.")
