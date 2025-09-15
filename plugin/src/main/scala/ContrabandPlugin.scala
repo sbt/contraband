@@ -109,7 +109,7 @@ object ContrabandPlugin extends AutoPlugin {
     contrabandSjsonNewVersion := {
       scalaBinaryVersion.value match {
         case "3" =>
-          "0.14.0-M1"
+          "0.14.0-M5"
         case _ =>
           "0.10.1"
       }
