@@ -34,6 +34,7 @@ object ContrabandPlugin extends AutoPlugin {
       settingKey[(String, String) => String]("Function that instantiate a optional expression from an expression in Java.")
     val contrabandFormatsForType = settingKey[Type => List[String]]("Function that maps types to the list of required codecs for them.")
     val contrabandSjsonNewVersion = settingKey[String]("The version of sjson-new to use")
+    val contrabandScala3enum = settingKey[Boolean]("")
 
     lazy val baseContrabandSettings: Seq[Def.Setting[?]] = Seq(
       generateContrabands / skipGeneration := false,
@@ -54,6 +55,7 @@ object ContrabandPlugin extends AutoPlugin {
       generateContrabands / contrabandInstantiateJavaLazy := { (e: String) => s"xsbti.SafeLazy($e)" },
       generateContrabands / contrabandInstantiateJavaOptional := CodeGen.instantiateJavaOptional,
       generateContrabands / contrabandFormatsForType := CodecCodeGen.formatsForType,
+      generateContrabands / contrabandScala3enum := (scalaBinaryVersion.value == "3"),
       generateContrabands := Def.uncached {
         Generate(
           (generateContrabands / contrabandSource).value,
@@ -72,7 +74,8 @@ object ContrabandPlugin extends AutoPlugin {
           (generateContrabands / contrabandInstantiateJavaLazy).value,
           (generateContrabands / contrabandInstantiateJavaOptional).value,
           (generateContrabands / contrabandFormatsForType).value,
-          streams.value
+          streams.value,
+          (generateContrabands / contrabandScala3enum).value,
         )
       },
       Compile / sourceGenerators += generateContrabands.taskValue
@@ -132,7 +135,8 @@ object Generate {
       instantiateJavaLazy: String => String,
       instantiateJavaOptional: (String, String) => String,
       formatsForType: Type => List[String],
-      log: Logger
+      log: Logger,
+      scala3enum: Boolean
   ): Seq[File] = {
     val jsonFiles = definitions.toList collect {
       case f: File if f.getName endsWith ".json" => f
@@ -156,6 +160,7 @@ object Generate {
       scalaPrivateConstructor,
       wrapOption,
       scalaVersion,
+      scala3enum
     )
     val jsonFormatsGenerator = new CodecCodeGen(
       codecParents = codecParents,
@@ -225,7 +230,8 @@ object Generate {
       instantiateJavaLazy: String => String,
       instantiateJavaOptional: (String, String) => String,
       formatsForType: Type => List[String],
-      s: TaskStreams
+      s: TaskStreams,
+      scala3enum: Boolean,
   ): Seq[File] = {
     val definitions = IO listFiles base
     def gen() = generate(
@@ -245,7 +251,8 @@ object Generate {
       instantiateJavaLazy,
       instantiateJavaOptional,
       formatsForType,
-      s.log
+      s.log,
+      scala3enum
     )
 
     val scalaVersionSubDir = scalaVersion match {

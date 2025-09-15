@@ -19,6 +19,7 @@ class ScalaCodeGen(
     scalaPrivateConstructor: Boolean,
     wrapOption: Boolean,
     scalaVersion: String,
+    scala3enum: Boolean
 ) extends CodeGenerator {
 
   implicit object indentationConfiguration extends IndentationConfiguration {
@@ -38,6 +39,36 @@ class ScalaCodeGen(
     }) map (generate(s, _)) reduce (_ merge _) mapV (_.indented)
 
   override def generateEnum(s: Document, e: EnumTypeDefinition): ListMap[File, String] = {
+    if (scala3enum) {
+      generateEnumScala3(e)
+    } else {
+      generateEnumScala2(e)
+    }
+  }
+
+  private def generateEnumScala3(e: EnumTypeDefinition): ListMap[File, String] = {
+    val values =
+      e.values map { case EnumValueDefinition(name, _, comments, _) =>
+        s"""${genDoc(toDoc(comments))}
+           |case $name""".stripMargin
+      } mkString EOL
+
+    val extra: List[String] = toExtra(e)
+    val code =
+      s"""${genPackage(e)}
+         |${genDoc(toDoc(e.comments))}
+         |enum ${e.name} {
+         |  $values
+         |}
+         |
+         |object ${e.name} {
+         |  ${extra mkString EOL}
+         |}""".stripMargin
+
+    ListMap(genFile(e) -> code)
+  }
+
+  private def generateEnumScala2(e: EnumTypeDefinition): ListMap[File, String] = {
     val values =
       e.values map { case (EnumValueDefinition(name, _, comments, _)) =>
         s"""${genDoc(toDoc(comments))}
