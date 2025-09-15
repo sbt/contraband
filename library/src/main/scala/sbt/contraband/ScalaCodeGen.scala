@@ -492,12 +492,24 @@ class ScalaCodeGen(
 
   private def genCopy(r: ObjectTypeDefinition, intfLang: String) = {
     val allFields = r.fields filter { _.arguments.isEmpty }
-    def genParam(f: FieldDefinition) = s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)} = ${bq(f.name)}"
-    val params = allFields map genParam mkString ", "
-    val constructorCall = allFields map (f => bq(f.name)) mkString ", "
-    s"""private def copy($params): ${r.name} = {
-       |  new ${r.name}($constructorCall)
-       |}""".stripMargin
+    allFields.size match {
+      case 0 =>
+        ""
+      case size =>
+        def genParam(f: FieldDefinition): String = {
+          if (size == 1) {
+            // https://github.com/sbt/contraband/issues/149
+            s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)}"
+          } else {
+            s"${bq(f.name)}: ${genRealTpe(f.fieldType, isParam = true, intfLang)} = ${bq(f.name)}"
+          }
+        }
+        val params = allFields map genParam mkString ", "
+        val constructorCall = allFields map (f => bq(f.name)) mkString ", "
+        s"""private def copy($params): ${r.name} = {
+           |  new ${r.name}($constructorCall)
+           |}""".stripMargin
+    }
   }
 
   private def genWith(r: ObjectTypeDefinition, intfLang: String) = {

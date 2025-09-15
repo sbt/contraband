@@ -145,9 +145,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "ChildRecord()"
         |  }
-        |  private def copy(): ChildRecord = {
-        |    new ChildRecord()
-        |  }
         |}
         |object ChildRecord {
         |  def apply(): ChildRecord = new ChildRecord()
@@ -204,7 +201,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "simpleRecordExample(" + field + ")"
         |  }
-        |  private def copy(field: java.net.URL = field): simpleRecordExample = {
+        |  private def copy(field: java.net.URL): simpleRecordExample = {
         |    new simpleRecordExample(field)
         |  }
         |  def withField(field: java.net.URL): simpleRecordExample = {
@@ -234,7 +231,7 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |  override def toString: String = {
         |    "growableAddOneField(" + field + ")"
         |  }
-        |  private def copy(field: Int = field): growableAddOneField = {
+        |  private def copy(field: Int): growableAddOneField = {
         |    new growableAddOneField(field)
         |  }
         |  def withField(field: Int): growableAddOneField = {
@@ -342,7 +339,7 @@ object primitiveTypesExample2 {
         |  override def toString: String = {
         |    "modifierExample(" + field + ")"
         |  }
-        |  private def copy(field: Int = field): modifierExample = {
+        |  private def copy(field: Int): modifierExample = {
         |    new modifierExample(field)
         |  }
         |  def withField(field: Int): modifierExample = {
