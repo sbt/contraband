@@ -5,12 +5,7 @@
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
         <title>Contraband — Combined Pages</title>
         
-        <link rel="stylesheet" href="../css/blueprint/screen.css" type="text/css" media="screen, projection"/>
-        <link rel="stylesheet" href="../css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <link rel="stylesheet" href="../css/blueprint/print.css" type="text/css" media="print"/> 
-        <!--[if lt IE 8]>
-          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
-        <![endif]-->
+        <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css"/>
         <link rel="stylesheet" href="../css/pamflet.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/pamflet-print.css" type="text/css" media="print"/>
         <link rel="stylesheet" href="../css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
@@ -18,8 +13,8 @@
         <link rel="stylesheet" href="../css/color_scheme-github.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <script type="text/javascript" src="../js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="../js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="../js/jquery.min.js"></script>
+        <script type="text/javascript" src="../js/bootstrap.bundle.min.js"></script>
         <script type="text/javascript" src="../js/pamflet.js"></script>
         <script type="text/javascript">
           Pamflet.page.language = 'ja';
@@ -32,18 +27,16 @@
         
       </head>
       <body class="color_scheme-github">
-        <a class="page prev nav" href="Contents+in+Depth.html">
-            <span class="space">&nbsp;</span>
-            <span class="flip arrow">❧</span>
-          </a>
-        <div class="container contentswrapper">
-          <div class="span-16 prepend-1 append-1 contents">
-            <div class="tocwrapper show">
-      <a class="tochead nav" style="display: none" href="#toc">❦</a>
-      <a name="toc"></a>
-      <h4 class="toctitle">Contents</h4>
-      <div class="tocbody">
-      <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型</a></div></li><li><div><a href="#%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90">コード生成</a></div></li><li><div><a href="#JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90">JSON コーデックの生成</a></div></li> </ol></div></div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband (コントラバンド) は、データ型や API の記述言語で、現在 Scala と Java を対象としている。
+        <div class="container-fluid contentswrapper h-100">
+          <div class="row minh-100">
+          <div class="col-md-4 col-xl-3 leftcolumn">&nbsp;</div><div class="col-md-8 col-xs-9">
+                  <div class="rightcolumn contents">
+                    <div class="tocwrapper">
+        
+        <div class="tocbody show" id="toc">
+        <h4 class="toctitle">Contents</h4>
+        <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型</a></div></li><li><div><a href="#%E3%82%B3%E3%83%BC%E3%83%89%E7%94%9F%E6%88%90">コード生成</a></div></li><li><div><a href="#JSON+%E3%82%B3%E3%83%BC%E3%83%87%E3%83%83%E3%82%AF%E3%81%AE%E7%94%9F%E6%88%90">JSON コーデックの生成</a></div></li> </ol></div>
+      </div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband (コントラバンド) は、データ型や API の記述言語で、現在 Scala と Java を対象としている。
 </p><p>API の型やフィールドを記述すると、Contraband は:
 </p><ul><li>Java クラス、もしくは Scala での疑似 case class を生成する。
 </li><li>データ型のための JSON バインディングを生成する。
@@ -224,7 +217,7 @@ type Person {
 }
 </code></pre><p>このスキーマは以下の Scala コードを生成する:
 </p><pre><code class="prettyprint lang-scala">/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -266,13 +259,13 @@ object Person {
 &gt; x.withAge(21)
 </code></pre><p>Java のコード生成は以下のようになっている (target アノテーションを Java に変更する):
 </p><pre><code class="prettyprint lang-java">/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-    
+
     public static Person create(String _name, java.util.Optional&lt;Integer&gt; _age) {
         return new Person(_name, _age);
     }
@@ -285,7 +278,7 @@ public final class Person implements java.io.Serializable {
     public static Person of(String _name, int _age) {
         return new Person(_name, _age);
     }
-    
+
     private String name;
     private java.util.Optional&lt;Integer&gt; age;
     protected Person(String _name, java.util.Optional&lt;Integer&gt; _age) {
@@ -384,13 +377,15 @@ scala&gt; assert(p == q)
   field: Int
 }
 </code></pre>
-          </div>
+                  </div>
+                </div>
+          </div> <!-- row -->
         </div>
         <div class="header">
-          <div class="container">
-        <div class="span-16 prepend-1 append-1">
-          <div class="span-16 top nav">
-            <div class="span-16 title">
+          <div class="container-fluid top nav">
+        <div class="row justify-content-md-center w-100">
+          <div class="col-md-auto">
+            <div class="title">
               <span>Contraband</span> — Combined Pages
             </div>
           </div>

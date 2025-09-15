@@ -5,12 +5,7 @@
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
         <title>Contraband — スキーマと型</title>
         
-        <link rel="stylesheet" href="../css/blueprint/screen.css" type="text/css" media="screen, projection"/>
-        <link rel="stylesheet" href="../css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <link rel="stylesheet" href="../css/blueprint/print.css" type="text/css" media="print"/> 
-        <!--[if lt IE 8]>
-          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
-        <![endif]-->
+        <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css"/>
         <link rel="stylesheet" href="../css/pamflet.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/pamflet-print.css" type="text/css" media="print"/>
         <link rel="stylesheet" href="../css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
@@ -18,8 +13,8 @@
         <link rel="stylesheet" href="../css/color_scheme-github.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="../css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <script type="text/javascript" src="../js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="../js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="../js/jquery.min.js"></script>
+        <script type="text/javascript" src="../js/bootstrap.bundle.min.js"></script>
         <script type="text/javascript" src="../js/pamflet.js"></script>
         <script type="text/javascript">
           Pamflet.page.language = 'ja';
@@ -32,16 +27,20 @@
         
       </head>
       <body class="color_scheme-github">
-        <a class="page prev nav" href="index.html">
-            <span class="space">&nbsp;</span>
-            <span class="flip arrow">❧</span>
-          </a><a class="page next nav" href="code-generation.html">
-            <span class="space">&nbsp;</span>
-            <span class="arrow">❧</span>
-          </a>
-        <div class="container contentswrapper">
-          <div class="span-16 prepend-1 append-1 contents">
-            <h2 id="%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型<a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>このページでは GraphQL の型システムに基づいた Contraband の型システムを説明する。
+        <div class="container-fluid contentswrapper h-100">
+          <div class="row minh-100">
+          <div class="col-md-4 col-xl-3 toccolumn leftcolumn">
+                  <div class="lefttocwrapper">
+      <div class="tocwrapper">
+        
+        <div class="tocbody show" id="toc">
+        
+        <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div class="current">スキーマと型</div></li><li><div><a href="code-generation.html">コード生成</a></div></li><li><div><a href="json.html">JSON コーデックの生成</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div>
+      </div>
+      </div>
+                </div><div class="col-md-8 col-xs-9">
+                  <div class="rightcolumn contents">
+                  <h2 id="%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B">スキーマと型<a href="#%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E3%81%A8%E5%9E%8B" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>このページでは GraphQL の型システムに基づいた Contraband の型システムを説明する。
 </p><p>Contraband は、既存の JSON ベースの API をアクセスするのに使ったり、サービスを実装するのに使うことができる。
 </p><h3 id="Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E">Contraband スキーマ言語<a href="#Contraband+%E3%82%B9%E3%82%AD%E3%83%BC%E3%83%9E%E8%A8%80%E8%AA%9E" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband のスキーマを記述するのに特定のプログラミング言語の構文に依存したくないため、
 GraphQL のスキーマ言語を拡張することにした。
@@ -194,26 +193,39 @@ interface IntfExample {
 </li><li><code>#xtostring</code> は <code>toString</code> メソッドのカスタム化に使用する。
 </li><li><code>#xcompanion</code> は、生成されるクラスのコンパニオンオブジェクト内にコードを挿入する。
 </li><li><code>#xcompanioninterface</code> はコンパニオンオブジェクトに親クラスを追加する。
-</li></ul><div class="bottom nav span-16">
-                        <em>Next Page</em>
+</li></ul><div class="bottom nav">
+                <div class="row">
+                  <div class="col-md-auto">
+                    <a href="code-generation.html">
+                      <div class="arrowitem">
                         <span class="arrow">❧</span>
-                        <a href="code-generation.html"> コード生成 </a>                        
-                        <ul class="language-bar">
-        <li><a href="../schema.html"><span class="lang-item lang-en">English</span></a></li><li><a href="../ja/schema.html"><span class="lang-item lang-ja">日本語</span></a></li>
-      </ul>
-                      </div><div class="tocwrapper show">
-      <a class="tochead nav" style="display: none" href="#toc">❦</a>
-      <a name="toc"></a>
-      <h4 class="toctitle">Contents</h4>
-      <div class="tocbody">
-      <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div class="current">スキーマと型</div></li><li><div><a href="code-generation.html">コード生成</a></div></li><li><div><a href="json.html">JSON コーデックの生成</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
-          </div>
+                      </div>
+
+                      <div class="arrowitem">
+                        <em>Next page</em><br/>
+                        コード生成
+                      </div>
+
+                    </a>
+                  </div>
+                </div>
+                <div class="row w-100">
+        <div class="col-md-auto ml-auto">
+          <ul class="language-bar">
+            <li><a href="../schema.html"><span class="lang-item lang-en">English</span></a></li><li><a href="../ja/schema.html"><span class="lang-item lang-ja">日本語</span></a></li>
+          </ul>
+        </div>
+      </div>
+              </div>
+                  </div>
+                </div>
+          </div> <!-- row -->
         </div>
         <div class="header">
-          <div class="container">
-        <div class="span-16 prepend-1 append-1">
-          <div class="span-16 top nav">
-            <div class="span-16 title">
+          <div class="container-fluid top nav">
+        <div class="row justify-content-md-center w-100">
+          <div class="col-md-auto">
+            <div class="title">
               <span>Contraband</span> — スキーマと型
             </div>
           </div>

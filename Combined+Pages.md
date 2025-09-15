@@ -180,6 +180,10 @@ type as a list, which indicates that this field will
 return a list of that type. In the schema language,
 this is denoted by wrapping the type in square brackets, `[` and `]`.
 
+### Map type
+
+Contraband allows to use `StringStringMap` type, which translates to `scala.collection.immutable.Map[String, String]`.
+
 ### Lazy type
 
 Lazy types defer the initialization of the field until it is first used.
@@ -304,7 +308,7 @@ This schema will produce the following Scala class:
 
 ```scala
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -312,10 +316,10 @@ package com.example
 final class Person private (
   val name: String,
   val age: Option[Int]) extends Serializable {
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
     case x: Person => (this.name == x.name) && (this.age == x.age)
     case _ => false
-  }
+  })
   override def hashCode: Int = {
     37 * (37 * (17 + name.##) + age.##)
   }
@@ -355,13 +359,13 @@ Here's the Java code it generates (after changing the target annotation to `Java
 
 ```java
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-    
+
     public static Person create(String _name, java.util.Optional<Integer> _age) {
         return new Person(_name, _age);
     }
@@ -374,7 +378,7 @@ public final class Person implements java.io.Serializable {
     public static Person of(String _name, int _age) {
         return new Person(_name, _age);
     }
-    
+
     private String name;
     private java.util.Optional<Integer> age;
     protected Person(String _name, java.util.Optional<Integer> _age) {

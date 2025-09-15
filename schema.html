@@ -5,12 +5,7 @@
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
         <title>Contraband — Schemas and Types</title>
         
-        <link rel="stylesheet" href="css/blueprint/screen.css" type="text/css" media="screen, projection"/>
-        <link rel="stylesheet" href="css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <link rel="stylesheet" href="css/blueprint/print.css" type="text/css" media="print"/> 
-        <!--[if lt IE 8]>
-          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
-        <![endif]-->
+        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
         <link rel="stylesheet" href="css/pamflet.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/pamflet-print.css" type="text/css" media="print"/>
         <link rel="stylesheet" href="css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
@@ -18,8 +13,8 @@
         <link rel="stylesheet" href="css/color_scheme-github.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
         <script type="text/javascript" src="js/pamflet.js"></script>
         <script type="text/javascript">
           Pamflet.page.language = 'en';
@@ -32,16 +27,20 @@
         
       </head>
       <body class="color_scheme-github">
-        <a class="page prev nav" href="index.html">
-            <span class="space">&nbsp;</span>
-            <span class="flip arrow">❧</span>
-          </a><a class="page next nav" href="code-generation.html">
-            <span class="space">&nbsp;</span>
-            <span class="arrow">❧</span>
-          </a>
-        <div class="container contentswrapper">
-          <div class="span-16 prepend-1 append-1 contents">
-            <h2 id="Schemas+and+Types">Schemas and Types<a href="#Schemas+and+Types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This page describes Contraband type system, which is based on GraphQL type system.
+        <div class="container-fluid contentswrapper h-100">
+          <div class="row minh-100">
+          <div class="col-md-4 col-xl-3 toccolumn leftcolumn">
+                  <div class="lefttocwrapper">
+      <div class="tocwrapper">
+        
+        <div class="tocbody show" id="toc">
+        
+        <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div class="current">Schemas and Types</div></li><li><div><a href="code-generation.html">Code generation</a></div></li><li><div><a href="json.html">JSON codec generation</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div>
+      </div>
+      </div>
+                </div><div class="col-md-8 col-xs-9">
+                  <div class="rightcolumn contents">
+                  <h2 id="Schemas+and+Types">Schemas and Types<a href="#Schemas+and+Types" class="header-link"><span class="header-link-content">&nbsp;</span></a></h2><p>This page describes Contraband type system, which is based on GraphQL type system.
 </p><p>Contraband could be used to acess existing JSON-based API,
 or to implement your own service.
 </p><h3 id="Contraband+schema+language">Contraband schema language<a href="#Contraband+schema+language" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Since we don’t want to rely on a specific programming language syntax,
@@ -129,6 +128,7 @@ type Character {
 type as a list, which indicates that this field will
 return a list of that type. In the schema language,
 this is denoted by wrapping the type in square brackets, <code>[</code> and <code>]</code>.
+</p><h3 id="Map+type">Map type<a href="#Map+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband allows to use <code>StringStringMap</code> type, which translates to <code>scala.collection.immutable.Map[String, String]</code>.
 </p><h3 id="Lazy+type">Lazy type<a href="#Lazy+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Lazy types defer the initialization of the field until it is first used.
 In the schema language,
 this is denoted by the keyword <code>lazy</code>.
@@ -196,26 +196,39 @@ interface IntfExample {
 </li><li><code>#xtostring</code> is used to provide a custom <code>toString</code> method.
 </li><li><code>#xcompanion</code> injects the code in the companion object of the generated class.
 </li><li><code>#xcompanioninterface</code> add additional parent classes to the companion object.
-</li></ul><div class="bottom nav span-16">
-                        <em>Next Page</em>
+</li></ul><div class="bottom nav">
+                <div class="row">
+                  <div class="col-md-auto">
+                    <a href="code-generation.html">
+                      <div class="arrowitem">
                         <span class="arrow">❧</span>
-                        <a href="code-generation.html"> Code generation </a>                        
-                        <ul class="language-bar">
-        <li><a href="schema.html"><span class="lang-item lang-en">English</span></a></li><li><a href="ja/schema.html"><span class="lang-item lang-ja">日本語</span></a></li>
-      </ul>
-                      </div><div class="tocwrapper show">
-      <a class="tochead nav" style="display: none" href="#toc">❦</a>
-      <a name="toc"></a>
-      <h4 class="toctitle">Contents</h4>
-      <div class="tocbody">
-      <div><a href="index.html">Contraband</a></div><ol class="toc"> <li><div class="current">Schemas and Types</div></li><li><div><a href="code-generation.html">Code generation</a></div></li><li><div><a href="json.html">JSON codec generation</a></div></li><li class="generated"><div><a href="Contents+in+Depth.html">Contents in Depth</a></div></li><li class="generated"><div><a href="Combined+Pages.html">Combined Pages</a></div></li> </ol></div></div>
-          </div>
+                      </div>
+
+                      <div class="arrowitem">
+                        <em>Next page</em><br/>
+                        Code generation
+                      </div>
+
+                    </a>
+                  </div>
+                </div>
+                <div class="row w-100">
+        <div class="col-md-auto ml-auto">
+          <ul class="language-bar">
+            <li><a href="schema.html"><span class="lang-item lang-en">English</span></a></li><li><a href="ja/schema.html"><span class="lang-item lang-ja">日本語</span></a></li>
+          </ul>
+        </div>
+      </div>
+              </div>
+                  </div>
+                </div>
+          </div> <!-- row -->
         </div>
         <div class="header">
-          <div class="container">
-        <div class="span-16 prepend-1 append-1">
-          <div class="span-16 top nav">
-            <div class="span-16 title">
+          <div class="container-fluid top nav">
+        <div class="row justify-content-md-center w-100">
+          <div class="col-md-auto">
+            <div class="title">
               <span>Contraband</span> — Schemas and Types
             </div>
           </div>

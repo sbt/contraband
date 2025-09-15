@@ -5,12 +5,7 @@
         <meta content="width=device-width, initial-scale=1" name="viewport"/>
         <title>Contraband — Combined Pages</title>
         
-        <link rel="stylesheet" href="css/blueprint/screen.css" type="text/css" media="screen, projection"/>
-        <link rel="stylesheet" href="css/blueprint/grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <link rel="stylesheet" href="css/blueprint/print.css" type="text/css" media="print"/> 
-        <!--[if lt IE 8]>
-          <link rel="stylesheet" href={ relativeBase + "css/blueprint/ie.css" } type="text/css" media="screen, projection"/>
-        <![endif]-->
+        <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css"/>
         <link rel="stylesheet" href="css/pamflet.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/pamflet-print.css" type="text/css" media="print"/>
         <link rel="stylesheet" href="css/pamflet-grid.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
@@ -18,8 +13,8 @@
         <link rel="stylesheet" href="css/color_scheme-github.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/color_scheme-monokai.css" type="text/css" media="screen, projection"/>
         <link rel="stylesheet" href="css/pamfletheight_2em_2em.css" type="text/css" media="screen and (min-device-width: 800px), projection"/>
-        <script type="text/javascript" src="js/jquery-1.6.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.collapse.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.bundle.min.js"></script>
         <script type="text/javascript" src="js/pamflet.js"></script>
         <script type="text/javascript">
           Pamflet.page.language = 'en';
@@ -32,18 +27,16 @@
         
       </head>
       <body class="color_scheme-github">
-        <a class="page prev nav" href="Contents+in+Depth.html">
-            <span class="space">&nbsp;</span>
-            <span class="flip arrow">❧</span>
-          </a>
-        <div class="container contentswrapper">
-          <div class="span-16 prepend-1 append-1 contents">
-            <div class="tocwrapper show">
-      <a class="tochead nav" style="display: none" href="#toc">❦</a>
-      <a name="toc"></a>
-      <h4 class="toctitle">Contents</h4>
-      <div class="tocbody">
-      <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#Schemas+and+Types">Schemas and Types</a></div></li><li><div><a href="#Code+generation">Code generation</a></div></li><li><div><a href="#JSON+codec+generation">JSON codec generation</a></div></li> </ol></div></div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband is a description language for your datatypes and APIs,
+        <div class="container-fluid contentswrapper h-100">
+          <div class="row minh-100">
+          <div class="col-md-4 col-xl-3 leftcolumn">&nbsp;</div><div class="col-md-8 col-xs-9">
+                  <div class="rightcolumn contents">
+                    <div class="tocwrapper">
+        
+        <div class="tocbody show" id="toc">
+        <h4 class="toctitle">Contents</h4>
+        <div><a href="#Contraband">Contraband</a></div><ol class="toc"> <li><div><a href="#Schemas+and+Types">Schemas and Types</a></div></li><li><div><a href="#Code+generation">Code generation</a></div></li><li><div><a href="#JSON+codec+generation">JSON codec generation</a></div></li> </ol></div>
+      </div><h1 id="Contraband">Contraband<a href="#Contraband" class="header-link"><span class="header-link-content">&nbsp;</span></a></h1><p>Contraband is a description language for your datatypes and APIs,
 currently targeting Java and Scala.
 </p><p>You describe the types and fields of your API,
 and Contraband will:
@@ -148,6 +141,7 @@ type Character {
 type as a list, which indicates that this field will
 return a list of that type. In the schema language,
 this is denoted by wrapping the type in square brackets, <code>[</code> and <code>]</code>.
+</p><h3 id="Map+type">Map type<a href="#Map+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Contraband allows to use <code>StringStringMap</code> type, which translates to <code>scala.collection.immutable.Map[String, String]</code>.
 </p><h3 id="Lazy+type">Lazy type<a href="#Lazy+type" class="header-link"><span class="header-link-content">&nbsp;</span></a></h3><p>Lazy types defer the initialization of the field until it is first used.
 In the schema language,
 this is denoted by the keyword <code>lazy</code>.
@@ -228,7 +222,7 @@ type Person {
 }
 </code></pre><p>This schema will produce the following Scala class:
 </p><pre><code class="prettyprint lang-scala">/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -236,10 +230,10 @@ package com.example
 final class Person private (
   val name: String,
   val age: Option[Int]) extends Serializable {
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
     case x: Person =&gt; (this.name == x.name) &amp;&amp; (this.age == x.age)
     case _ =&gt; false
-  }
+  })
   override def hashCode: Int = {
     37 * (37 * (17 + name.##) + age.##)
   }
@@ -270,13 +264,13 @@ which cannot evolve in a binary compatible way.
 &gt; x.withAge(21)
 </code></pre><p>Here’s the Java code it generates (after changing the target annotation to <code>Java</code>):
 </p><pre><code class="prettyprint lang-java">/**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-    
+
     public static Person create(String _name, java.util.Optional&lt;Integer&gt; _age) {
         return new Person(_name, _age);
     }
@@ -289,7 +283,7 @@ public final class Person implements java.io.Serializable {
     public static Person of(String _name, int _age) {
         return new Person(_name, _age);
     }
-    
+
     private String name;
     private java.util.Optional&lt;Integer&gt; age;
     protected Person(String _name, java.util.Optional&lt;Integer&gt; _age) {
@@ -387,13 +381,15 @@ scala&gt; assert(p == q)
   field: Int
 }
 </code></pre>
-          </div>
+                  </div>
+                </div>
+          </div> <!-- row -->
         </div>
         <div class="header">
-          <div class="container">
-        <div class="span-16 prepend-1 append-1">
-          <div class="span-16 top nav">
-            <div class="span-16 title">
+          <div class="container-fluid top nav">
+        <div class="row justify-content-md-center w-100">
+          <div class="col-md-auto">
+            <div class="title">
               <span>Contraband</span> — Combined Pages
             </div>
           </div>

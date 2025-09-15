@@ -300,7 +300,7 @@ type Person {
 
 ```scala
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
@@ -351,13 +351,13 @@ Java のコード生成は以下のようになっている (target アノテー
 
 ```java
 /**
- * This code is generated using [[http://www.scala-sbt.org/contraband/ sbt-contraband]].
+ * This code is generated using [[https://www.scala-sbt.org/contraband]].
  */
 
 // DO NOT EDIT MANUALLY
 package com.example;
 public final class Person implements java.io.Serializable {
-    
+
     public static Person create(String _name, java.util.Optional<Integer> _age) {
         return new Person(_name, _age);
     }
@@ -370,7 +370,7 @@ public final class Person implements java.io.Serializable {
     public static Person of(String _name, int _age) {
         return new Person(_name, _age);
     }
-    
+
     private String name;
     private java.util.Optional<Integer> age;
     protected Person(String _name, java.util.Optional<Integer> _age) {
