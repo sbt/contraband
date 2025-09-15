@@ -80,7 +80,7 @@ class ScalaCodeGen(
       toDoc(a.comments) match {
         case Nil        => Nil
         case doc :: Nil => s"@param ${a.name} $doc" :: Nil
-        case docs =>
+        case docs       =>
           val prefix = s"@param ${a.name} "
           docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
       }
@@ -167,7 +167,7 @@ class ScalaCodeGen(
   private def genDoc(doc: List[String]) = doc match {
     case Nil      => ""
     case l :: Nil => s"/** $l */"
-    case lines =>
+    case lines    =>
       val doc = lines map (l => s" * $l") mkString EOL
       s"""/**
          |$doc
@@ -442,7 +442,7 @@ class ScalaCodeGen(
         toDoc(a.comments) match {
           case Nil        => Nil
           case doc :: Nil => s"@param ${a.name} $doc" :: Nil
-          case docs =>
+          case docs       =>
             val prefix = s"@param ${a.name} "
             docs.mkString(prefix, EOL + " " * (prefix.length + 3), "") :: Nil
         }

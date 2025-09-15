@@ -282,7 +282,7 @@ class CodecCodeGen(
   private def getRequiredFormats(s: Document, d: TypeDefinition): List[String] = {
     val typeFormats =
       d match {
-        case _: EnumTypeDefinition => Nil
+        case _: EnumTypeDefinition   => Nil
         case c: RecordLikeDefinition =>
           c.fields flatMap { f =>
             // if the field type is d, we don't need additional codec
