@@ -17,13 +17,13 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
       code.head._2.stripSpace,
       """package com.example
         |/** Example of an enumeration */
-        |sealed abstract class EnumExample extends Serializable
+        |enum EnumExample {
+        |  /** First symbol */
+        |  case First
+        |  case Second
+        |}
         |object EnumExample {
         |  // Some extra code
-        |  /** First symbol */
-        |  case object First extends EnumExample
-        |
-        |  case object Second extends EnumExample
         |}""".stripMargin.stripSpace
     )
   }
@@ -398,6 +398,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
       scalaPrivateConstructor = true,
       wrapOption = true,
       scalaVersion = scalaVersion,
+      scala3enum = true
     )
   val javaLazy = "com.example.Lazy"
   val outputFile = new File("output.scala")
