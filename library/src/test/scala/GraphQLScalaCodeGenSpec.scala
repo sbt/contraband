@@ -52,7 +52,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  override def toString: String = {
         |    "TypeExample(" + field + ")"
         |  }
-        |  private def copy(field: Option[java.net.URL] = field): TypeExample = {
+        |  private def copy(field: Option[java.net.URL]): TypeExample = {
         |    new TypeExample(field)
         |  }
         |  def withField(field: Option[java.net.URL]): TypeExample = {
@@ -92,7 +92,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  override def toString: String = {
         |    "TypeExample(" + field + ")"
         |  }
-        |  private def copy(field: Option[java.net.URL] = field): TypeExample = {
+        |  private def copy(field: Option[java.net.URL]): TypeExample = {
         |    new TypeExample(field)
         |  }
         |  def withField(field: Option[java.net.URL]): TypeExample = {
@@ -129,7 +129,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  override def toString: String = {
         |    "TypeExample(" + field + ")"
         |  }
-        |  private def copy(field: scala.collection.immutable.Map[String, String] = field): TypeExample = {
+        |  private def copy(field: scala.collection.immutable.Map[String, String]): TypeExample = {
         |    new TypeExample(field)
         |  }
         |  def withField(field: scala.collection.immutable.Map[String, String]): TypeExample = {
@@ -163,7 +163,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  override def toString: String = {
         |    "Growable(" + field + ")"
         |  }
-        |  private def copy(field: Option[Int] = field): Growable = {
+        |  private def copy(field: Option[Int]): Growable = {
         |    new Growable(field)
         |  }
         |  def withField(field: Option[Int]): Growable = {
@@ -249,7 +249,7 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |  override def toString: String = {
         |    "ModifierExample(" + field + ")"
         |  }
-        |  private def copy(field: Int = field): ModifierExample = {
+        |  private def copy(field: Int): ModifierExample = {
         |    new ModifierExample(field)
         |  }
         |  def withField(field: Int): ModifierExample = {
