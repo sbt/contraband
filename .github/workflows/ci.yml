@@ -15,7 +15,7 @@ jobs:
           - jobtype: 3
           - jobtype: 4
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Setup JDK
       uses: actions/setup-java@v5
       with:
@@ -44,7 +44,7 @@ jobs:
       with:
         java-version: 8
         distribution: adopt
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - uses: sbt/setup-sbt@v1
     - run: sbt makeSite
     - name: Push to gh-pages

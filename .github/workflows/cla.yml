@@ -4,7 +4,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Check CLA
       uses: scala/cla-checker@v1
       with:
