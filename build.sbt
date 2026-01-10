@@ -75,7 +75,7 @@ lazy val plugin = (project in file("plugin"))
     scriptedSbt := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.10.7"
-        case _      => "2.0.0-RC6"
+        case _      => "2.0.0-RC8"
       }
     },
     publishLocal := (publishLocal dependsOn (library / publishLocal)).value,
