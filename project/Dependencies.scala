@@ -4,7 +4,7 @@ import Keys.*
 object Dependencies {
   val scala212 = "2.12.20"
   val scala213 = "2.13.15"
-  val scala3 = "3.7.3"
+  val scala3 = "3.8.2"
 
   val sjsonNewScalaJson = "com.eed3si9n" %% "sjson-new-scalajson" % "0.10.0"
   val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
