@@ -37,6 +37,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public type field() {
         |        return this.field;
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -47,9 +48,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "simpleInterfaceExample".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "custom";
         |    }
@@ -73,6 +76,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public int field() {
         |        return this.field;
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -83,9 +87,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return (this.field() == o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "oneChildInterfaceExample".hashCode()) + Integer.hashCode(field()));
         |    }
+        |    @Override
         |    public String toString() {
         |        return "oneChildInterfaceExample("  + "field: " + field() + ")";
         |    }
@@ -112,6 +118,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public childRecord withX(int x) {
         |        return new childRecord(field(), x);
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -122,9 +129,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |            return (this.field() == o.field()) && (this.x() == o.x());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (37 * (17 + "childRecord".hashCode()) + Integer.hashCode(field())) + Integer.hashCode(x()));
         |    }
+        |    @Override
         |    public String toString() {
         |        return "childRecord("  + "field: " + field() + ", " + "x: " + x() + ")";
         |    }
@@ -144,6 +153,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    protected nestedProtocolExample() {
             |        super();
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -154,9 +164,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return true;
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (17 + "nestedProtocolExample".hashCode());
             |    }
+            |    @Override
             |    public String toString() {
             |        return "nestedProtocolExample("  + ")";
             |    }
@@ -166,6 +178,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    protected nestedProtocol() {
             |        super();
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -176,9 +189,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return true;
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (17 + "nestedProtocol".hashCode());
             |    }
+            |    @Override
             |    public String toString() {
             |        return "nestedProtocol("  + ")";
             |    }
@@ -194,6 +209,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    protected ChildRecord() {
             |        super();
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -204,9 +220,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return true;
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (17 + "ChildRecord".hashCode());
             |    }
+            |    @Override
             |    public String toString() {
             |        return "ChildRecord("  + ")";
             |    }
@@ -240,6 +258,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |     * @param arg1 This argument is not important, so it gets single line doc.
             |     */
             |    public abstract int[] messageExample(com.example.MyLazy<int[]> arg0,boolean arg1);
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -250,9 +269,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return (this.field() == o.field());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (17 + "generateArgDocExample".hashCode()) + Integer.hashCode(field()));
             |    }
+            |    @Override
             |    public String toString() {
             |        return "generateArgDocExample("  + "field: " + field() + ")";
             |    }
@@ -289,6 +310,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public simpleRecordExample withField(java.net.URL field) {
             |        return new simpleRecordExample(field);
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -299,9 +321,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return this.field().equals(o.field());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (17 + "simpleRecordExample".hashCode()) + field().hashCode());
             |    }
+            |    @Override
             |    public String toString() {
             |        return "simpleRecordExample("  + "field: " + field() + ")";
             |    }
@@ -345,6 +369,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public growableAddOneField withField(int field) {
             |        return new growableAddOneField(field);
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -355,9 +380,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return (this.field() == o.field());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (17 + "growableAddOneField".hashCode()) + Integer.hashCode(field()));
             |    }
+            |    @Override
             |    public String toString() {
             |        return "growableAddOneField("  + "field: " + field() + ")";
             |    }
@@ -446,6 +473,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public Foo withY(int[] y) {
             |        return new Foo(x, y);
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -456,9 +484,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return this.x().equals(o.x()) && java.util.Arrays.equals(this.y(), o.y());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (37 * (17 + "Foo".hashCode()) + x().hashCode()) + java.util.Arrays.hashCode(y()));
             |    }
+            |    @Override
             |    public String toString() {
             |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
             |    }
@@ -502,6 +532,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
     public primitiveTypesExample2 withBigBoolean(boolean bigBoolean) {
         return new primitiveTypesExample2(smallBoolean, bigBoolean);
     }
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -512,9 +543,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             return (this.smallBoolean() == o.smallBoolean()) && (this.bigBoolean() == o.bigBoolean());
         }
     }
+    @Override
     public int hashCode() {
         return 37 * (37 * (37 * (17 + "primitiveTypesExample2".hashCode()) + Boolean.hashCode(smallBoolean())) + Boolean.hashCode(bigBoolean()));
     }
+    @Override
     public String toString() {
         return "primitiveTypesExample2("  + "smallBoolean: " + smallBoolean() + ", " + "bigBoolean: " + bigBoolean() + ")";
     }
@@ -549,6 +582,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public modifierExample withField(int field) {
             |        return new modifierExample(field);
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -559,9 +593,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return (this.field() == o.field());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (17 + "modifierExample".hashCode()) + Integer.hashCode(field()));
             |    }
+            |    @Override
             |    public String toString() {
             |        return "modifierExample("  + "field: " + field() + ")";
             |    }
@@ -655,12 +691,15 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
         |    public primitiveTypesExample withLazyOptionInteger(com.example.MyLazy<Integer> lazyOptionInteger) {
         |        return new primitiveTypesExample(simpleInteger, lazyInteger, arrayInteger, optionInteger, lazyArrayInteger, java.util.Optional.<Integer>ofNullable(lazyOptionInteger));
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
         |    }
+        |    @Override
         |    public String toString() {
         |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
         |    }
@@ -703,6 +742,7 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |    public primitiveTypesNoLazyExample withArrayInteger(int[] arrayInteger) {
             |        return new primitiveTypesNoLazyExample(simpleInteger, arrayInteger);
             |    }
+            |    @Override
             |    public boolean equals(Object obj) {
             |        if (this == obj) {
             |            return true;
@@ -713,9 +753,11 @@ class JsonJavaCodeGenSpec extends GCodeGenSpec("Java") {
             |            return (this.simpleInteger() == o.simpleInteger()) && java.util.Arrays.equals(this.arrayInteger(), o.arrayInteger());
             |        }
             |    }
+            |    @Override
             |    public int hashCode() {
             |        return 37 * (37 * (37 * (17 + "primitiveTypesNoLazyExample".hashCode()) + Integer.hashCode(simpleInteger())) + java.util.Arrays.hashCode(arrayInteger()));
             |    }
+            |    @Override
             |    public String toString() {
             |        return "primitiveTypesNoLazyExample("  + "simpleInteger: " + simpleInteger() + ", " + "arrayInteger: " + arrayInteger() + ")";
             |    }
