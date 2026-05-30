@@ -29,13 +29,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |sealed abstract class simpleInterfaceExample(
         |  val field: type) extends Interface1 with Interface2 with Serializable {
         |  // Some extra code...
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: simpleInterfaceExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "simpleInterfaceExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    return "custom";
         |  }
@@ -54,13 +47,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
     code.head._2.unindent should equalLines("""/** example of interface */
         |sealed abstract class oneChildInterfaceExample(
         |    val field: Int) extends Serializable {
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: oneChildInterfaceExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "oneChildInterfaceExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    "oneChildInterfaceExample(" + field + ")"
         |  }
@@ -104,13 +90,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
 
     code.head._2.unindent should equalLines("""/** example of nested protocols */
         |sealed abstract class nestedProtocolExample() extends Serializable {
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case _: nestedProtocolExample => true
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (17 + "nestedProtocolExample".##)
-        |  }
         |  override def toString: String = {
         |    "nestedProtocolExample()"
         |  }
@@ -119,13 +98,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |}
         |
         |sealed abstract class nestedProtocol() extends nestedProtocolExample() with Serializable {
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case _: nestedProtocol => true
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (17 + "nestedProtocol".##)
-        |  }
         |  override def toString: String = {
         |    "nestedProtocol()"
         |  }
@@ -166,13 +138,6 @@ class JsonScalaCodeGenSpec extends GCodeGenSpec("Scala") {
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
         |  def messageExample(arg0: => Vector[Int], arg1: Boolean): Vector[Int]
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: generateArgDocExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "generateArgDocExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    "generateArgDocExample(" + field + ")"
         |  }

@@ -440,13 +440,6 @@ sealed abstract class Greetings(
    */
   lazy val message: String = _message
 
-  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-    case _: Greetings => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
-    case _ => false
-  })
-  override def hashCode: Int = {
-    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
-  }
   override def toString: String = {
     super.toString // Avoid evaluating lazy members in toString to avoid circularity.
   }
@@ -497,13 +490,6 @@ sealed abstract class GreetingExtra(
   def this(message: => String, extra: Vector[String]) = this(message, new com.example.GreetingHeader(new java.util.Date(), "Unknown"), extra)
 
 
-  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-    case _: GreetingExtra => super.equals(o) // We have lazy members, so use object identity to avoid circularity.
-    case _ => false
-  })
-  override def hashCode: Int = {
-    super.hashCode // Avoid evaluating lazy members in hashCode to avoid circularity.
-  }
   override def toString: String = {
     return "Welcome, extra!";
   }

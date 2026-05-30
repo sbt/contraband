@@ -176,8 +176,6 @@ class ScalaCodeGen(
          |  $alternativeCtors
          |  $lazyMembers
          |  $messages
-         |  ${genEquals(i, intfLang)}
-         |  ${genHashCode(i, intfLang)}
          |  ${genToString(i, toStringImpl)}
          |}
          |

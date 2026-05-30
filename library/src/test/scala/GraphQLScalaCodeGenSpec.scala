@@ -273,13 +273,6 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |sealed abstract class InterfaceExample(
         |val field: Option[Int]) extends Serializable {
         |  // Some extra code
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: InterfaceExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "com.example.InterfaceExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    "InterfaceExample(" + field + ")"
         |  }
@@ -339,13 +332,6 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |   * @param arg1 This argument is not important, so it gets single line doc.
         |   */
         |  def messageExample(arg0: => Vector[Int], arg1: Option[Boolean]): Vector[Int]
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: IntfExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "com.example.IntfExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    "IntfExample(" + field + ")"
         |  }
@@ -367,13 +353,6 @@ object GraphQLScalaCodeGenSpec extends BasicTestSuite with EqualLines {
         |sealed abstract class IntfExample(
         |  val field: Option[Int]) extends Interface1 with Interface2 with Serializable {
         |  // Some extra code...
-        |  override def equals(o: Any): Boolean = this.eq(o.asInstanceOf[AnyRef]) || (o match {
-        |    case x: IntfExample => (this.field == x.field)
-        |    case _ => false
-        |  })
-        |  override def hashCode: Int = {
-        |    37 * (37 * (17 + "com.example.IntfExample".##) + field.##)
-        |  }
         |  override def toString: String = {
         |    return "custom";
         |  }
