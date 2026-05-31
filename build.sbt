@@ -17,17 +17,20 @@ ThisBuild / developers := List(
 ThisBuild / description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
 Global / semanticdbEnabled := true
 Global / semanticdbVersion := "4.10.1"
-ThisBuild / scalacOptions ++= {
-  scalaBinaryVersion.value match {
-    case "2.12" =>
-      Seq("-Xsource:3")
-    case "2.13" =>
-      Seq("-Xsource:3-cross")
-    case _ =>
-      Nil
-  }
-}
 ThisBuild / publishMavenStyle := true
+
+val commonSettings = Def.settings(
+  scalacOptions ++= {
+    scalaBinaryVersion.value match {
+      case "2.12" =>
+        Seq("-Xsource:3")
+      case "2.13" =>
+        Seq("-Xsource:3-cross")
+      case _ =>
+        Nil
+    }
+  }
+)
 
 lazy val root = (project in file("."))
   .enablePlugins(ContrabandSitePlugin)
@@ -41,6 +44,7 @@ lazy val root = (project in file("."))
 lazy val library = (project in file("library"))
   .enablePlugins(KeywordPlugin, SonatypePublish)
   .settings(
+    commonSettings,
     name := "contraband",
     Compile / unmanagedSourceDirectories += {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -58,6 +62,7 @@ lazy val plugin = (project in file("plugin"))
   .enablePlugins(SbtPlugin, SonatypePublish)
   .dependsOn(library)
   .settings(
+    commonSettings,
     name := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
     scriptedLaunchOpts := {
