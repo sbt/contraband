@@ -66,6 +66,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public TypeExample withField(java.net.URL field) {
         |        return new TypeExample(java.util.Optional.<java.net.URL>ofNullable(field));
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -76,9 +77,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "com.example.TypeExample".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "TypeExample("  + "field: " + field() + ")";
         |    }
@@ -127,6 +130,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public TypeExample withField(java.net.URL field) {
         |        return new TypeExample(java.util.Optional.<java.net.URL>ofNullable(field));
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -137,9 +141,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "com.example.TypeExample".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "TypeExample("  + "field: " + field() + ")";
         |    }
@@ -196,6 +202,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public Growable withField(int field) {
         |        return new Growable(java.util.Optional.<Integer>ofNullable(field));
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -206,9 +213,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "com.example.Growable".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "Growable("  + "field: " + field() + ")";
         |    }
@@ -297,6 +306,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public Foo withY(int[] y) {
         |        return new Foo(x, y);
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -307,9 +317,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.x().equals(o.x()) && java.util.Arrays.equals(this.y(), o.y());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (37 * (17 + "com.example.Foo".hashCode()) + x().hashCode()) + java.util.Arrays.hashCode(y()));
         |    }
+        |    @Override
         |    public String toString() {
         |        return "Foo("  + "x: " + x() + ", " + "y: " + y() + ")";
         |    }
@@ -342,6 +354,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public java.util.Optional<Integer> field() {
         |        return this.field;
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -352,9 +365,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "com.example.InterfaceExample".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "InterfaceExample("  + "field: " + field() + ")";
         |    }
@@ -400,6 +415,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |    public ChildType withField(int field) {
         |        return new ChildType(name, java.util.Optional.<Integer>ofNullable(field));
         |    }
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -410,9 +426,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.name().equals(o.name()) && this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (37 * (17 + "com.example.ChildType".hashCode()) + name().hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "ChildType("  + "name: " + name() + ", " + "field: " + field() + ")";
         |    }
@@ -448,6 +466,7 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |     * @param arg1 This argument is not important, so it gets single line doc.
         |     */
         |    public abstract int[] messageExample(com.example.MyLazy<int[]> arg0,java.util.Optional<Boolean> arg1);
+        |    @Override
         |    public boolean equals(Object obj) {
         |        if (this == obj) {
         |            return true;
@@ -458,9 +477,11 @@ object GraphQLJavaCodeGenSpec extends BasicTestSuite with EqualLines {
         |            return this.field().equals(o.field());
         |        }
         |    }
+        |    @Override
         |    public int hashCode() {
         |        return 37 * (37 * (17 + "com.example.IntfExample".hashCode()) + field().hashCode());
         |    }
+        |    @Override
         |    public String toString() {
         |        return "IntfExample("  + "field: " + field() + ")";
         |    }

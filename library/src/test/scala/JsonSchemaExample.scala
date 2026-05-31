@@ -696,14 +696,17 @@ object PriorityLevel {
           |        return new GreetingHeader(created, priority, author);
           |    }
           |
+          |    @Override
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
           |
+          |    @Override
           |    public int hashCode() {
           |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
+          |    @Override
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
@@ -755,12 +758,15 @@ object PriorityLevel {
           |    public GreetingWithAttachments withAttachments(java.io.File[] attachments) {
           |        return new GreetingWithAttachments(new com.example.MyLazy<String>() { public String get() { return message(); } }, header(), attachments);
           |    }
+          |    @Override
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
+          |    @Override
           |    public int hashCode() {
           |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
+          |    @Override
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
@@ -782,12 +788,15 @@ public abstract class GreetingExtra extends com.example.Greetings implements jav
         return this.extra;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return this == obj; // We have lazy members, so use object identity to avoid circularity.
     }
+    @Override
     public int hashCode() {
         return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
     }
+    @Override
     public String toString() {
         return "Welcome, extra!";
     }
@@ -832,12 +841,15 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra implement
     public GreetingExtraImpl withX(String x) {
         return new GreetingExtraImpl(new com.example.MyLazy<String>() { public String get() { return message(); } }, header(), extra(), x);
     }
+    @Override
     public boolean equals(Object obj) {
         return this == obj; // We have lazy members, so use object identity to avoid circularity.
     }
+    @Override
     public int hashCode() {
         return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
     }
+    @Override
     public String toString() {
         return "Welcome, extra implosion!";
     }
@@ -875,14 +887,17 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra implement
           |        return this.header;
           |    }
           |
+          |    @Override
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
           |
+          |    @Override
           |    public int hashCode() {
           |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
+          |    @Override
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }
@@ -919,14 +934,17 @@ public final class GreetingExtraImpl extends com.example.GreetingExtra implement
           |        return new SimpleGreeting(new com.example.MyLazy<String>() { public String get() { return message(); } }, header);
           |    }
           |
+          |    @Override
           |    public boolean equals(Object obj) {
           |        return this == obj; // We have lazy members, so use object identity to avoid circularity.
           |    }
           |
+          |    @Override
           |    public int hashCode() {
           |        return super.hashCode(); // Avoid evaluating lazy members in hashCode to avoid circularity.
           |    }
           |
+          |    @Override
           |    public String toString() {
           |        return super.toString(); // Avoid evaluating lazy members in toString to avoid circularity.
           |    }

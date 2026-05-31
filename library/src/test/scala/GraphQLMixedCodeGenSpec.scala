@@ -64,6 +64,7 @@ public abstract class Greeting implements java.io.Serializable {
         return this.s;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -74,9 +75,11 @@ public abstract class Greeting implements java.io.Serializable {
             return this.message().equals(o.message()) && this.s().equals(o.s());
         }
     }
+    @Override
     public int hashCode() {
         return 37 * (37 * (37 * (17 + "com.example.Greeting".hashCode()) + message().hashCode()) + s().hashCode());
     }
+    @Override
     public String toString() {
         return "Greeting("  + "message: " + message() + ", " + "s: " + s() + ")";
     }

@@ -368,7 +368,8 @@ class JavaCodeGen(
            |}""".stripMargin
       }
 
-    s"""public boolean equals(Object obj) {
+    s"""@Override
+       |public boolean equals(Object obj) {
        |    $body
        |}""".stripMargin
   }
@@ -392,7 +393,8 @@ class JavaCodeGen(
         s"return $computation;"
       }
 
-    s"""public int hashCode() {
+    s"""@Override
+       |public int hashCode() {
        |    $body
        |}""".stripMargin
   }
@@ -415,7 +417,8 @@ class JavaCodeGen(
       }
     } else toString mkString s"$EOL    "
 
-    s"""public String toString() {
+    s"""@Override
+       |public String toString() {
        |    $body
        |}""".stripMargin
   }
