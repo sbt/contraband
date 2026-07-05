@@ -7,7 +7,7 @@ object Dependencies {
   val scala3 = "3.8.4"
 
   val sjsonNewScalaJson = "com.eed3si9n" %% "sjson-new-scalajson" % "0.10.0"
-  val scalaTest = "org.scalatest" %% "scalatest" % "3.2.19"
+  val scalaTest = "org.scalatest" %% "scalatest" % "3.2.20"
   val parboiled = "org.parboiled" %% "parboiled" % "2.5.1"
   val diffutils = "com.googlecode.java-diff-utils" % "diffutils" % "1.3.0"
   val verify = "com.eed3si9n.verify" %% "verify" % "1.0.0"
