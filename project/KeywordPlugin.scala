@@ -5,16 +5,17 @@ object KeywordPlugin extends AutoPlugin {
   override val requires = plugins.JvmPlugin
 
   lazy val scalaKeywords = TaskKey[Set[String]]("scala-keywords")
+  @transient
   lazy val generateKeywords = TaskKey[File]("generateKeywords")
 
   private val scala3keywords = Seq("enum", "export", "given", "then")
 
   def getScalaKeywords: Set[String] = {
-    val g = new scala.tools.nsc.Global(new scala.tools.nsc.Settings)
-    g.nme.keywords.map(_.toString) ++ scala3keywords
+    val g = dotty.tools.dotc.core.StdNames
+    g.nme.keywords.map(_.toString).toSet ++ scala3keywords
   }
   def writeScalaKeywords(base: File, keywords: Set[String]): File = {
-    val init = keywords.toList.sortBy(identity).map(tn => '"' + tn + '"').mkString("Set(", ", ", ")")
+    val init = keywords.toList.sortBy(identity).map(tn => "\"" + tn + "\"").mkString("Set(", ", ", ")")
     val objectName = "ScalaKeywords"
     val packageName = "sbt.contraband"
     val keywordsSrc =

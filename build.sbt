@@ -5,14 +5,14 @@ ThisBuild / organization := "org.scala-sbt"
 ThisBuild / crossScalaVersions := Seq(scala213, scala212, scala3)
 ThisBuild / scalaVersion := scala212
 ThisBuild / organizationName := "sbt"
-ThisBuild / organizationHomepage := Some(url("http://scala-sbt.org/"))
-ThisBuild / homepage := Some(url("http://scala-sbt.org/contraband"))
+ThisBuild / organizationHomepage := Some(uri("http://scala-sbt.org/"))
+ThisBuild / homepage := Some(uri("http://scala-sbt.org/contraband"))
 ThisBuild / licenses += License.Apache2
-ThisBuild / scmInfo := Some(ScmInfo(url("https://github.com/sbt/contraband"), "git@github.com:sbt/contraband.git"))
+ThisBuild / scmInfo := Some(ScmInfo(uri("https://github.com/sbt/contraband"), "git@github.com:sbt/contraband.git"))
 ThisBuild / developers := List(
-  Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", url("https://github.com/eed3si9n")),
-  Developer("dwijnand", "Dale Wijnand", "@dwijnand", url("https://github.com/dwijnand")),
-  Developer("Duhemm", "Martin Duhem", "@Duhemm", url("https://github.com/Duhemm"))
+  Developer("eed3si9n", "Eugene Yokota", "@eed3si9n", uri("https://github.com/eed3si9n")),
+  Developer("dwijnand", "Dale Wijnand", "@dwijnand", uri("https://github.com/dwijnand")),
+  Developer("Duhemm", "Martin Duhem", "@Duhemm", uri("https://github.com/Duhemm"))
 )
 ThisBuild / description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
 Global / semanticdbEnabled := true
@@ -20,6 +20,14 @@ Global / semanticdbVersion := "4.10.1"
 ThisBuild / publishMavenStyle := true
 
 val commonSettings = Def.settings(
+  scalacOptions ++= {
+    scalaBinaryVersion.value match {
+      case "2.12" | "2.13" =>
+        Seq("-release:8")
+      case "3" =>
+        Nil
+    }
+  },
   scalacOptions ++= {
     scalaBinaryVersion.value match {
       case "2.12" =>
@@ -32,9 +40,9 @@ val commonSettings = Def.settings(
   }
 )
 
-lazy val root = (project in file("."))
+lazy val root = rootProject
   .enablePlugins(ContrabandSitePlugin)
-  .aggregate(library, plugin)
+  .autoAggregate
   .settings(
     name := "contraband root",
     publish / skip := true,
@@ -83,5 +91,5 @@ lazy val plugin = (project in file("plugin"))
         case _      => "2.0.0"
       }
     },
-    publishLocal := (publishLocal dependsOn (library / publishLocal)).value,
+    publishLocal := (publishLocal.dependsOn(library / publishLocal)).value,
   )

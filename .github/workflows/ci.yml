@@ -16,16 +16,8 @@ jobs:
           - jobtype: 4
     steps:
     - uses: actions/checkout@v7
-    - name: Setup JDK 8
-      uses: actions/setup-java@v5
-      if: ${{ matrix.jobtype != 3 }}
-      with:
-        distribution: temurin
-        java-version: 8
-        cache: sbt
     - name: Setup JDK 17
       uses: actions/setup-java@v5
-      if: ${{ matrix.jobtype == 3 }}
       with:
         distribution: temurin
         java-version: 17
@@ -33,16 +25,16 @@ jobs:
     - uses: sbt/setup-sbt@v1
     - if: ${{ matrix.jobtype == 1 }}
       shell: bash
-      run: sbt -v "++2.13.x" library/test
+      run: sbt -v "++2.13.x ; library/test"
     - if: ${{ matrix.jobtype == 2 }}
       shell: bash
-      run: sbt -v "++2.12.x" test scripted
+      run: sbt -v "++2.12.x ; test ; scripted"
     - if: ${{ matrix.jobtype == 3 }}
       shell: bash
-      run: sbt -v "++3.x" test scripted
+      run: sbt -v "++3.x ; test ; scripted"
     - if: ${{ matrix.jobtype == 4 }}
       shell: bash
-      run: sbt -v "++2.12.x" scalafmtSbtCheck scalafmtCheckAll
+      run: sbt -v "++2.12.x ; scalafmtSbtCheck ; scalafmtCheckAll"
   push_gh_pages:
     needs: test
     timeout-minutes: 30
@@ -50,7 +42,7 @@ jobs:
     steps:
     - uses: actions/setup-java@v5
       with:
-        java-version: 8
+        java-version: 17
         distribution: adopt
     - uses: actions/checkout@v7
     - uses: sbt/setup-sbt@v1
