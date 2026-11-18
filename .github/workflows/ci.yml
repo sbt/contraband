@@ -11,16 +11,24 @@ jobs:
       matrix:
         include:
           - jobtype: 1
+            java: 17
           - jobtype: 2
+            java: 17
           - jobtype: 3
+            java: 17
+          - jobtype: 3
+            java: 21
+          - jobtype: 3
+            java: 25
           - jobtype: 4
+            java: 17
     steps:
     - uses: actions/checkout@v7
-    - name: Setup JDK 17
+    - name: Setup JDK
       uses: actions/setup-java@v6
       with:
         distribution: temurin
-        java-version: 17
+        java-version: ${{ matrix.java }}
         cache: sbt
     - uses: sbt/setup-sbt@v1
     - if: ${{ matrix.jobtype == 1 }}
