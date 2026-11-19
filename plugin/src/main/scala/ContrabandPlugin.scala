@@ -139,10 +139,10 @@ object Generate {
       scala3enum: Boolean
   ): Seq[File] = {
     val jsonFiles = definitions.toList collect {
-      case f: File if f.getName endsWith ".json" => f
+      case f: File if f.getName `endsWith` ".json" => f
     }
     val contraFiles = definitions.toList collect {
-      case f: File if (f.getName endsWith ".contra") || (f.getName endsWith ".gql") => f
+      case f: File if (f.getName `endsWith` ".contra") || (f.getName `endsWith` ".gql") => f
     }
     val input =
       (jsonFiles map { f => JsonParser.Document.parse(IO read f) }) ++

@@ -16,7 +16,7 @@ ThisBuild / developers := List(
 )
 ThisBuild / description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
 Global / semanticdbEnabled := true
-Global / semanticdbVersion := "4.10.1"
+Global / semanticdbVersion := "4.14.2"
 ThisBuild / publishMavenStyle := true
 
 val commonSettings = Def.settings(
@@ -54,6 +54,11 @@ lazy val library = (project in file("library"))
   .settings(
     commonSettings,
     name := "contraband",
+    crossScalaVersions := Seq(scala213, scala212, scala3),
+    scalaVersion := {
+      if ((LocalProject("plugin") / scalaBinaryVersion).value == "3") scala3
+      else scala212
+    },
     Compile / unmanagedSourceDirectories += {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, v)) if v <= 12 =>
@@ -77,18 +82,18 @@ lazy val plugin = (project in file("plugin"))
       scriptedLaunchOpts.value ++
         Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
     },
-    crossScalaVersions := Seq(scala212, scala3),
+    crossScalaVersions := Seq(scala212, scala3sbt),
     pluginCrossBuild / sbtVersion := {
       scalaBinaryVersion.value match {
         case "2.13" => "1.5.8"
         case "2.12" => "1.5.8" // set minimum sbt version
-        case _      => "2.0.0"
+        case _      => "2.1.0"
       }
     },
     scriptedSbt := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.10.7"
-        case _      => "2.0.0"
+        case "2.12" => "1.13.1"
+        case _      => "2.1.0"
       }
     },
     publishLocal := (publishLocal.dependsOn(library / publishLocal)).value,
