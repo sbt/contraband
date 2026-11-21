@@ -15,8 +15,6 @@ ThisBuild / developers := List(
   Developer("Duhemm", "Martin Duhem", "@Duhemm", uri("https://github.com/Duhemm"))
 )
 ThisBuild / description := "Contraband is a description language for your datatypes and APIs, currently targeting Java and Scala."
-Global / semanticdbEnabled := true
-Global / semanticdbVersion := "4.14.2"
 ThisBuild / publishMavenStyle := true
 
 val commonSettings = Def.settings(
